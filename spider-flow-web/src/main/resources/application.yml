@@ -1,5 +1,17 @@
 server:
   port: 8088
+  undertow:
+    io-threads: 8
+    worker-threads: 200
+    buffer-size: 16384
+    direct-buffers: true
+    record-request-start-time: true
+    accesslog:
+      enabled: true
+      dir: ./logs
+      pattern: '%t[%I] %{i,x_forwarded_for} "%{i,Referer}" "%{i,User-Agent}" %a "%r" %s %b (%D ms)'
+
+
 
 spider:
   workspace: E:/spider-spaces
