@@ -4,7 +4,10 @@ import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
+import org.spiderflow.core.http.TLSVersion;
+import org.spiderflow.core.utils.SSLHelper;
 
+import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -114,7 +117,16 @@ public class HttpRequest {
 
 	@SuppressWarnings("deprecation")
 	public HttpRequest validateTLSCertificates(boolean value) {
-		this.connection.validateTLSCertificates(value);
+		return this.validateTLSCertificates(value, null);
+	}
+
+	@SuppressWarnings("deprecation")
+	public HttpRequest validateTLSCertificates(boolean value, TLSVersion tlsVersion) {
+		//this.connection.validateTLSCertificates(value);
+		if (!value) {
+			SSLSocketFactory sslSocketFactory = SSLHelper.buildSSLSocketFactory(tlsVersion);
+			this.connection.sslSocketFactory(sslSocketFactory);
+		}
 		return this;
 	}
 
