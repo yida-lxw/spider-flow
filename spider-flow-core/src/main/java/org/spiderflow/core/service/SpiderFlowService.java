@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow> {
 
 	@Autowired
-	private SpiderFlowMapper sfMapper;
+	private SpiderFlowMapper spiderFlowMapper;
 
 	@Autowired
 	private SpiderJobManager spiderJobManager;
@@ -59,16 +59,16 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	@PostConstruct
 	private void initJobs() {
 		//清空所有任务下次执行时间
-		sfMapper.resetNextExecuteTime();
+		spiderFlowMapper.resetNextExecuteTime();
 		//获取启用corn的任务
-		List<SpiderFlow> spiderFlows = sfMapper.selectList(new QueryWrapper<SpiderFlow>().eq("enabled", "1"));
+		List<SpiderFlow> spiderFlows = spiderFlowMapper.selectList(new QueryWrapper<SpiderFlow>().eq("enabled", "1"));
 		if (spiderFlows != null && !spiderFlows.isEmpty()) {
 			for (SpiderFlow sf : spiderFlows) {
 				if (StringUtils.isNotEmpty(sf.getCron())) {
 					Date nextExecuteTimt = spiderJobManager.addJob(sf);
 					if (nextExecuteTimt != null) {
 						sf.setNextExecuteTime(nextExecuteTimt);
-						sfMapper.updateById(sf);
+						spiderFlowMapper.updateById(sf);
 					}
 				}
 			}
@@ -76,14 +76,14 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	}
 
 	public IPage<SpiderFlow> selectSpiderPage(Page<SpiderFlow> page, String name) {
-		return sfMapper.selectSpiderPage(page, name);
+		return spiderFlowMapper.selectSpiderPage(page, name);
 	}
 
 	public int executeCountIncrement(String id, Date lastExecuteTime, Date nextExecuteTime) {
 		if (nextExecuteTime == null) {
-			return sfMapper.executeCountIncrement(id, lastExecuteTime);
+			return spiderFlowMapper.executeCountIncrement(id, lastExecuteTime);
 		}
-		return sfMapper.executeCountIncrementAndExecuteTime(id, lastExecuteTime, nextExecuteTime);
+		return spiderFlowMapper.executeCountIncrementAndExecuteTime(id, lastExecuteTime, nextExecuteTime);
 
 	}
 
@@ -98,7 +98,7 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 				.withIdentity("Caclulate Next Execute Date")
 				.withSchedule(CronScheduleBuilder.cronSchedule(cron))
 				.build();
-		sfMapper.resetCornExpression(id, cron, trigger.getFireTimeAfter(null));
+		spiderFlowMapper.resetCornExpression(id, cron, trigger.getFireTimeAfter(null));
 		spiderJobManager.remove(id);
 		SpiderFlow spiderFlow = getById(id);
 		if ("1".equals(spiderFlow.getEnabled()) && StringUtils.isNotEmpty(spiderFlow.getCron())) {
@@ -117,7 +117,7 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 			spiderFlow.setNextExecuteTime(trigger.getStartTime());
 		}
 		if (StringUtils.isNotEmpty(spiderFlow.getId())) {    //update 任务
-			sfMapper.updateSpiderFlow(spiderFlow.getId(), spiderFlow.getName(), spiderFlow.getXml());
+			spiderFlowMapper.updateSpiderFlow(spiderFlow.getId(), spiderFlow.getName(), spiderFlow.getXml());
 			spiderJobManager.remove(spiderFlow.getId());
 			spiderFlow = getById(spiderFlow.getId());
 			if ("1".equals(spiderFlow.getEnabled()) && StringUtils.isNotEmpty(spiderFlow.getCron())) {
@@ -125,7 +125,7 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 			}
 		} else {//insert 任务
 			String id = UUID.randomUUID().toString().replace("-", "");
-			sfMapper.insertSpiderFlow(id, spiderFlow.getName(), spiderFlow.getXml());
+			spiderFlowMapper.insertSpiderFlow(id, spiderFlow.getName(), spiderFlow.getXml());
 			spiderFlow.setId(id);
 		}
 		File file = new File(workspace, spiderFlow.getId() + File.separator + "xmls" + File.separator + System.currentTimeMillis() + ".xml");
@@ -138,16 +138,16 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	}
 
 	public void stop(String id) {
-		sfMapper.resetSpiderStatus(id, "0");
-		sfMapper.resetNextExecuteTime(id);
+		spiderFlowMapper.resetSpiderStatus(id, "0");
+		spiderFlowMapper.resetNextExecuteTimeWithId(id);
 		spiderJobManager.remove(id);
 	}
 
 	public void copy(String id) {
 		// 复制ID
-		SpiderFlow spiderFlow = sfMapper.selectById(id);
+		SpiderFlow spiderFlow = spiderFlowMapper.selectById(id);
 		String new_id = UUID.randomUUID().toString().replace("-", "");
-		sfMapper.insertSpiderFlow(new_id, spiderFlow.getName() + "-copy", spiderFlow.getXml());
+		spiderFlowMapper.insertSpiderFlow(new_id, spiderFlow.getName() + "-copy", spiderFlow.getXml());
 	}
 
 	public void start(String id) {
@@ -156,8 +156,8 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 		Date nextExecuteTime = spiderJobManager.addJob(spiderFlow);
 		if (nextExecuteTime != null) {
 			spiderFlow.setNextExecuteTime(nextExecuteTime);
-			sfMapper.updateById(spiderFlow);
-			sfMapper.resetSpiderStatus(id, "1");
+			spiderFlowMapper.updateById(spiderFlow);
+			spiderFlowMapper.resetSpiderStatus(id, "1");
 		}
 	}
 
@@ -166,21 +166,21 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	}
 
 	public void resetExecuteCount(String id) {
-		sfMapper.resetExecuteCount(id);
+		spiderFlowMapper.resetExecuteCount(id);
 	}
 
 	public void remove(String id) {
-		sfMapper.deleteById(id);
+		spiderFlowMapper.deleteById(id);
 		spiderJobManager.remove(id);
 		flowNoticeMapper.deleteById(id);
 	}
 
 	public List<SpiderFlow> selectOtherFlows(String id) {
-		return sfMapper.selectOtherFlows(id);
+		return spiderFlowMapper.selectOtherFlows(id);
 	}
 
 	public List<SpiderFlow> selectFlows() {
-		return sfMapper.selectFlows();
+		return spiderFlowMapper.selectFlows();
 	}
 
 	/**
@@ -233,6 +233,6 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	}
 
 	public Integer getFlowMaxTaskId(String flowId) {
-		return sfMapper.getFlowMaxTaskId(flowId);
+		return spiderFlowMapper.getFlowMaxTaskId(flowId);
 	}
 }

@@ -55,7 +55,7 @@ public interface SpiderFlowMapper extends BaseMapper<SpiderFlow> {
 	int resetSpiderStatus(@Param("id") String id, @Param("enabled") String enabled);
 
 	@Update("update sp_flow set next_execute_time = null where id = #{id}")
-	int resetNextExecuteTime(@Param("id") String id);
+	int resetNextExecuteTimeWithId(@Param("id") String id);
 
 	@Update("update sp_flow set next_execute_time = null")
 	int resetNextExecuteTime();
