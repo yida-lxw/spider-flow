@@ -13,7 +13,7 @@ import java.util.Date;
 @TableName("sp_flow")
 public class SpiderFlow {
 
-	@TableId(type = IdType.UUID)
+	@TableId(type = IdType.ASSIGN_UUID)
 	private String id;
 
 	/**

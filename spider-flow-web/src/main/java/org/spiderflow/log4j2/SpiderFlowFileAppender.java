@@ -3,16 +3,9 @@ package org.spiderflow.log4j2;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.appender.AbstractOutputStreamAppender;
-import org.apache.logging.log4j.core.appender.FileManager;
 import org.apache.logging.log4j.core.config.Property;
-import org.spiderflow.context.SpiderContext;
-import org.spiderflow.context.SpiderContextHolder;
-import org.spiderflow.core.job.SpiderJobContext;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.Serializable;
 
 /**

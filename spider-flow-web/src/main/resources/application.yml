@@ -1,10 +1,13 @@
 server:
   port: 8088
   undertow:
-    io-threads: 8
-    worker-threads: 200
-    buffer-size: 16384
+    threads:
+      worker: 200
+      io: 8
+    buffer-size: 65536
+    eager-filter-init: true
     direct-buffers: true
+    max-http-post-size: 209715200
     record-request-start-time: true
     accesslog:
       enabled: true
