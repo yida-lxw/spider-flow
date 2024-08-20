@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>SpiderFlow-Editor</title>
+    <link rel="stylesheet" href="js/layui/css/layui.css"/>
+    <link rel="stylesheet" href="css/layui-blue.css"/>
+    <link rel="stylesheet" href="css/editor.css"/>
+    <link rel="stylesheet" href="js/codemirror/codemirror.css"/>
+    <link rel="stylesheet" href="js/codemirror/idea.css"/>
+    <link rel="stylesheet" href="js/codemirror/show-hint.css"/>
+    <link rel="stylesheet" href="js/jsontree/jsontree.css"/>
+    <script type="text/javascript" src="js/layui/layui.all.js"></script>
+    <script>mxBasePath = 'js/mxgraph';
+    $ = layui.$</script>
+    <script type="text/javascript" src="js/mxgraph/mxgraph.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <script type="text/javascript" src="js/spider-editor.js"></script>
+    <script type="text/javascript" src="js/canvas-viewer.js"></script>
+    <script type="text/javascript" src="js/codemirror/codemirror.js"></script>
+    <script type="text/javascript" src="js/codemirror/spiderflow.js"></script>
+    <script type="text/javascript" src="js/codemirror/placeholder.js"></script>
+    <script type="text/javascript" src="js/codemirror/sql.js"></script>
+    <script type="text/javascript" src="js/codemirror/show-hint.js"></script>
+    <script type="text/javascript" src="js/codemirror/spiderflow-hint.js"></script>
+    <script type="text/javascript" src="js/jsontree/jsontree.js"></script>
+    <script type="text/javascript" src="js/editor.js"></script>
+</head>
+<body>
+<div class="main-container">
+    <div class="toolbar-container">
+        <ul>
+            <li class="btn-return" title="返回列表"></li>
+            <span>|</span>
+            <li class="btn-save" title="保存（Ctrl+S）"></li>
+            <li class="btn-test" title="测试（Ctrl+Q）"></li>
+            <span>|</span>
+            <li class="btn-undo" title="撤销（Ctrl+Z）"></li>
+            <li class="btn-redo" title="反撤销（Ctrl+Y）"></li>
+            <li class="btn-history" title="历史版本"></li>
+            <span>|</span>
+            <li class="btn-selectAll" title="全选（Ctrl+A）"></li>
+            <li class="btn-cut" title="剪切（Ctrl+X）"></li>
+            <li class="btn-copy" title="复制（Ctrl+C）"></li>
+            <li class="btn-paste" title="粘贴（Ctrl+V）"></li>
+            <li class="btn-delete" title="删除（Delete）"></li>
+            <span>|</span>
+            <li class="btn-edit-xml" title="XML编辑"></li>
+            <li class="btn-console-xml" title="打印XML"></li>
+            <span>|</span>
+            <li class="btn-debug" title="调试（Ctrl+Q）"></li>
+            <li class="btn-resume disabled" title="下一步"></li>
+            <li class="btn-stop disabled" title="停止"></li>
+            <span>|</span>
+            <li class="btn-dock-right" title="Dock to right"></li>
+            <li class="btn-dock-bottom" title="Dock to bottom"></li>
+        </ul>
+    </div>
+    <div class="sidebar-container"></div>
+    <div class="xml-container"><textarea></textarea></div>
+    <div class="editor-container"></div>
+    <div class="resize-container"></div>
+    <div class="properties-container"></div>
+</div>
+<script type="text/html" id="parameter-name-tmpl">
+    <input type="text" name="parameter-name" placeholder="请输入参数名" autocomplete="off" class="layui-input array"
+           value="{{=d['parameter-name']}}">
+</script>
+<script type="text/html" id="parameter-description-tmpl">
+    <input type="text" name="parameter-description" placeholder="请输入参数描述" autocomplete="off"
+           class="layui-input array" value="{{=d['parameter-description']}}">
+</script>
+<script type="text/html" id="parameter-value-tmpl">
+    <div class="layui-input-block array" placeholder="请输入参数值" codemirror="parameter-value"
+         data-value="{{=d['parameter-value']}}"></div>
+</script>
+<script type="text/html" id="parameter-type-tmpl">
+    <select name="parameter-form-type" class="array">
+        <option value="text" {{d[
+        'parameter-form-type'] == 'text' ? 'selected': '' }}">text</option>
+        <option value="file" {{d[
+        'parameter-form-type'] == 'file' ? 'selected': '' }}>file</option>
+    </select>
+</script>
+<script type="text/html" id="parameter-from-name-tmpl">
+    <input type="text" name="parameter-form-name" placeholder="请输入参数名" autocomplete="off"
+           class="layui-input array" value="{{=d['parameter-form-name']}}">
+</script>
+<script type="text/html" id="parameter-from-description-tmpl">
+    <input type="text" name="parameter-form-description" placeholder="请输入参数描述" autocomplete="off"
+           class="layui-input array" value="{{=d['parameter-form-description']}}">
+</script>
+<script type="text/html" id="parameter-from-value-tmpl">
+    <div class="layui-input-block array" placeholder="请输入参数值" codemirror="parameter-form-value"
+         data-value="{{=d['parameter-form-value']}}"></div>
+</script>
+<script type="text/html" id="parameter-from-type-tmpl">
+    <select name="parameter-form-type" class="array">
+        <option value="text" {{d[
+        'parameter-form-type'] == 'text' ? 'selected': '' }}">text</option>
+        <option value="file" {{d[
+        'parameter-form-type'] == 'file' ? 'selected': '' }}>file</option>
+    </select>
+</script>
+<script type="text/html" id="parameter-from-filename-tmpl">
+    <div class="layui-input-block array" placeholder="请输入文件名" codemirror="parameter-form-filename"
+         data-value="{{=d['parameter-form-filename']}}"></div>
+</script>
+
+<script type="text/html" id="cookie-name-tmpl">
+    <input type="text" name="cookie-name" placeholder="请输入Cookie名" autocomplete="off" class="layui-input array"
+           value="{{=d['cookie-name']}}">
+</script>
+<script type="text/html" id="cookie-description-tmpl">
+    <input type="text" name="cookie-description" placeholder="请输入Cookie描述" autocomplete="off"
+           class="layui-input array" value="{{=d['cookie-description']}}">
+</script>
+<script type="text/html" id="cookie-value-tmpl">
+    <div class="layui-input-block array" placeholder="请输入Cookie值" codemirror="cookie-value"
+         data-value="{{=d['cookie-value']}}"></div>
+</script>
+
+<script type="text/html" id="header-name-tmpl">
+    <input type="text" name="header-name" placeholder="请输入Header名" autocomplete="off" class="layui-input array"
+           value="{{=d['header-name']}}">
+</script>
+<script type="text/html" id="header-description-tmpl">
+    <input type="text" name="header-description" placeholder="请输入Header描述" autocomplete="off"
+           class="layui-input array" value="{{=d['header-description']}}">
+</script>
+<script type="text/html" id="header-value-tmpl">
+    <div class="layui-input-block array" placeholder="请输入Header值" codemirror="header-value"
+         data-value="{{=d['header-value']}}"></div>
+</script>
+
+<script type="text/html" id="variable-name-tmpl">
+    <input type="text" name="variable-name" placeholder="请输入变量名" autocomplete="off" class="layui-input array"
+           value="{{=d['variable-name']}}">
+</script>
+<script type="text/html" id="variable-description-tmpl">
+    <input type="text" name="variable-description" placeholder="请输入变量描述" autocomplete="off"
+           class="layui-input array" value="{{=d['variable-description']}}">
+</script>
+<script type="text/html" id="variable-value-tmpl">
+    <div class="layui-input-block array" placeholder="请输入变量值" codemirror="variable-value"
+         data-value="{{=d['variable-value']}}"></div>
+</script>
+
+<script type="text/html" id="output-name-tmpl">
+    <input type="text" name="output-name" placeholder="输出项" autocomplete="off" class="layui-input array"
+           value="{{=d['output-name']}}">
+</script>
+<script type="text/html" id="output-value-tmpl">
+    <div class="layui-input-block array" codemirror="output-value" placeholder="输出值"
+         data-value="{{=d['output-value']}}"></div>
+</script>
+
+<script type="text/html" id="history-version-tmpl">
+    <ul class="history-version">
+        {{# layui.each(d,function(index,item){ }}
+        <li data-timestamp="{{item.timestamp}}">{{item.time}}</li>
+        {{# });}}
+    </ul>
+</script>
+
+<script type="text/html" id="common-operation">
+    <a class="layui-btn layui-btn-sm table-row-up">上移</a>
+    <a class="layui-btn layui-btn-sm table-row-down">下移</a>
+    <a class="layui-btn layui-btn-sm" lay-event="del">删除</a>
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<div class="layui-tab layui-tab-fixed layui-tab-brief">
+    <ul class="layui-tab-title">
+        <li class="layui-this">配置</li>
+    </ul>
+    <div class="layui-tab-content">
+        <div class="layui-tab-item layui-show">
+            <form class="layui-form editor-form-node" lay-filter="executesql-form">
+                <div class="layui-row">
+                    <div class="layui-col-md3">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">节点名称</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}"
+                                       autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-md3">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">数据源</label>
+                            <div class="layui-input-block">
+                                <select name="datasourceId">
+                                    {{# layui.each(d.datasources,function(index,datasource){ }}
+                                    <option value="{{=datasource.id}}" {{datasource.id== d.data.object.datasourceId ?
+                                    'selected': ''}}>{{datasource.name}}</option>
+                                    {{# }) }}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-md3">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">语句类型</label>
+                            <div class="layui-input-block">
+                                <select name="statementType" target-div="dynamicDiv" target-value="select"
+                                        lay-filter="targetCheck">
+                                    <option value="select" {{d.data.object.statementType==
+                                    'select' ? 'selected':''}}>select</option>
+                                    <option value="selectOne" {{d.data.object.statementType==
+                                    'selectOne' ? 'selected':''}}>selectOne</option>
+                                    <option value="selectInt" {{d.data.object.statementType==
+                                    'selectInt' ? 'selected':''}}>selectInt</option>
+                                    <option value="insert" {{d.data.object.statementType==
+                                    'insert' ? 'selected':''}}>insert</option>
+                                    <option value="delete" {{d.data.object.statementType==
+                                    'delete' ? 'selected':''}}>delete</option>
+                                    <option value="update" {{d.data.object.statementType==
+                                    'update' ? 'selected':''}}>update</option>
+                                    <option value="insertofPk" {{d.data.object.statementType==
+                                    'insertofPk' ? 'selected':''}}>insertofPk</option>
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-md3 dynamicDiv" {{d.data.object.statementType=='select' ||
+                         !d.data.object.statementType ?
+                    '' : 'style="display:none;"'}} >
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <input type="checkbox" value="isStream" lay-skin="primary" title="输出到sqlRowSet流"
+                                   tips-text="sqlRowSet流|List<Map<String,Object>"
+                                   {{d.data.object.isStream=='1'?'checked':''}}/>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">SQL语句</label>
+            <div class="layui-input-block" style="height:200px;" codemirror="sql"
+                 data-value="{{=d.data.object.sql}}"></div>
+        </div>
+        </form>
+    </div>
+</div>
+</div>
+<script>
+    $.ajax({
+        url: 'datasource/all',
+        success: function (datasources) {
+            for (var i = 0; i < datasources.length; i++) {
+                var ds = datasources[i];
+                $('select[name=datasourceId]').append('<option value="' + ds.id + '">' + ds.name + '</option>');
+            }
+            layui.form.render();
+            var selectDataSourceId = '{{=d.data.object.datasourceId}}';
+            if (selectDataSourceId != '') {
+                $('.layui-form-select dd[lay-value=' + selectDataSourceId + ']').trigger('click');
+            }
+        }
+    })
+</script>

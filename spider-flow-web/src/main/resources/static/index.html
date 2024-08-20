@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SpiderFlow</title>
+    <link rel="stylesheet" href="js/layui/css/layui.css"/>
+    <link rel="stylesheet" id="theSkin"/>
+    <link rel="stylesheet" href="css/index.css"/>
+    <script>SPIDER_FLOW_VERSION = '0.5.0'</script>
+    <script type="text/javascript" src="js/layui/layui.all.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="https://www.spiderflow.org/update-detection.js"></script>
+</head>
+<body class="layui-layout layui-layout-admin">
+<div class="layui-header">
+    <div class="layui-logo">SpiderFlow平台</div>
+    <ul class="layui-nav layui-layout-left"></ul>
+    <ul class="layui-nav layui-layout-right">
+        <li class="layui-nav-item"><a target="_blank" href="https://www.spiderflow.org">帮助文档</a></li>
+        <li class="layui-nav-item"><a target="_blank"
+                                      href="https://shang.qq.com/wpa/qunwpa?idkey=10faa4cf9743e0aa379a72f2ad12a9e576c81462742143c8f3391b52e8c3ed8d">加入QQ群
+        </li>
+        <li class="layui-nav-item"><a target="_blank" href='https://gitee.com/jmxd/spider-flow'><img
+                src='https://gitee.com/jmxd/spider-flow/badge/star.svg?theme=white' alt='gitee star'/></a></li>
+        <li class="layui-nav-item"><a target="_blank" href='https://github.com/javamxd/spider-flow'><img
+                src='https://img.shields.io/github/stars/javamxd/spider-flow.svg?style=social' alt='github star'
+                style="background: none"/></a></li>
+        <li class="layui-nav-item">
+            <a href="javascript:;" style="padding: 0 20px;">
+                换肤
+            </a>
+            <dl class="layui-nav-child">
+                <dd><a data-value="layui-blue">默认</a></dd>
+                <dd><a data-value="layui-black-gray">黑色</a></dd>
+            </dl>
+        </li>
+    </ul>
+</div>
+<div class="layui-side">
+    <div class="layui-side-scroll menu-list">
+        <ul class="layui-nav layui-nav-tree">
+            <li class="layui-nav-item layui-nav-itemed layui-this"><a data-link="spiderList.html"
+                                                                      title="爬虫列表">爬虫列表</a></li>
+            <li class="layui-nav-item layui-nav-itemed"><a data-link="variables.html" title="全局变量">全局变量</a></li>
+            <li class="layui-nav-item layui-nav-itemed"><a data-link="functions.html" title="自定义函数">自定义函数</a>
+            </li>
+            <li class="layui-nav-item layui-nav-itemed"><a data-link="datasources.html"
+                                                           title="数据源管理">数据源管理</a></li>
+        </ul>
+    </div>
+</div>
+<div class="layui-body">
+    <div class="layui-tab" lay-filter="admin-tab" lay-allowClose="true">
+        <ul id="layuiTab" class="layui-tab-title admin-unselect" unselectable="on" lay-allowClose="false">
+            <li class="layui-this layui-tab-hidden-close" lay-id="welcome">爬虫列表</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <iframe src="spiderList.html" width="100%" height="100%" scrolling="yes" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var title = $(".layui-logo");
+    title.append('<span class="version-no">v' + SPIDER_FLOW_VERSION + '</span>');
+</script>
+</body>
+</html>

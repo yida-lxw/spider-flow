@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SpiderFlow</title>
+    <link rel="stylesheet" href="js/layui/css/layui.css"/>
+    <link rel="stylesheet" href="css/layui-blue.css"/>
+    <script type="text/javascript" src="js/layui/layui.all.js"></script>
+</head>
+<body style="padding:5px;">
+<div class="layui-form-item">
+    <label class="layui-form-label">爬虫名称</label>
+    <div class="layui-input-inline">
+        <input type="text" name="name" required lay-verify="required" placeholder="请输入爬虫名称" autocomplete="off"
+               class="layui-input">
+    </div>
+    <div class="layui-input-inline" style="margin-top:5px">
+        <a class="layui-btn layui-btn-sm layui-btn-normal btn-search"><i class="layui-icon">&#xe615;</i> 搜索</a>
+        <a class="layui-btn layui-btn-sm layui-btn-normal" href="editor.html"><i class="layui-icon">&#xe654;</i> 添加爬虫</a>
+    </div>
+</div>
+
+<hr>
+<table class="layui-table" id="table" lay-filter="table"></table>
+<script>
+    var $ = layui.$;
+    var $table = layui.table.render({
+        id: 'table',
+        elem: '#table',
+        url: 'spider/list',
+        method: 'post',
+        page: true,
+        parseData: function (resp) {
+            return {
+                code: 0,
+                data: resp.records,
+                count: resp.total
+            }
+        },
+        cols: [[{
+            title: '序号',
+            width: 35,
+            type: 'numbers',
+            align: 'center'
+        }, {
+            title: '爬虫名称',
+            field: 'name',
+            templet: function (row) {
+                return '<a class="layui-btn layui-btn-sm btn-details" data-name="' + row.name + '" data-id="' + row.id + '">' + row.name + '</a>';
+            }
+        }, {
+            title: 'cron',
+            field: 'cron',
+            width: 80,
+            templet: function (row) {
+                return '<a class="layui-btn layui-btn-sm btn-edit-cron" data-id="' + row.id + '" data-cron="' + row.cron + '">' + (row.cron || '编辑cron') + '</a>';
+            }
+        }, {
+            title: '定时/长任务',
+            field: 'enabled',
+            width: 105,
+            templet: function (row) {
+                return '<input type="checkbox" data-cron="' + (row.cron || '') + '" name="switch" lay-skin="switch" lay-text="定时|长任务" value="' + row.id + '" ' + (row.enabled == 1 ? 'checked' : '') + '>';
+            }
+        }, {
+            title: '创建时间',
+            width: 160,
+            field: 'createDate',
+            align: 'center'
+        }, {
+            title: '上次执行时间',
+            width: 160,
+            field: 'lastExecuteTime',
+            align: 'center'
+        }, {
+            title: '运行中/已完成',
+            width: 120,
+            field: 'executeCount',
+            align: 'center',
+            templet: '#execute-count'
+        }, {
+            title: '下次执行时间',
+            width: 160,
+            field: 'nextExecuteTime',
+            align: 'center'
+        }, {
+            title: '操作',
+            width: 250,
+            align: 'center',
+            templet: '#buttons'
+        }]]
+    })
+    layui.form.on('switch', function (e) {
+        if (e.elem.checked && !$(e.elem).data('cron')) {
+            layui.layer.msg('cron表达式不能为空！');
+            e.elem.checked = false;
+            layui.form.render();
+            return;
+        }
+        $.ajax({
+            url: 'spider/' + (e.elem.checked ? 'start' : 'stop'),
+            data: {
+                id: e.value
+            },
+            success: function () {
+                layui.layer.msg((e.elem.checked ? '切换为定时任务' : '切换为长任务') + '成功');
+            },
+            error: function () {
+                layui.layer.msg((e.elem.checked ? '切换为定时任务' : '切换为长任务') + '成功');
+            }
+        })
+    })
+
+    function reloadTable() {
+        $table.reload({
+            where: {
+                name: $('input[name=name]').val()
+            },
+            page: {
+                curr: 1
+            }
+        })
+    }
+
+    $("body").on('click', '.btn-search', function () {
+        reloadTable();
+    }).on('click', '.btn-copy', function () {
+        var id = $(this).data('id');
+        layui.layer.confirm('您确定要复制此爬虫吗？', {
+            title: '复制'
+        }, function (index) {
+            $table.reload();
+            $.ajax({
+                url: 'spider/copy',
+                data: {
+                    id: id
+                },
+                success: function () {
+                    layui.layer.msg('复制成功', {time: 500}, function () {
+                        $table.reload();
+                    })
+                },
+                error: function () {
+                    layui.layer.msg('复制失败')
+                }
+            })
+            layui.layer.close(index);
+        })
+    }).on('click', '.btn-remove', function () {
+        var id = $(this).data('id');
+        layui.layer.confirm('您确定要删除此爬虫吗？', {
+            title: '删除'
+        }, function (index) {
+            $table.reload();
+            $.ajax({
+                url: 'spider/remove',
+                data: {
+                    id: id
+                },
+                success: function () {
+                    layui.layer.msg('删除成功', {time: 500}, function () {
+                        $table.reload();
+                    })
+                },
+                error: function () {
+                    layui.layer.msg('删除失败')
+                }
+            })
+            layui.layer.close(index);
+        })
+    }).on('click', '.btn-run', function () {
+        var id = $(this).data('id');
+        layui.layer.confirm('您确定要手动运行一次该爬虫吗？', {
+            title: '运行任务'
+        }, function (index) {
+            $table.reload();
+            $.ajax({
+                url: 'spider/run',
+                data: {
+                    id: id
+                },
+                success: function () {
+                    layui.layer.msg('手动运行成功,后台运行中', {time: 500}, function () {
+                        $table.reload();
+                    })
+                },
+                error: function () {
+                    layui.layer.msg('手动运行失败')
+                }
+            })
+            layui.layer.close(index);
+        })
+    }).on('click', '.btn-task', function () {
+        parent.openTab($(this).data('name') + '-任务详情', $(this).data('id') + '-task', 'task.html?id=' + $(this).data('id') + '&name=' + encodeURIComponent(encodeURIComponent($(this).data('name'))));
+    }).on('click', '.btn-log', function () {
+        parent.openTab($(this).data('name') + '-日志', $(this).data('id') + '-log', 'log.html?id=' + $(this).data('id'));
+    }).on('click', '.btn-edit-cron', function () {
+        var id = $(this).data('id');
+        var value = $(this).data('cron') || '';
+        parent.$table = $table;
+        parent.layer.open({
+            type: 2,
+            area: ['850px', '660px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: 'editCron.html?id=' + id + '&cron=' + value
+        });
+    }).on('click', '.btn-details', function () {
+        parent.openTab($(this).data('name') + '-编辑', $(this).data('id') + '-edit', 'editor.html?id=' + $(this).data('id'));
+    }).on('click', '.btn-notice', function () {
+        var id = $(this).data('id');
+        parent.$table = $table;
+        parent.layer.open({
+            type: 2,
+            area: ['700px', '400px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: 'spiderList-notice.html?id=' + id
+        });
+    })
+</script>
+<script type="text/html" id="execute-count">
+    <a class="layui-btn layui-btn-sm btn-task" data-name="{{d.name}}" data-id="{{d.id}}">{{d.running ||
+        0}}/{{d.executeCount || 0}}</a>
+</script>
+<script type="text/html" id="buttons">
+    <a class="layui-btn layui-btn-sm btn-details" data-id="{{d.id}}" data-name="{{d.name}}" title="查看"><i
+            class="layui-icon">&#xe615;</i></a>
+    <a class="layui-btn layui-btn-sm btn-notice" data-id="{{d.id}}" title="通知设置"><i class="layui-icon">&#xe667;</i></a>
+    <a class="layui-btn layui-btn-sm btn-run" data-id="{{d.id}}" title="手动运行"><i class="layui-icon">&#xe623;</i></a>
+    <a class="layui-btn layui-btn-sm btn-log" data-name="{{d.name}}" data-id="{{d.id}}" title="日志"><i
+            class="layui-icon">&#xe60e;</i></a>
+    <a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}" title="删除"><i class="layui-icon">&#xe640;</i></a>
+</script>
+</body>
+</html>

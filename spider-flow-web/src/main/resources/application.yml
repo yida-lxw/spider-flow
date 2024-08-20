@@ -1,0 +1,65 @@
+server:
+  port: 8088
+
+spider:
+  workspace: E:/spider-spaces
+  thread:
+    default: 8
+    max: 64
+  bloomfilter:
+    capacity: 1000000
+    error-rate: 1.0E-4
+  job:
+    enable: false
+  notice:
+    content:
+      end: 流程执行完毕：{name}，结束时间：{currentDate}
+      exception: 流程发生异常：{name}，异常时间：{currentDate}
+      start: 流程开始执行：{name}，开始时间：{currentDate}
+    subject: spider-flow流程通知
+
+
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration,org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    password: 1111
+    url: jdbc:mysql://localhost:3306/spiderflow?useSSL=false&useUnicode=true&characterEncoding=UTF8&autoReconnect=true
+    username: root
+  mvc:
+    favicon:
+      enabled: false
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    serialization:
+      fail_on_empty_beans: false
+    time-zone: Asia/Shanghai
+  mail:
+    default-encoding: UTF-8
+    host: smtp.qq.com
+    password: xxxx
+    port: 465
+    properties:
+      mail:
+        smtp:
+          auth: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+            fallback: false
+            port: 465
+          starttls:
+            enable: true
+            required: true
+    protocol: smtp
+    username: xxxx@qq.com
+
+
+selenium:
+  driver:
+    chrome: D:/chromedriver-127.0.6533.119-win64/chromedriver.exe
+    firefox: D:/geckodriver-v0.34.0-win64/geckodriver.exe
+
+logging:
+  level:
+    root: INFO
