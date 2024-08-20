@@ -21,8 +21,10 @@ public class ResourcesConfiguration implements WebMvcConfigurer {
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
-				.allowedOrigins("*")
-				.allowedMethods("GET", "POST", "OPTIONS")
-				.allowCredentials(true);
+				//.allowedOrigins("*")
+				.allowedOriginPatterns("")
+				.allowedMethods(new String[] {"GET", "POST", "PUT", "OPTIONS"})
+				.allowedHeaders("*")
+				.allowCredentials(true).maxAge(3600);
 	}
 }

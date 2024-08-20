@@ -23,13 +23,12 @@ spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration,org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    password: 1111
-    url: jdbc:mysql://localhost:3306/spiderflow?useSSL=false&useUnicode=true&characterEncoding=UTF8&autoReconnect=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-  mvc:
-    favicon:
-      enabled: false
+    password: 1111
+    url: jdbc:mysql://localhost:3306/spiderflow?useSSL=false&useUnicode=true&characterEncoding=UTF8&serverTimezone=Asia/Shanghai&autoReconnect=true&rewriteBatchedStatements=true
+  favicon:
+    enabled: false
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     serialization:

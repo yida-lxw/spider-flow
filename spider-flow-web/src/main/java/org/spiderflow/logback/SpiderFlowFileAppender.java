@@ -35,17 +35,18 @@ public class SpiderFlowFileAppender extends FileAppender<ILoggingEvent> {
 	}
 
 	private void writeBytes(OutputStream os, byte[] byteArray) throws IOException {
-		if (byteArray == null || byteArray.length == 0)
+		if (byteArray == null || byteArray.length == 0) {
 			return;
+		}
 
-		lock.lock();
 		try {
+			streamWriteLock.lock();
 			os.write(byteArray);
 			if (isImmediateFlush()) {
 				os.flush();
 			}
 		} finally {
-			lock.unlock();
+			streamWriteLock.unlock();
 		}
 	}
 

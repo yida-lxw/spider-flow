@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.spiderflow.core.Spider;
 import org.spiderflow.core.model.SpiderFlow;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -32,6 +33,7 @@ public class SpiderJobManager {
 
 	public final static String JOB_PARAM_NAME = "SPIDER_FLOW";
 
+	@Lazy
 	@Autowired
 	private SpiderJob spiderJob;
 
