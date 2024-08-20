@@ -4,29 +4,25 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SpiderLog {
-
 	private String level;
-
+	private String loggerName;
+	private long threadId;
+	private String threadName;
+	private long eventTime;
 	private String message;
+	private Map<String, String> contextDataMap;
 
-	private List<Object> variables;
-
-	public SpiderLog(String level, String message, List<Object> variables) {
-		if (variables != null && variables.size() > 0) {
-			List<Object> nVariables = new ArrayList<>(variables.size());
-			for (Object object : variables) {
-				if (object instanceof Throwable) {
-					nVariables.add(ExceptionUtils.getStackTrace((Throwable) object));
-				} else {
-					nVariables.add(object);
-				}
-			}
-			this.variables = nVariables;
-		}
+	public SpiderLog(String level, String loggerName, long threadId, String threadName, long eventTime, String message, Map<String, String> contextDataMap) {
 		this.level = level;
+		this.loggerName = loggerName;
+		this.threadId = threadId;
+		this.threadName = threadName;
+		this.eventTime = eventTime;
 		this.message = message;
+		this.contextDataMap = contextDataMap;
 	}
 
 	public String getLevel() {
@@ -37,6 +33,38 @@ public class SpiderLog {
 		this.level = level;
 	}
 
+	public String getLoggerName() {
+		return loggerName;
+	}
+
+	public void setLoggerName(String loggerName) {
+		this.loggerName = loggerName;
+	}
+
+	public long getThreadId() {
+		return threadId;
+	}
+
+	public void setThreadId(long threadId) {
+		this.threadId = threadId;
+	}
+
+	public String getThreadName() {
+		return threadName;
+	}
+
+	public void setThreadName(String threadName) {
+		this.threadName = threadName;
+	}
+
+	public long getEventTime() {
+		return eventTime;
+	}
+
+	public void setEventTime(long eventTime) {
+		this.eventTime = eventTime;
+	}
+
 	public String getMessage() {
 		return message;
 	}
@@ -45,11 +73,11 @@ public class SpiderLog {
 		this.message = message;
 	}
 
-	public List<Object> getVariables() {
-		return variables;
+	public Map<String, String> getContextDataMap() {
+		return contextDataMap;
 	}
 
-	public void setVariables(List<Object> variables) {
-		this.variables = variables;
+	public void setContextDataMap(Map<String, String> contextDataMap) {
+		this.contextDataMap = contextDataMap;
 	}
 }
