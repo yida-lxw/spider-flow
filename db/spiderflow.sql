@@ -41,15 +41,16 @@ VALUES ('663aaa5e36a84c9594ef3cfd6738e9a7', '百度热点',
 DROP TABLE IF EXISTS `sp_datasource`;
 CREATE TABLE `sp_datasource`
 (
-    `id`                varchar(32) NOT NULL,
-    `name`              varchar(255)         DEFAULT NULL,
-    `driver_class_name` varchar(255)         DEFAULT NULL,
-    `jdbc_url`          varchar(255)         DEFAULT NULL,
-    `username`          varchar(64)          DEFAULT NULL,
-    `password`          varchar(32)          DEFAULT NULL,
-    `create_date`       datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `id`                     varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+    `name`                   varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+    `driver_class_name`      varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+    `jdbc_url`               varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+    `username`               varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+    `password`               varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+    `create_date`            datetime                                                     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `connection_pool_config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'JDBC连接池配置(JSON格式)',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `sp_variable`;
 CREATE TABLE `sp_variable`

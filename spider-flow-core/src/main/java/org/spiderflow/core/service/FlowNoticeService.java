@@ -24,7 +24,6 @@ import java.util.Map;
 
 @Service
 public class FlowNoticeService extends ServiceImpl<FlowNoticeMapper, FlowNotice> {
-
 	private static final Logger logger = LoggerFactory.getLogger(FlowNoticeService.class);
 	@Autowired
 	private SpiderFlowMapper spiderFlowMapper;

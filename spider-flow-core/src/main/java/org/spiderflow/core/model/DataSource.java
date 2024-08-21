@@ -24,6 +24,11 @@ public class DataSource {
 
 	private Date createDate;
 
+	/**
+	 * JDBC连接池配置(JSON格式)
+	 */
+	private String connectionPoolConfig;
+
 	public DataSource() {
 	}
 
@@ -88,4 +93,11 @@ public class DataSource {
 		this.createDate = createDate;
 	}
 
+	public String getConnectionPoolConfig() {
+		return connectionPoolConfig;
+	}
+
+	public void setConnectionPoolConfig(String connectionPoolConfig) {
+		this.connectionPoolConfig = connectionPoolConfig;
+	}
 }

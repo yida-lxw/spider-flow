@@ -69,16 +69,6 @@
             <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件开始覆盖-->
             <DefaultRolloverStrategy max="15"/>
         </RollingFile>
-
-        <!--druid的日志记录追加器-->
-        <RollingFile name="druidSqlRollingFile" fileName="${FILE_PATH}/druid-sql.log" filePattern="${FILE_PATH}/$${date:yyyy-MM}/api-%d{yyyy-MM-dd}-%i.log.gz">
-            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}] %-5level %L %M - %msg%xEx%n"/>
-            <Policies>
-                <SizeBasedTriggeringPolicy size="500MB"/>
-                <TimeBasedTriggeringPolicy/>
-            </Policies>
-        </RollingFile>
-
     </appenders>
 
     <!--Logger节点用来单独指定日志的形式，比如要为指定包下的class指定不同的日志级别等。-->
@@ -95,10 +85,6 @@
             <AppenderRef ref="Filelog"/>
         </Logger>
 
-        <!--Druid监控系统信息-->
-        <logger name="druid.sql.Statement" level="debug" additivity="false">
-            <appender-ref ref="druidSqlRollingFile"/>
-        </logger>
 
         <!-- 针对当前项目下的controller -->
         <logger name="org.spiderflow.controller" level="debug" additivity="false">
@@ -107,6 +93,11 @@
             <appender-ref ref="RollingFileInfo" />
             <appender-ref ref="RollingFileError"/>
         </logger>
+
+        <logger name="org.apache.ibatis" level="INFO"/>
+        <logger name="java.sql.Connection" level="INFO"/>
+        <logger name="java.sql.Statement" level="INFO"/>
+        <logger name="java.sql.PreparedStatement" level="INFO"/>
 
         <root level="info">
             <appender-ref ref="Console"/>

@@ -34,7 +34,7 @@
         <spring.version>5.3.39</spring.version>
         <springboot.version>2.7.18</springboot.version>
         <alibaba.fastjson.version>1.2.83</alibaba.fastjson.version>
-        <alibaba.druid.version>1.1.16</alibaba.druid.version>
+        <hikaricp.version>4.0.3</hikaricp.version>
         <alibaba.transmittable.version>2.11.5</alibaba.transmittable.version>
         <mybatis.plus.version>3.5.7</mybatis.plus.version>
         <commons-text.version>1.12.0</commons-text.version>
@@ -471,6 +471,10 @@
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-jdbc</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.zaxxer</groupId>
+                    <artifactId>HikariCP</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -505,15 +509,16 @@
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-starter</artifactId>
-            <version>${alibaba.druid.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
             <artifactId>transmittable-thread-local</artifactId>
             <version>${alibaba.transmittable.version}</version>
         </dependency>
-        <!-- apache commons相关 -->
+
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikaricp.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
