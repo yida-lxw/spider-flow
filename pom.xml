@@ -15,6 +15,12 @@
         <version>2.7.18</version>
     </parent>
 
+    <modules>
+        <module>spider-flow-api</module>
+        <module>spider-flow-core</module>
+        <module>spider-flow-web</module>
+    </modules>
+
     <repositories>
         <repository>
             <id>aliyun</id>
@@ -637,9 +643,42 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-    <modules>
-        <module>spider-flow-api</module>
-        <module>spider-flow-core</module>
-        <module>spider-flow-web</module>
-    </modules>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <profiles.active>dev</profiles.active>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>test</id>
+            <properties>
+                <profiles.active>test</profiles.active>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profiles.active>prod</profiles.active>
+            </properties>
+        </profile>
+    </profiles>
 </project>
