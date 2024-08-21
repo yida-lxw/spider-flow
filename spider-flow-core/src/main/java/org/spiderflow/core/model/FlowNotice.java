@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import org.spiderflow.enums.FlowNoticeWay;
+import org.spiderflow.core.enums.FlowNoticeWay;
 
 /**
  * 爬虫任务通知实体

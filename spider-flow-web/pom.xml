@@ -16,7 +16,13 @@
     <dependencies>
         <dependency>
             <groupId>org.spiderflow</groupId>
-            <artifactId>spider-flow-core</artifactId>
+            <artifactId>spider-flow-api</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>

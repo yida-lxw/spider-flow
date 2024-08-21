@@ -1,8 +1,8 @@
 package org.spiderflow.core.executor.shape;
 
-import org.spiderflow.context.SpiderContext;
-import org.spiderflow.executor.ShapeExecutor;
-import org.spiderflow.model.SpiderNode;
+import org.spiderflow.core.context.SpiderContext;
+import org.spiderflow.core.executor.ShapeExecutor;
+import org.spiderflow.core.model.SpiderNode;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

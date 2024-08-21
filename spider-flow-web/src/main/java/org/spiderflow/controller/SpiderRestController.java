@@ -2,16 +2,16 @@ package org.spiderflow.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.Spider;
+import org.spiderflow.core.context.SpiderContext;
 import org.spiderflow.core.job.SpiderJob;
 import org.spiderflow.core.job.SpiderJobContext;
 import org.spiderflow.core.model.SpiderFlow;
+import org.spiderflow.core.model.SpiderOutput;
 import org.spiderflow.core.model.Task;
-import org.spiderflow.core.service.SpiderFlowService;
-import org.spiderflow.core.service.TaskService;
 import org.spiderflow.model.JsonBean;
-import org.spiderflow.model.SpiderOutput;
+import org.spiderflow.service.SpiderFlowServiceImpl;
+import org.spiderflow.service.TaskServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +30,7 @@ public class SpiderRestController {
 	private static Logger logger = LoggerFactory.getLogger(SpiderRestController.class);
 
 	@Autowired
-	private SpiderFlowService spiderFlowService;
+	private SpiderFlowServiceImpl spiderFlowService;
 
 	@Autowired
 	private Spider spider;
@@ -42,7 +42,7 @@ public class SpiderRestController {
 	private SpiderJob spiderJob;
 
 	@Autowired
-	private TaskService taskService;
+	private TaskServiceImpl taskService;
 
 	/**
 	 * 异步运行

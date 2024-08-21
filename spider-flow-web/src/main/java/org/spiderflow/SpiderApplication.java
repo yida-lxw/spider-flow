@@ -12,7 +12,7 @@ import java.io.IOException;
 
 @SpringBootApplication
 @EnableScheduling
-@MapperScan("org.spiderflow.*.mapper")
+@MapperScan(basePackages = {"org.spiderflow.mapper", "org.spiderflow.**.mapper"})
 public class SpiderApplication implements ServletContextInitializer {
 
 	public static void main(String[] args) throws IOException {

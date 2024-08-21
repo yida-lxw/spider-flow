@@ -3,11 +3,11 @@ package org.spiderflow.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.spiderflow.context.SpiderContext;
+import org.spiderflow.core.context.SpiderContext;
 import org.spiderflow.core.job.SpiderJob;
 import org.spiderflow.core.model.Task;
-import org.spiderflow.core.service.TaskService;
 import org.spiderflow.model.JsonBean;
+import org.spiderflow.service.TaskServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskController {
 
 	@Autowired
-	private TaskService taskService;
+	private TaskServiceImpl taskService;
 
 	@RequestMapping("/list")
 	public IPage<Task> list(@RequestParam(name = "page", defaultValue = "1") Integer page, @RequestParam(name = "limit", defaultValue = "1") Integer size, String flowId) {

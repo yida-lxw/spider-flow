@@ -5,7 +5,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.spiderflow.model.SpiderNode;
+import org.spiderflow.core.model.SpiderNode;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;

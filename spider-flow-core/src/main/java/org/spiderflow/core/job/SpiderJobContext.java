@@ -2,8 +2,8 @@ package org.spiderflow.core.job;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spiderflow.context.SpiderContext;
-import org.spiderflow.model.SpiderOutput;
+import org.spiderflow.core.context.SpiderContext;
+import org.spiderflow.core.model.SpiderOutput;
 
 import java.io.File;
 import java.io.FileOutputStream;

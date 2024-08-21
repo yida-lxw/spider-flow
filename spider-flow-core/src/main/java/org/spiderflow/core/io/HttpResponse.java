@@ -3,7 +3,7 @@ package org.spiderflow.core.io;
 import com.alibaba.fastjson.JSON;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
-import org.spiderflow.io.SpiderResponse;
+import org.spiderflow.core.http.SpiderResponse;
 
 import java.io.InputStream;
 import java.util.Map;

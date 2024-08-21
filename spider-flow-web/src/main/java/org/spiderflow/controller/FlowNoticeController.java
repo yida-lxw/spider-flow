@@ -3,9 +3,9 @@ package org.spiderflow.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.core.model.FlowNotice;
-import org.spiderflow.core.service.FlowNoticeService;
 import org.spiderflow.enums.FlowNoticeWay;
 import org.spiderflow.model.JsonBean;
+import org.spiderflow.service.FlowNoticeServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +19,7 @@ public class FlowNoticeController {
 
 	private static final Logger logger = LoggerFactory.getLogger(FlowNoticeController.class);
 	@Autowired
-	private FlowNoticeService flowNoticeService;
+	private FlowNoticeServiceImpl flowNoticeService;
 
 	@RequestMapping("/save")
 	public JsonBean<FlowNotice> save(FlowNotice entity) {

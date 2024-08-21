@@ -1,7 +1,7 @@
 package org.spiderflow.core.utils;
 
-import org.spiderflow.executor.ShapeExecutor;
-import org.spiderflow.model.Shape;
+import org.spiderflow.core.executor.ShapeExecutor;
+import org.spiderflow.core.model.Shape;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

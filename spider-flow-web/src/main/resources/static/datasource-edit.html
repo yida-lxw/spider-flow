@@ -47,9 +47,9 @@
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">数据库连接</label>
+        <label class="layui-form-label">JDBC连接字符串</label>
         <div class="layui-input-block">
-            <input type="text" name="jdbcUrl" placeholder="请输入数据库连接" autocomplete="off" class="layui-input"
+            <input type="text" name="jdbcUrl" placeholder="请输入JDBC连接字符串" autocomplete="off" class="layui-input"
                    lay-verify="required"/>
         </div>
     </div>
@@ -64,6 +64,13 @@
         <div class="layui-input-block">
             <input type="password" name="password" placeholder="请输入密码" autocomplete="off" class="layui-input"
                    lay-verify="required"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">JDBC连接池配置</label>
+        <div class="layui-input-block">
+            <textarea name="connectionPoolConfig" placeholder="请输入JDBC连接池配置(JSON格式)" autocomplete="off"
+                      class="layui-textarea" rows=20></textarea>
         </div>
     </div>
     <div class="btns-submit">
@@ -96,7 +103,8 @@
                 driverClassName: $("input[name=driverClassName]").val(),
                 jdbcUrl: $("input[name=jdbcUrl]").val(),
                 username: $("input[name=username]").val(),
-                password: $("input[name=password]").val()
+                password: $("input[name=password]").val(),
+                connectionPoolConfig: $("input[name=connectionPoolConfig]").val()
             },
             success: function (json) {
                 layui.layer.msg('保存成功', {

@@ -2,7 +2,9 @@ package org.spiderflow.model;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.spiderflow.context.SpiderContext;
+import org.spiderflow.core.context.SpiderContext;
+import org.spiderflow.core.model.SpiderLog;
+import org.spiderflow.core.model.SpiderOutput;
 import org.spiderflow.core.serializer.FastJsonSerializer;
 
 import javax.websocket.Session;

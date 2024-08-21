@@ -1,36 +1,18 @@
 package org.spiderflow.core.service;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.spiderflow.core.expression.ExpressionGlobalVariables;
-import org.spiderflow.core.mapper.VariableMapper;
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.spiderflow.core.model.Variable;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.Serializable;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-@Service
-public class VariableService extends ServiceImpl<VariableMapper, Variable> {
+/**
+ * @author yida
+ * @package org.spiderflow.core.service
+ * @date 2024-08-21 17:07
+ * @description Type your description over here.
+ */
+public interface VariableService extends IService<Variable> {
+	boolean removeById(Serializable id);
 
-	@Override
-	public boolean removeById(Serializable id) {
-		boolean ret = super.removeById(id);
-		this.resetGlobalVariables();
-		return ret;
-	}
-
-	@Override
-	public boolean saveOrUpdate(Variable entity) {
-		boolean ret = super.saveOrUpdate(entity);
-		this.resetGlobalVariables();
-		return ret;
-	}
-
-	@PostConstruct
-	private void resetGlobalVariables() {
-		Map<String, String> variables = this.list().stream().collect(Collectors.toMap(Variable::getName, Variable::getValue));
-		ExpressionGlobalVariables.reset(variables);
-	}
+	boolean saveOrUpdate(Variable entity);
 }

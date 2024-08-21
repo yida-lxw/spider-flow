@@ -1,9 +1,9 @@
 package org.spiderflow.core.executor.function.extension;
 
 import org.apache.commons.lang3.StringUtils;
-import org.spiderflow.annotation.Comment;
-import org.spiderflow.annotation.Example;
-import org.spiderflow.executor.FunctionExtension;
+import org.spiderflow.core.annotation.Comment;
+import org.spiderflow.core.annotation.Example;
+import org.spiderflow.core.executor.FunctionExtension;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;

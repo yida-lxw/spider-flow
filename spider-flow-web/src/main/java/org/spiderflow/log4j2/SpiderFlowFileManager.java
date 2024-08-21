@@ -3,8 +3,8 @@ package org.spiderflow.log4j2;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.FileManager;
-import org.spiderflow.context.SpiderContext;
-import org.spiderflow.context.SpiderContextHolder;
+import org.spiderflow.core.context.SpiderContext;
+import org.spiderflow.core.context.SpiderContextHolder;
 import org.spiderflow.core.job.SpiderJobContext;
 
 import java.io.IOException;

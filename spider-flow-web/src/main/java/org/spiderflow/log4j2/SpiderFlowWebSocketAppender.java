@@ -9,9 +9,9 @@ import org.apache.logging.log4j.core.appender.OutputStreamManager;
 import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.impl.ThrowableProxy;
 import org.apache.logging.log4j.util.ReadOnlyStringMap;
-import org.spiderflow.context.SpiderContext;
-import org.spiderflow.context.SpiderContextHolder;
-import org.spiderflow.model.SpiderLog;
+import org.spiderflow.core.context.SpiderContext;
+import org.spiderflow.core.context.SpiderContextHolder;
+import org.spiderflow.core.model.SpiderLog;
 import org.spiderflow.model.SpiderWebSocketContext;
 
 import java.io.Serializable;

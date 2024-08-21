@@ -3,6 +3,7 @@ package org.spiderflow.core.expression.parsing;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.spiderflow.core.expression.DynamicMethod;
 import org.spiderflow.core.expression.ExpressionError;
 import org.spiderflow.core.expression.ExpressionError.TemplateException;
 import org.spiderflow.core.expression.ExpressionTemplate;
@@ -11,7 +12,6 @@ import org.spiderflow.core.expression.interpreter.AstInterpreter;
 import org.spiderflow.core.expression.interpreter.JavaReflection;
 import org.spiderflow.core.expression.interpreter.Reflection;
 import org.spiderflow.core.script.ScriptManager;
-import org.spiderflow.expression.DynamicMethod;
 
 import javax.xml.transform.Source;
 import java.io.IOException;

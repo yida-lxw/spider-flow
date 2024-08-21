@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.spiderflow.core.model.DataSource;
-import org.spiderflow.core.service.DataSourceService;
 import org.spiderflow.core.utils.DataSourceUtils;
 import org.spiderflow.model.JsonBean;
+import org.spiderflow.service.DataSourceServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +22,7 @@ import java.util.List;
 public class DataSourceController {
 
 	@Autowired
-	private DataSourceService dataSourceService;
+	private DataSourceServiceImpl dataSourceService;
 
 	@RequestMapping("/list")
 	public IPage<DataSource> list(@RequestParam(name = "page", defaultValue = "1") Integer page, @RequestParam(name = "limit", defaultValue = "1") Integer size) {

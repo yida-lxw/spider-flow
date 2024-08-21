@@ -1,7 +1,6 @@
 package org.spiderflow.model;
 
 public class JsonBean<T> {
-
 	private Integer code = 1;
 
 	private String message = "执行成功";

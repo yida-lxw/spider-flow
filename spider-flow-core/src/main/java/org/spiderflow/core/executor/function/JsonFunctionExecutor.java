@@ -1,9 +1,9 @@
 package org.spiderflow.core.executor.function;
 
 import com.alibaba.fastjson.JSON;
-import org.spiderflow.annotation.Comment;
-import org.spiderflow.annotation.Example;
-import org.spiderflow.executor.FunctionExecutor;
+import org.spiderflow.core.annotation.Comment;
+import org.spiderflow.core.annotation.Example;
+import org.spiderflow.core.executor.FunctionExecutor;
 import org.springframework.stereotype.Component;
 
 /**
