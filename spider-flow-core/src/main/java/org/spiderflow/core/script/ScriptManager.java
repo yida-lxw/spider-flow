@@ -39,9 +39,11 @@ public class ScriptManager {
 				.append("return ExpressionTemplate.create(expression).render(ExpressionTemplateContext.get());")
 				.append("}");
 		try {
-			scriptEngine.eval(script.toString());
-		} catch (ScriptException e) {
-			logger.error("注册_eval函数失败", e);
+			ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByName("nashorn");
+			ScriptingSandbox scriptingSandbox = new ScriptingSandbox(scriptEngine);
+			scriptingSandbox.eval(script.toString());
+		} catch (InstantiationException e) {
+			logger.error("实例化脚本的沙箱环境失败", e);
 		}
 	}
 
@@ -61,13 +63,14 @@ public class ScriptManager {
 		lock.writeLock().unlock();
 	}
 
-	public static void registerFunction(ScriptEngine engine, String functionName, String parameters, String script) {
+	public static void registerFunction(ScriptEngine scriptEngine, String functionName, String parameters, String script) {
 		try {
-			engine.eval(concatScript(functionName, parameters, script));
+			ScriptingSandbox scriptingSandbox = new ScriptingSandbox(scriptEngine);
+			scriptingSandbox.eval(concatScript(functionName, parameters, script));
 			functions.add(functionName);
 			logger.info("注册自定义函数{}成功", functionName);
-		} catch (ScriptException e) {
-			logger.warn("注册自定义函数{}失败", functionName, e);
+		} catch (InstantiationException e) {
+			logger.error("注册自定义函数{}失败,原因：实例化脚本的沙箱环境失败", functionName, e);
 		}
 	}
 
@@ -93,7 +96,11 @@ public class ScriptManager {
 	}
 
 	public static void validScript(String functionName, String parameters, String script) throws Exception {
-		new ScriptEngineManager().getEngineByName("nashorn").eval(concatScript(functionName, parameters, script));
+		//使用沙箱执行脚本
+		ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByName("nashorn");
+		ScriptingSandbox scriptingSandbox = new ScriptingSandbox(scriptEngine);
+		String code = concatScript(functionName, parameters, script);
+		scriptingSandbox.eval(code);
 	}
 
 	public static Object eval(ExpressionTemplateContext context, String functionName, Object... args) throws ScriptException, NoSuchMethodException {
