@@ -948,11 +948,13 @@ function runSpider(debug) {
                                 var cols = [];
                                 var texts = [new CanvasText({
                                     text: '序号',
+                                    font: 'bold 13px Consolas',
                                     maxWidth: 100
                                 })];
                                 for (var i = 0, len = message.outputNames.length; i < len; i++) {
                                     texts.push(new CanvasText({
                                         text: message.outputNames[i],
+                                        font: 'bold 13px Consolas',
                                         maxWidth: 200,
                                         click: true
                                     }));

@@ -7,7 +7,7 @@
     </ul>
     <div class="layui-tab-content editor-form-node">
         <div class="layui-tab-item layui-show">
-            <form class="layui-form layui-row">
+            <form name="spider-base-form" class="layui-form layui-row">
                 <div class="layui-col-md4">
                     <label class="layui-form-label">爬虫名称</label>
                     <div class="layui-input-block">
@@ -19,14 +19,18 @@
                     <label class="layui-form-label">提交策略</label>
                     <div class="layui-input-block">
                         <select name="submit-strategy">
-                            <option value="random" {{d.data.object[
-                            'submit-strategy'] == 'random' ? 'selected':''}}>随机</option>
-                            <option value="linked" {{d.data.object[
-                            'submit-strategy'] == 'linked' ? 'selected':''}}>顺序</option>
-                            <option value="child" {{d.data.object[
-                            'submit-strategy'] == 'child' ? 'selected':''}}>子优先</option>
-                            <option value="parent" {{d.data.object[
-                            'submit-strategy'] == 'parent' ? 'selected':''}}>父优先</option>
+                            <option value="random"
+                                    selected="{{d.data.object['submit-strategy'] == 'random' ? 'selected':'false'}}">随机
+                            </option>
+                            <option value="linked"
+                                    selected="{{d.data.object['submit-strategy'] == 'linked' ? 'selected':'false'}}">顺序
+                            </option>
+                            <option value="child"
+                                    selected="{{d.data.object['submit-strategy'] == 'child' ? 'selected':'false'}}">子优先
+                            </option>
+                            <option value="parent"
+                                    selected="{{d.data.object['submit-strategy'] == 'parent' ? 'selected':'false'}}">父优先
+                            </option>
                         </select>
                     </div>
                 </div>
@@ -84,28 +88,30 @@
         </div>
     </div>
 </div>
-<script>
+<script type="text/javascript">
     function renderGlobalParameter(data) {
         layui.table.render({
             elem: '#global-parameter',
             limit: 50,
-            cols: [[{
-                title: '参数名',
-                width: 150,
-                templet: '#parameter-name-tmpl'
-            }, {
-                title: '参数值',
-                templet: '#parameter-value-tmpl'
-            }, {
-                title: '参数描述',
-                width: 250,
-                templet: '#parameter-description-tmpl'
-            }, {
-                title: '操作',
-                width: 120,
-                align: 'center',
-                templet: '#common-operation'
-            }]],
+            cols: [
+                [{
+                    title: '参数名',
+                    width: 150,
+                    templet: '#parameter-name-tmpl'
+                }, {
+                    title: '参数值',
+                    templet: '#parameter-value-tmpl'
+                }, {
+                    title: '参数描述',
+                    width: 250,
+                    templet: '#parameter-description-tmpl'
+                }, {
+                    title: '操作',
+                    width: 120,
+                    align: 'center',
+                    templet: '#common-operation'
+                }]
+            ],
             data: data,
             text: {
                 none: '暂未设置参数'
@@ -117,23 +123,25 @@
         layui.table.render({
             elem: '#global-cookie',
             limit: 50,
-            cols: [[{
-                title: 'Cookie名',
-                width: 150,
-                templet: '#cookie-name-tmpl'
-            }, {
-                title: 'Cookie值',
-                templet: '#cookie-value-tmpl'
-            }, {
-                title: '描述',
-                width: 250,
-                templet: '#cookie-description-tmpl'
-            }, {
-                title: '操作',
-                width: 120,
-                align: 'center',
-                templet: '#common-operation'
-            }]],
+            cols: [
+                [{
+                    title: 'Cookie名',
+                    width: 150,
+                    templet: '#cookie-name-tmpl'
+                }, {
+                    title: 'Cookie值',
+                    templet: '#cookie-value-tmpl'
+                }, {
+                    title: '描述',
+                    width: 250,
+                    templet: '#cookie-description-tmpl'
+                }, {
+                    title: '操作',
+                    width: 120,
+                    align: 'center',
+                    templet: '#common-operation'
+                }]
+            ],
             data: data,
             text: {
                 none: '暂未设置Cookie'
@@ -145,24 +153,26 @@
         layui.table.render({
             elem: '#global-header',
             limit: 50,
-            cols: [[{
-                title: 'Header名',
-                width: 150,
-                templet: '#header-name-tmpl'
-            }, {
-                title: 'header值',
-                minWidth: 400,
-                templet: '#header-value-tmpl'
-            }, {
-                title: '描述',
-                width: 250,
-                templet: '#header-description-tmpl'
-            }, {
-                title: '操作',
-                width: 120,
-                align: 'center',
-                templet: '#common-operation'
-            }]],
+            cols: [
+                [{
+                    title: 'Header名',
+                    width: 150,
+                    templet: '#header-name-tmpl'
+                }, {
+                    title: 'header值',
+                    minWidth: 400,
+                    templet: '#header-value-tmpl'
+                }, {
+                    title: '描述',
+                    width: 250,
+                    templet: '#header-description-tmpl'
+                }, {
+                    title: '操作',
+                    width: 120,
+                    align: 'center',
+                    templet: '#common-operation'
+                }]
+            ],
             data: data,
             text: {
                 none: '暂未设置Header'
@@ -170,28 +180,7 @@
         })
     }
 
-    renderGlobalParameter(getCellData({
-    {
-        d.cell.id
-    }
-    },
-    $("#global-parameter").data('keys').split(",")
-    ))
-    ;
-    renderGlobalCookie(getCellData({
-    {
-        d.cell.id
-    }
-    },
-    $("#global-cookie").data('keys').split(",")
-    ))
-    ;
-    renderGlobalHeader(getCellData({
-    {
-        d.cell.id
-    }
-    },
-    $("#global-header").data('keys').split(",")
-    ))
-    ;
+    renderGlobalParameter(getCellData(d.cell.id, $("#global-parameter").data('keys').split(",")));
+    renderGlobalCookie(getCellData(d.cell.id, $("#global-cookie").data('keys').split(",")));
+    renderGlobalHeader(getCellData(d.cell.id, $("#global-header").data('keys').split(",")));
 </script>

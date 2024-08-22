@@ -1,6 +1,5 @@
 package org.spiderflow.core.executor.function.extension;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.nodes.Element;
@@ -12,6 +11,7 @@ import org.spiderflow.core.annotation.Return;
 import org.spiderflow.core.executor.FunctionExtension;
 import org.spiderflow.core.executor.function.DateFunctionExecutor;
 import org.spiderflow.core.utils.ExtractUtils;
+import org.spiderflow.core.utils.JacksonUtils;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -93,16 +93,22 @@ public class StringFunctionExtension implements FunctionExtension {
 		return element(source).select(cssQuery);
 	}
 
-	@Comment("将string转为json对象")
-	@Example("${strVar.json()}")
-	public static Object json(String source) {
-		return JSON.parse(source);
+	@Comment("将string转为Map对象")
+	@Example("${strVar.toMap()}")
+	public static Object toMap(String source) {
+		return JacksonUtils.json2Map(source);
+	}
+
+	@Comment("将string转为List对象")
+	@Example("${strVar.toList()}")
+	public static Object toList(String source) {
+		return JacksonUtils.json2ListMap(source);
 	}
 
 	@Comment("根据jsonpath提取内容")
 	@Example("${strVar.jsonpath('$.code')}")
 	public static Object jsonpath(String source, String jsonPath) {
-		return ExtractUtils.getValueByJsonPath(json(source), jsonPath);
+		return ExtractUtils.getValueByJsonPath(source, jsonPath);
 	}
 
 	@Comment("将字符串转为int类型")

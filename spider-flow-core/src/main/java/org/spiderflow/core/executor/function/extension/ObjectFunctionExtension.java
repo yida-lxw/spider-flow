@@ -1,6 +1,5 @@
 package org.spiderflow.core.executor.function.extension;
 
-import com.alibaba.fastjson.JSON;
 import org.spiderflow.core.annotation.Comment;
 import org.spiderflow.core.annotation.Example;
 import org.spiderflow.core.executor.FunctionExtension;
@@ -29,9 +28,6 @@ public class ObjectFunctionExtension implements FunctionExtension {
 	@Comment("根据jsonpath提取内容")
 	@Example("${objVar.jsonpath('$.code')}")
 	public static Object jsonpath(Object obj, String path) {
-		if (obj instanceof String) {
-			return ExtractUtils.getValueByJsonPath(JSON.parse((String) obj), path);
-		}
 		return ExtractUtils.getValueByJsonPath(obj, path);
 	}
 

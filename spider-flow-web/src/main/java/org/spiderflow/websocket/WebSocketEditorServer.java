@@ -1,8 +1,7 @@
 package org.spiderflow.websocket;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import org.spiderflow.core.Spider;
+import org.spiderflow.core.utils.JacksonUtils;
 import org.spiderflow.core.utils.SpiderFlowUtils;
 import org.spiderflow.model.SpiderWebSocketContext;
 import org.spiderflow.model.WebSocketEvent;
@@ -12,6 +11,7 @@ import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
+import java.util.Map;
 
 /**
  * WebSocket通讯编辑服务
@@ -28,16 +28,24 @@ public class WebSocketEditorServer {
 
 	@OnMessage
 	public void onMessage(String message, Session session) {
-		JSONObject event = JSON.parseObject(message);
-		String eventType = event.getString("eventType");
+		Map<String, Object> event = JacksonUtils.json2Map(message);
+		Object eventTypeObj = event.get("eventType");
+		String eventType = null;
+		if (null != eventTypeObj) {
+			eventType = eventTypeObj.toString();
+		}
 		boolean isDebug = "debug".equalsIgnoreCase(eventType);
 		if ("test".equalsIgnoreCase(eventType) || isDebug) {
 			context = new SpiderWebSocketContext(session);
 			context.setDebug(isDebug);
 			context.setRunning(true);
 			new Thread(() -> {
-				String xml = event.getString("message");
-				if (xml != null) {
+				Object messageObj = event.get("message");
+				String xml = null;
+				if (null != messageObj) {
+					xml = messageObj.toString();
+				}
+				if (xml != null && xml.length() > 0) {
 					spider.runWithTest(SpiderFlowUtils.loadXMLFromString(xml), context);
 					context.write(new WebSocketEvent<>("finish", null));
 				} else {

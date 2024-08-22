@@ -6,13 +6,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.type.CollectionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -90,20 +88,84 @@ public final class JacksonUtils {
 	}
 
 	/**
-	 * @param json
+	 * @param jsonString
 	 * @description 将JSON字符串转成List<T>
 	 * @author yida
 	 * @date 2023-09-09 10:08:18
 	 */
-	public static <T> List<T> json2List(String json, Class<T> clazz) {
+	public static <T> List<T> json2ListBean(String jsonString) {
+		if (null == jsonString || jsonString.length() == 0) {
+			return null;
+		}
 		try {
-			CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
-			//TypeReference<List<T>> typeReference = new TypeReference<List<T>>() {};
-			return objectMapper.readValue(json, listType);
+			//Type type = TypeToken.getParameterized(clazz1, clazz2).getType();
+			TypeReference<List<T>> typeReference = new TypeReference<List<T>>() {
+			};
+			return objectMapper.readValue(jsonString, typeReference);
 		} catch (IOException e) {
-			log.error("get the json data on the current group-info through http protocol, but occur exception,maybe request had been timeout.");
+			log.error("parse the jsonstring into List<T> occur exception:\n{}.", e.getMessage());
 			throw new RuntimeException(e.getMessage());
 		}
+	}
+
+	/**
+	 * @param jsonString
+	 * @description 将JSON字符串转成List<Map < K, V>>
+	 * @author yida
+	 * @date 2023-09-09 10:08:18
+	 */
+	public static <K, V> List<Map<K, V>> json2ListMap(String jsonString) {
+		if (null == jsonString || jsonString.length() == 0) {
+			return null;
+		}
+		try {
+			TypeReference<List<Map<K, V>>> typeReference = new TypeReference<List<Map<K, V>>>() {
+			};
+			return objectMapper.readValue(jsonString, typeReference);
+		} catch (IOException e) {
+			log.error("parse the jsonstring into List<Map<K, V>> occur exception:\n{}.", e.getMessage());
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+
+	/**
+	 * @param jsonString
+	 * @description 将JSON字符串转成List<List < E>>
+	 * @author yida
+	 * @date 2023-09-09 10:08:18
+	 */
+	public static <E> List<List<E>> json2ListWithElementList(String jsonString) {
+		if (null == jsonString || jsonString.length() == 0) {
+			return null;
+		}
+		try {
+			TypeReference<List<List<E>>> typeReference = new TypeReference<List<List<E>>>() {
+			};
+			return objectMapper.readValue(jsonString, typeReference);
+		} catch (IOException e) {
+			log.error("parse the jsonstring into List<List<E>> occur exception:\n{}.", e.getMessage());
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+
+	/**
+	 * @param jsonString
+	 * @description 将JSON字符串转成Map
+	 * @author yida
+	 * @date 2023-09-02 19:54:46
+	 */
+	public static <K, V> Map<K, V> json2Map(String jsonString) {
+		Map<K, V> map = null;
+		if (null == jsonString || jsonString.length() == 0) {
+			return map;
+		}
+		try {
+			TypeReference<Map<K, V>> typeReference = new TypeReference<Map<K, V>>() {
+			};
+			map = new ObjectMapper().readValue(jsonString, typeReference);
+		} catch (Exception e) {
+		}
+		return map;
 	}
 
 	/**
@@ -123,23 +185,6 @@ public final class JacksonUtils {
 	}
 
 	/**
-	 * @param jsonString
-	 * @description 将JSON字符串转成Map
-	 * @author yida
-	 * @date 2023-09-02 19:54:46
-	 */
-	public static <K, V> Map<K, V> json2Map(String jsonString) {
-		Map<K, V> map = null;
-		try {
-			TypeReference<Map<K, V>> typeReference = new TypeReference<Map<K, V>>() {
-			};
-			map = new ObjectMapper().readValue(jsonString, typeReference);
-		} catch (Exception e) {
-		}
-		return map;
-	}
-
-	/**
 	 * @param value
 	 * @return String
 	 * @description 将任意对象转换为JSON字符串
@@ -147,6 +192,9 @@ public final class JacksonUtils {
 	 * @date 2023-05-25 09:40:39
 	 */
 	public static String toJSONString(Object value) {
+		if (null == value) {
+			return null;
+		}
 		try {
 			return objectMapper.writeValueAsString(value);
 		} catch (IOException e) {

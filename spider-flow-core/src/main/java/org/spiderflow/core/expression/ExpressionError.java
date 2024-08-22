@@ -70,7 +70,7 @@ public class ExpressionError {
 	 * list of included templates, the {@link #getMessage()} method will return a condensed error message.
 	 **/
 	public static class TemplateException extends RuntimeException {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 8419454340253465494L;
 		private final Span location;
 		private final String errorMessage;
 
@@ -121,8 +121,7 @@ public class ExpressionError {
 	}
 
 	public static class StringLiteralException extends RuntimeException {
-
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 6719454596253465494L;
 
 	}
 }

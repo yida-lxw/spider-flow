@@ -1,11 +1,10 @@
 package org.spiderflow.model;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.spiderflow.core.context.SpiderContext;
 import org.spiderflow.core.model.SpiderLog;
 import org.spiderflow.core.model.SpiderOutput;
-import org.spiderflow.core.serializer.FastJsonSerializer;
+import org.spiderflow.core.utils.JacksonUtils;
 
 import javax.websocket.Session;
 import java.util.Date;
@@ -16,8 +15,7 @@ import java.util.Date;
  * @author Administrator
  */
 public class SpiderWebSocketContext extends SpiderContext {
-
-	private static final long serialVersionUID = -1205530535069540245L;
+	private static final long serialVersionUID = 1205890535069540209L;
 
 	private Session session;
 
@@ -48,7 +46,7 @@ public class SpiderWebSocketContext extends SpiderContext {
 
 	public <T> void write(WebSocketEvent<T> event) {
 		try {
-			String message = JSON.toJSONString(event, FastJsonSerializer.serializeConfig);
+			String message = JacksonUtils.toJSONString(event);
 			if (session.isOpen()) {
 				synchronized (session) {
 					session.getBasicRemote().sendText(message);

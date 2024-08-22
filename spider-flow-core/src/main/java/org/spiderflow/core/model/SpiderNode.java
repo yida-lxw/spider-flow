@@ -1,6 +1,5 @@
 package org.spiderflow.core.model;
 
-import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -96,24 +95,26 @@ public class SpiderNode {
 	}
 
 	public List<Map<String, String>> getListJsonValue(String... keys) {
-		List<JSONArray> arrays = new ArrayList<>();
+		List<List<String>> arrays = new ArrayList<>();
 		int size = -1;
 		List<Map<String, String>> result = new ArrayList<>();
 		for (int i = 0; i < keys.length; i++) {
-			JSONArray jsonArray = (JSONArray) this.jsonProperty.get(keys[i]);
-			if (jsonArray != null) {
+			List<String> list = null;
+			Object propertyObj = this.jsonProperty.get(keys[i]);
+			if (null != propertyObj && propertyObj instanceof List) {
+				list = (List<String>) propertyObj;
 				if (size == -1) {
-					size = jsonArray.size();
-				} else if (size != jsonArray.size()) {
+					size = list.size();
+				} else if (size != list.size()) {
 					throw new ArrayIndexOutOfBoundsException();
 				}
-				arrays.add(jsonArray);
+				arrays.add(list);
 			}
 		}
 		for (int i = 0; i < size; i++) {
 			Map<String, String> item = new HashMap<>();
 			for (int j = 0; j < keys.length; j++) {
-				String val = arrays.get(j).getString(i);
+				String val = arrays.get(j).get(i);
 				if (val != null) {
 					val = StringEscapeUtils.unescapeHtml4(val);
 				}

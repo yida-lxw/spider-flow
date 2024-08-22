@@ -94,7 +94,7 @@ public class ResponseFunctionExtension implements FunctionExtension {
 	@Comment("根据jsonpath提取请求结果")
 	@Example("${resp.jsonpath('$.code')}")
 	public static Object jsonpath(SpiderResponse response, String path) {
-		return ExtractUtils.getValueByJsonPath(response.getJson(), path);
+		return ExtractUtils.getValueByJsonPath(response.getHtml(), path);
 	}
 
 	@Comment("获取页面上的链接")

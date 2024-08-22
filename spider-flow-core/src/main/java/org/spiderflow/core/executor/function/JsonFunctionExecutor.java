@@ -1,9 +1,9 @@
 package org.spiderflow.core.executor.function;
 
-import com.alibaba.fastjson.JSON;
 import org.spiderflow.core.annotation.Comment;
 import org.spiderflow.core.annotation.Example;
 import org.spiderflow.core.executor.FunctionExecutor;
+import org.spiderflow.core.utils.JacksonUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,15 +20,15 @@ public class JsonFunctionExecutor implements FunctionExecutor {
 		return "json";
 	}
 
-	@Comment("将字符串转为json对象")
-	@Example("${json.parse('{code : 1}')}")
-	public static Object parse(String jsonString) {
-		return jsonString != null ? JSON.parse(jsonString) : null;
+	@Comment("将json字符串转为Map对象")
+	@Example("${json.toMap('{code : 1}')}")
+	public static Object toMap(String jsonString) {
+		return JacksonUtils.json2Map(jsonString);
 	}
 
 	@Comment("将对象转为json字符串")
 	@Example("${json.stringify(objVar)}")
 	public static String stringify(Object object) {
-		return object != null ? JSON.toJSONString(object) : null;
+		return JacksonUtils.toJSONString(object);
 	}
 }

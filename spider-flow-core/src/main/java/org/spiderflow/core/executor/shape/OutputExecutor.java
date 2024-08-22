@@ -1,6 +1,5 @@
 package org.spiderflow.core.executor.shape;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
@@ -14,9 +13,9 @@ import org.spiderflow.core.http.SpiderResponse;
 import org.spiderflow.core.listener.SpiderListener;
 import org.spiderflow.core.model.SpiderNode;
 import org.spiderflow.core.model.SpiderOutput;
-import org.spiderflow.core.serializer.FastJsonSerializer;
 import org.spiderflow.core.utils.DataSourceUtils;
 import org.spiderflow.core.utils.ExpressionUtils;
+import org.spiderflow.core.utils.JacksonUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +36,7 @@ import java.util.Set;
  */
 @Component
 public class OutputExecutor implements ShapeExecutor, SpiderListener {
+	private static Logger logger = LoggerFactory.getLogger(OutputExecutor.class);
 
 	public static final String OUTPUT_ALL = "output-all";
 
@@ -55,8 +55,6 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 	public static final String CSV_NAME = "csvName";
 
 	public static final String CSV_ENCODING = "csvEncoding";
-
-	private static Logger logger = LoggerFactory.getLogger(OutputExecutor.class);
 
 	/**
 	 * 输出CSVPrinter节点变量
@@ -133,9 +131,9 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 			}
 			//去除不能序列化的参数
 			try {
-				JSON.toJSONString(value, FastJsonSerializer.serializeConfig);
+				JacksonUtils.toJSONString(value);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("Parsing the value:{} to JSON String for validing occur exception:\n{}.", value, e.getMessage());
 				continue;
 			}
 			//输出信息

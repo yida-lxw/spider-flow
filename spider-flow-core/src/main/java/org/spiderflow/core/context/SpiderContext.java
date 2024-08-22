@@ -17,6 +17,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author jmxd
  */
 public class SpiderContext extends HashMap<String, Object> {
+	private static final long serialVersionUID = 8379165378417619790L;
 
 	private String id = UUID.randomUUID().toString().replace("-", "");
 
@@ -24,8 +25,6 @@ public class SpiderContext extends HashMap<String, Object> {
 	 * 流程ID
 	 */
 	private String flowId;
-
-	private static final long serialVersionUID = 8379177178417619790L;
 
 	/**
 	 * 流程执行线程

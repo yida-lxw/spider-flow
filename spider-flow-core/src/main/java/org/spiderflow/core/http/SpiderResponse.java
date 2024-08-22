@@ -1,10 +1,11 @@
 package org.spiderflow.core.http;
 
-import com.alibaba.fastjson.JSON;
 import org.spiderflow.core.annotation.Comment;
 import org.spiderflow.core.annotation.Example;
+import org.spiderflow.core.utils.JacksonUtils;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 public interface SpiderResponse {
@@ -21,10 +22,16 @@ public interface SpiderResponse {
 	@Example("${resp.html}")
 	String getHtml();
 
-	@Comment("获取json")
-	@Example("${resp.json}")
-	default Object getJson() {
-		return JSON.parse(getHtml());
+	@Comment("获取jsonMap")
+	@Example("${resp.jsonMap}")
+	default Map<String, Object> getJsonMap() {
+		return JacksonUtils.json2Map(getHtml());
+	}
+
+	@Comment("获取jsonList")
+	@Example("${resp.jsonList}")
+	default List<Map<String, Object>> getJsonList() {
+		return JacksonUtils.json2ListMap(getHtml());
 	}
 
 	@Comment("获取cookies")

@@ -1,11 +1,12 @@
 package org.spiderflow.core.io;
 
-import com.alibaba.fastjson.JSON;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.spiderflow.core.http.SpiderResponse;
+import org.spiderflow.core.utils.JacksonUtils;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,7 +26,9 @@ public class HttpResponse implements SpiderResponse {
 
 	private String titleName;
 
-	private Object jsonValue;
+	private Map<String, Object> jsonMap;
+
+	private List<Map<String, Object>> jsonList;
 
 	public HttpResponse(Response response) {
 		super();
@@ -60,11 +63,19 @@ public class HttpResponse implements SpiderResponse {
 	}
 
 	@Override
-	public Object getJson() {
-		if (jsonValue == null) {
-			jsonValue = JSON.parse(getHtml());
+	public Map<String, Object> getJsonMap() {
+		if (jsonMap == null || jsonMap.size() <= 0) {
+			jsonMap = JacksonUtils.json2Map(getHtml());
 		}
-		return jsonValue;
+		return jsonMap;
+	}
+
+	@Override
+	public List<Map<String, Object>> getJsonList() {
+		if (jsonList == null || jsonList.size() <= 0) {
+			jsonList = JacksonUtils.json2ListMap(getHtml());
+		}
+		return jsonList;
 	}
 
 	@Override

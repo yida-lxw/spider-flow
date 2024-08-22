@@ -1,12 +1,15 @@
 package org.spiderflow.model;
 
+import java.io.Serializable;
+
 /**
  * WebSocket事件
  *
  * @param <T>
  * @author Administrator
  */
-public class WebSocketEvent<T> {
+public class WebSocketEvent<T> implements Serializable {
+	private static final long serialVersionUID = 8379590378417619790L;
 
 	private String eventType;
 

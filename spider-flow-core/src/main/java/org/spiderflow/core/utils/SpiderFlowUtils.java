@@ -1,6 +1,5 @@
 package org.spiderflow.core.utils;
 
-import com.alibaba.fastjson.JSON;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -80,7 +79,7 @@ public class SpiderFlowUtils {
 	private static Map<String, Object> getSpiderFlowJsonProperty(Element element) {
 		Elements elements = element.getElementsByTag("JsonProperty");
 		if (!CollectionUtils.isEmpty(elements)) {
-			return JSON.parseObject(elements.get(0).html(), Map.class);
+			return JacksonUtils.json2Map(elements.get(0).html());
 		}
 		return null;
 	}

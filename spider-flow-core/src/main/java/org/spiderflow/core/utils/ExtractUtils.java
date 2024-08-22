@@ -1,6 +1,6 @@
 package org.spiderflow.core.utils;
 
-import com.alibaba.fastjson.JSONPath;
+import com.jayway.jsonpath.JsonPath;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import us.codecraft.xsoup.Xsoup;
@@ -148,8 +148,19 @@ public class ExtractUtils {
 		return result;
 	}
 
-	public static Object getValueByJsonPath(Object root, String jsonPath) {
-		return JSONPath.eval(root, jsonPath);
+	public static Object getValueByJsonPath(Object obj, String jsonPath) {
+		if (null == obj) {
+			return null;
+		}
+		if (obj instanceof String) {
+			return JsonPath.read(obj.toString(), jsonPath);
+		}
+		String jsonString = JacksonUtils.toJSONString(obj);
+		return JsonPath.read(jsonString, jsonPath);
+	}
+
+	public static Object getValueByJsonPath(String jsonString, String jsonPath) {
+		return JsonPath.read(jsonString, jsonPath);
 	}
 
 	public static List<String> getValuesByXPath(Element element, String xpath) {
