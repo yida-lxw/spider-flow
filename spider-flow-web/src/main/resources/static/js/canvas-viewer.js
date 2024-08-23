@@ -326,11 +326,11 @@ CanvasViewer.prototype.redraw = function () {
 	this._drawScroll();
 }
 CanvasViewer.prototype._drawLongText = function (text, x, y, maxWidth, calcWidth) {
+	var textArr = Array.from(text);
 	var length = text.length;
 	var index = 0;
 	var width = 0;
-	while (index < length) {
-		var str = text.substr(index, 1);
+	for(let str of text) {
 		var w = this.context.measureText(str).width;
 		width += w;
 		if (width > maxWidth) {
