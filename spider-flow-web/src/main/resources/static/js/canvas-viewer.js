@@ -44,7 +44,8 @@ function CanvasViewer(options) {
 	};
 	this.grid = options.grid;
 	this.header = options.header;
-	this.canvas.onmousemove = function (e) {
+
+	var onMousemove = function (e) {
 		var x = e.offsetX;
 		var y = e.offsetY;
 		_this.mouseX = x;
@@ -79,16 +80,17 @@ function CanvasViewer(options) {
 			var canvasWidth = _this.canvas.width - 8;
 			_this.startX = Math.max(Math.min(_this.startX - (canvasWidth / _this.slideWidth) * delta, _this.grid ? 5 : 0), canvasWidth - _this.maxWidth)
 		}
-
 	}
-	this.canvas.onmousewheel = function (e) {
+
+	var onMousewheel = function (e) {
 		if (e.wheelDelta > 0) {	//向上滚动
 			_this.scrollTo(Math.max(_this.startIndex - 2, 0));
 		} else {
 			_this.scrollTo(Math.max(Math.min(_this.startIndex + 1, _this.lines.length - _this.maxRows), 0));
 		}
 	}
-	this.canvas.onmousedown = function (e) {
+
+	var onMousedown = function (e) {
 		if (e.offsetX > _this.canvas.width - 8 && e.offsetY < _this.canvas.height - 8) {
 			_this.mouseEvent = 1;
 			_this.mouseDownX = e.offsetX;
@@ -100,11 +102,21 @@ function CanvasViewer(options) {
 			_this.mouseDownY = e.offsetY;
 		}
 	}
-	this.canvas.onmouseup = this.canvas.onmouseout = function () {
+
+	var onMouseup = function () {
 		_this.mouseEvent = 0;
 		_this.mouseDownX = 0;
 		_this.mouseDownY = 0;
 	}
+
+	//解决chrome passive event 警告问题
+	this.canvas.addEventListener("mousemove", onMousemove, { passive: true });
+	this.canvas.addEventListener("mousewheel", onMousewheel, { passive: true });
+	this.canvas.addEventListener("mousedown", onMousedown, { passive: true });
+	this.canvas.addEventListener("mouseup", onMouseup, { passive: true });
+	this.canvas.addEventListener("mouseout", onMouseup, { passive: true });
+
+
 	this.canvas.onclick = function (e) {
 		var x = e.offsetX;
 		var y = e.offsetY;
@@ -326,11 +338,11 @@ CanvasViewer.prototype.redraw = function () {
 	this._drawScroll();
 }
 CanvasViewer.prototype._drawLongText = function (text, x, y, maxWidth, calcWidth) {
+	var textArr = Array.from(text);
 	var length = text.length;
 	var index = 0;
 	var width = 0;
-	while (index < length) {
-		var str = text.substr(index, 1);
+	for(let str of text) {
 		var w = this.context.measureText(str).width;
 		width += w;
 		if (width > maxWidth) {
