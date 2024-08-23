@@ -232,7 +232,7 @@ layui.define(["jquery", "laytpl"], function (exports) {
             // 渲染第一层
             laytpl(TPL_ELEM(options, 0)).render(options.data, function (string) {
                 options.elem.html(string).children().show();
-            });
+            }); 
             // 懒加载 > 展开所有 > 初始展开项 > 初始渲染所有子节点 > 初始选中项 > 每次点击只渲染当前层（默认）
             // 判断所有dom是否全部加载
             if (!options.lazy) {
@@ -257,7 +257,7 @@ layui.define(["jquery", "laytpl"], function (exports) {
             if (!options.url) {
                 laytpl(TPL_NoText()).render(options, function (string) {
                     options.elem.html(string);
-                });
+                }); 
                 return;
             }
             var data = $.extend({}, options.where);
@@ -683,7 +683,7 @@ layui.define(["jquery", "laytpl"], function (exports) {
                 node.length !== 0 && laytpl(TPL_ELEM(options, floor)).render(data, function (string) {
                     $(node).children(".eleTree-node-group").empty().append(string);
                     options.defaultExpandAll && $(node).children(".eleTree-node-group").children().show();
-                });
+                }); 
                 _self.unCheckNodes();
                 _self.defaultChecked();
             });
@@ -742,7 +742,7 @@ layui.define(["jquery", "laytpl"], function (exports) {
                 eletreeStatus = eletreeStatus === "2" ? "0" : eletreeStatus;
                 node.length !== 0 && laytpl(TPL_ELEM(options, floor, eletreeStatus)).render([arr[len - 1]], function (string) {
                     node.children(".eleTree-node-group").append(string).children().show();
-                });
+                }); 
             });
             this.checkboxRender();
         },
@@ -760,7 +760,7 @@ layui.define(["jquery", "laytpl"], function (exports) {
                 eletreeStatus = eletreeStatus === "2" ? "0" : eletreeStatus;
                 node.length !== 0 && laytpl(TPL_ELEM(options, floor, eletreeStatus)).render([data], function (string) {
                     node.before(string).prev(".eleTree-node").show();
-                });
+                }); 
             });
             this.checkboxRender();
         },
@@ -778,7 +778,7 @@ layui.define(["jquery", "laytpl"], function (exports) {
                 eletreeStatus = eletreeStatus === "2" ? "0" : eletreeStatus;
                 node.length !== 0 && laytpl(TPL_ELEM(options, floor, eletreeStatus)).render([data], function (string) {
                     $(node).after(string).next(".eleTree-node").show();
-                });
+                }); 
             });
             this.checkboxRender();
             // if(!options.lazy){

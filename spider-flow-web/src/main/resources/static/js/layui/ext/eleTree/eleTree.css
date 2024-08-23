@@ -28,7 +28,6 @@
     line-height: 1.3;
     white-space: nowrap;
 }
-
 .eleTree-node-content:hover,
 .eleTree-node-content.eleTree-node-content-active {
     background-color: #eee;
@@ -70,7 +69,6 @@
 input.eleTree-hideen[type=checkbox] {
     display: none;
 }
-
 .eleTree-checkbox {
     height: auto !important;
     line-height: normal !important;
@@ -81,7 +79,6 @@ input.eleTree-hideen[type=checkbox] {
     position: relative;
     display: inline-block;
 }
-
 .eleTree-checkbox i {
     left: 0;
     border: 1px solid #d2d2d2;
@@ -99,11 +96,9 @@ input.eleTree-hideen[type=checkbox] {
     height: 14px;
     line-height: 1.3;
 }
-
 .eleTree-checkbox i:hover {
     border-color: #5FB878;
 }
-
 .eleTree-checkbox-checked i {
     border-color: #5FB878;
     background-color: #5FB878;
@@ -166,5 +161,4 @@ input.eleTree-hideen[type=checkbox] {
 .tree-menu-bg {
     background-color: #ccc;
 }
-
 /* #endregion */
