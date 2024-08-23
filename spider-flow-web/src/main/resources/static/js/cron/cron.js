@@ -156,7 +156,6 @@ function initYear(strVal) {
         $("#yearEnd_0").numberspinner('setValue', ary[1]);
     }
 }
-
 /**
  * 每周期
  */

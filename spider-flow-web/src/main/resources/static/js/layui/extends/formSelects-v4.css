@@ -86,7 +86,6 @@ select[xm-select] {
     -webkit-animation-fill-mode: both;
     animation-fill-mode: both
 }
-
 @-webkit-keyframes layui-upbit {
     from {
         -webkit-transform: translate3d(0, 30px, 0);
@@ -97,7 +96,6 @@ select[xm-select] {
         opacity: 1
     }
 }
-
 @keyframes layui-upbit {
     from {
         transform: translate3d(0, 30px, 0);

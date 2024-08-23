@@ -1,186 +1,162 @@
 <div class="layui-tab layui-tab-fixed layui-tab-brief">
-    <ul class="layui-tab-title">
-        <li class="layui-this">全局配置</li>
-        <li>全局参数</li>
-        <li>全局Cookie</li>
-        <li>全局Header</li>
-    </ul>
-    <div class="layui-tab-content editor-form-node">
-        <div class="layui-tab-item layui-show">
-            <form name="spider-base-form" class="layui-form layui-row">
-                <div class="layui-col-md4">
-                    <label class="layui-form-label">爬虫名称</label>
-                    <div class="layui-input-block">
-                        <input type="text" name="spiderName" placeholder="请输入爬虫名称" autocomplete="off"
-                               class="layui-input" value="{{d.data.object.spiderName || '未定义名称'}}">
-                    </div>
-                </div>
-                <div class="layui-col-md4">
-                    <label class="layui-form-label">提交策略</label>
-                    <div class="layui-input-block">
-                        <select name="submit-strategy">
-                            <option value="random"
-                                    selected="{{d.data.object['submit-strategy'] == 'random' ? 'selected':'false'}}">随机
-                            </option>
-                            <option value="linked"
-                                    selected="{{d.data.object['submit-strategy'] == 'linked' ? 'selected':'false'}}">顺序
-                            </option>
-                            <option value="child"
-                                    selected="{{d.data.object['submit-strategy'] == 'child' ? 'selected':'false'}}">子优先
-                            </option>
-                            <option value="parent"
-                                    selected="{{d.data.object['submit-strategy'] == 'parent' ? 'selected':'false'}}">父优先
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="layui-col-md4">
-                    <label class="layui-form-label">最大线程数</label>
-                    <div class="layui-input-block">
-                        <input type="number" min="1" name="threadCount" placeholder="请输入线程数" autocomplete="off"
-                               class="layui-input" value="{{=d.data.object.threadCount}}">
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="layui-tab-item">
-            <form class="layui-form">
-                <table class="layui-table" id="global-parameter" data-cell="{{=d.cell.id}}"
-                       data-keys="parameter-name,parameter-value,parameter-description"></table>
-                <div class="layui-form-item">
-                    <div class="layui-input-inline">
-                        <button class="layui-btn table-row-add" type="button" for="global-parameter">添加一个参数
-                        </button>
-                    </div>
-                    <div class="layui-input-inline">
-                        <button class="layui-btn parameter-batch" type="button" for="global-parameter">批量设置参数
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="layui-tab-item">
-            <form class="layui-form">
-                <table class="layui-table" id="global-cookie" data-cell="{{=d.cell.id}}"
-                       data-keys="cookie-name,cookie-value,cookie-description"></table>
-                <div id="addCookieBtn" class="layui-form-item">
-                    <div class="layui-input-inline">
-                        <button class="layui-btn table-row-add" type="button" for="global-cookie">添加一个Cookie
-                        </button>
-                    </div>
-                    <div class="layui-input-inline">
-                        <button class="layui-btn cookie-batch" type="button" for="global-cookie">批量设置Cookie</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="layui-tab-item">
-            <form class="layui-form">
-                <table class="layui-table" id="global-header" data-cell="{{=d.cell.id}}"
-                       data-keys="header-name,header-value,header-description"></table>
-                <div class="layui-input-inline">
-                    <button class="layui-btn table-row-add" type="button" for="global-header">添加一个Header</button>
-                </div>
-                <div class="layui-input-inline">
-                    <button class="layui-btn header-batch" type="button" for="global-header">批量设置Header</button>
-                </div>
-            </form>
-        </div>
+  <ul class="layui-tab-title">
+    <li class="layui-this">全局配置</li>
+    <li>全局参数</li>
+	<li>全局Cookie</li>
+    <li>全局Header</li>
+  </ul>
+  <div class="layui-tab-content editor-form-node">
+    <div class="layui-tab-item layui-show">
+    	<form class="layui-form layui-row">
+			<div class="layui-col-md4">
+				<label class="layui-form-label">爬虫名称</label>
+				<div class="layui-input-block">
+					<input type="text" name="spiderName" placeholder="请输入爬虫名称" autocomplete="off" class="layui-input" value="{{d.data.object.spiderName || '未定义名称'}}">
+				</div>
+			</div>
+			<div class="layui-col-md4">
+				<label class="layui-form-label">提交策略</label>
+				<div class="layui-input-block">
+					<select name="submit-strategy">
+						<option value="random" {{d.data.object['submit-strategy'] == 'random' ? 'selected':''}}>随机</option>
+						<option value="linked" {{d.data.object['submit-strategy'] == 'linked' ? 'selected':''}}>顺序</option>
+						<option value="child"  {{d.data.object['submit-strategy'] == 'child'  ? 'selected':''}}>子优先</option>
+						<option value="parent" {{d.data.object['submit-strategy'] == 'parent' ? 'selected':''}}>父优先</option>
+					</select>
+				</div>
+			</div>
+			<div class="layui-col-md4">
+				<label class="layui-form-label">最大线程数</label>
+				<div class="layui-input-block">
+					<input type="number" min="1" name="threadCount" placeholder="请输入线程数" autocomplete="off" class="layui-input" value="{{=d.data.object.threadCount}}">
+				</div>
+			</div>
+    	</form>
     </div>
+    <div class="layui-tab-item">
+   		<form class="layui-form">
+			<table class="layui-table" id="global-parameter" data-cell="{{=d.cell.id}}" data-keys="parameter-name,parameter-value,parameter-description"></table>
+	   		<div class="layui-form-item">
+	   			<div class="layui-input-inline">
+	    			<button class="layui-btn table-row-add" type="button" for="global-parameter">添加一个参数</button>
+	    		</div>
+				<div class="layui-input-inline">
+					<button class="layui-btn parameter-batch" type="button" for="global-parameter">批量设置参数</button>
+				</div>
+	    	</div>
+	    </form>
+    </div>
+	<div class="layui-tab-item">
+	  <form class="layui-form">
+		  <table class="layui-table" id="global-cookie" data-cell="{{=d.cell.id}}" data-keys="cookie-name,cookie-value,cookie-description"></table>
+		  <div id="addCookieBtn" class="layui-form-item">
+			  <div class="layui-input-inline">
+				  <button class="layui-btn table-row-add" type="button" for="global-cookie">添加一个Cookie</button>
+			  </div>
+			  <div class="layui-input-inline">
+				  <button class="layui-btn cookie-batch" type="button" for="global-cookie">批量设置Cookie</button>
+			  </div>
+		  </div>
+	  </form>
+	</div>
+    <div class="layui-tab-item">
+   		<form class="layui-form">
+			<table class="layui-table" id="global-header" data-cell="{{=d.cell.id}}" data-keys="header-name,header-value,header-description"></table>
+			<div class="layui-input-inline">
+				<button class="layui-btn table-row-add" type="button" for="global-header">添加一个Header</button>
+			</div>
+			<div class="layui-input-inline">
+				<button class="layui-btn header-batch" type="button" for="global-header">批量设置Header</button>
+			</div>
+	    </form>
+    </div>
+  </div>
 </div>
-<script type="text/javascript">
-    function renderGlobalParameter(data) {
-        layui.table.render({
-            elem: '#global-parameter',
-            limit: 50,
-            cols: [
-                [{
-                    title: '参数名',
-                    width: 150,
-                    templet: '#parameter-name-tmpl'
-                }, {
-                    title: '参数值',
-                    templet: '#parameter-value-tmpl'
-                }, {
-                    title: '参数描述',
-                    width: 250,
-                    templet: '#parameter-description-tmpl'
-                }, {
-                    title: '操作',
-                    width: 120,
-                    align: 'center',
-                    templet: '#common-operation'
-                }]
-            ],
-            data: data,
-            text: {
-                none: '暂未设置参数'
-            }
-        })
-    }
+<script>
+	function renderGlobalParameter(data){
+		layui.table.render({
+			elem : '#global-parameter',
+			limit: 50,
+			cols : [[{
+				title : '参数名',
+				width : 150,
+				templet : '#parameter-name-tmpl'
+			},{
+				title : '参数值',
+				templet : '#parameter-value-tmpl'
+			},{
+				title : '参数描述',
+				width : 250,
+				templet : '#parameter-description-tmpl'
+			},{
+				title : '操作',
+				width : 120,
+				align : 'center',
+				templet : '#common-operation'
+			}]],
+			data : data,
+			text : {
+				none : '暂未设置参数'
+			}
+		})
+	}
+	function renderGlobalCookie(data){
+		layui.table.render({
+			elem : '#global-cookie',
+			limit: 50,
+			cols : [[{
+				title : 'Cookie名',
+				width : 150,
+				templet : '#cookie-name-tmpl'
+			},{
+				title : 'Cookie值',
+				templet : '#cookie-value-tmpl'
+			},{
+				title : '描述',
+				width : 250,
+				templet : '#cookie-description-tmpl'
+			},{
+				title : '操作',
+				width : 120,
+				align : 'center',
+				templet : '#common-operation'
+			}]],
+			data : data,
+			text : {
+				none : '暂未设置Cookie'
+			}
+		})
+	}
 
-    function renderGlobalCookie(data) {
-        layui.table.render({
-            elem: '#global-cookie',
-            limit: 50,
-            cols: [
-                [{
-                    title: 'Cookie名',
-                    width: 150,
-                    templet: '#cookie-name-tmpl'
-                }, {
-                    title: 'Cookie值',
-                    templet: '#cookie-value-tmpl'
-                }, {
-                    title: '描述',
-                    width: 250,
-                    templet: '#cookie-description-tmpl'
-                }, {
-                    title: '操作',
-                    width: 120,
-                    align: 'center',
-                    templet: '#common-operation'
-                }]
-            ],
-            data: data,
-            text: {
-                none: '暂未设置Cookie'
-            }
-        })
-    }
-
-    function renderGlobalHeader(data) {
-        layui.table.render({
-            elem: '#global-header',
-            limit: 50,
-            cols: [
-                [{
-                    title: 'Header名',
-                    width: 150,
-                    templet: '#header-name-tmpl'
-                }, {
-                    title: 'header值',
-                    minWidth: 400,
-                    templet: '#header-value-tmpl'
-                }, {
-                    title: '描述',
-                    width: 250,
-                    templet: '#header-description-tmpl'
-                }, {
-                    title: '操作',
-                    width: 120,
-                    align: 'center',
-                    templet: '#common-operation'
-                }]
-            ],
-            data: data,
-            text: {
-                none: '暂未设置Header'
-            }
-        })
-    }
-
-    renderGlobalParameter(getCellData(d.cell.id, $("#global-parameter").data('keys').split(",")));
-    renderGlobalCookie(getCellData(d.cell.id, $("#global-cookie").data('keys').split(",")));
-    renderGlobalHeader(getCellData(d.cell.id, $("#global-header").data('keys').split(",")));
+	function renderGlobalHeader(data){
+		layui.table.render({
+			elem : '#global-header',
+			limit: 50,
+			cols : [[{
+				title : 'Header名',
+				width : 150,
+				templet : '#header-name-tmpl'
+			},{
+				title : 'header值',
+				minWidth : 400,
+				templet : '#header-value-tmpl'
+			},{
+				title : '描述',
+				width : 250,
+				templet : '#header-description-tmpl'
+			},{
+				title : '操作',
+				width : 120,
+				align : 'center',
+				templet : '#common-operation'
+			}]],
+			data : data,
+			text : {
+				none : '暂未设置Header'
+			}
+		})
+	}
+	renderGlobalParameter(getCellData({{d.cell.id}},$("#global-parameter").data('keys').split(",")));
+	renderGlobalCookie(getCellData({{d.cell.id}},$("#global-cookie").data('keys').split(",")));
+	renderGlobalHeader(getCellData({{d.cell.id}},$("#global-header").data('keys').split(",")));
 </script>
