@@ -39,6 +39,8 @@ public final class JacksonUtils {
 		objectMapper.setDateFormat(new SimpleDateFormat(DEFAULT_DATE_FORMAT));
 		objectMapper.setLocale(Locale.CHINA);
 		objectMapper.setTimeZone(TimeZone.getTimeZone(DEFAULT_TIMEZONE));
+		//map按key进行排序
+		objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
 	}
 
 	private JacksonUtils() {

@@ -338,7 +338,6 @@ CanvasViewer.prototype.redraw = function () {
 	this._drawScroll();
 }
 CanvasViewer.prototype._drawLongText = function (text, x, y, maxWidth, calcWidth) {
-	var textArr = Array.from(text);
 	var length = text.length;
 	var index = 0;
 	var width = 0;
@@ -360,7 +359,6 @@ CanvasViewer.prototype._drawLongText = function (text, x, y, maxWidth, calcWidth
 		if (calcWidth === undefined) {
 			this.context.fillText('...', x + width - w, y);
 		}
-
 	}
 	return width;
 }

@@ -223,6 +223,4 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 		grammer.setReturns(Arrays.asList("List<Map<String,Object>>", "int"));
 		return Collections.singletonList(grammer);
 	}
-
-
 }
