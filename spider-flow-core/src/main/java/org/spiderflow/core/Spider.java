@@ -135,16 +135,16 @@ public class Spider {
 			submitStrategy = new RandomThreadSubmitStrategy();
 		}
 		//创建子线程池，采用一父多子的线程池,子线程数不能超过总线程数（超过时进入队列等待）,+1是因为会占用一个线程用来调度执行下一级
-		SubThreadPoolExecutor pool = executorInstance.createSubThreadPoolExecutor(Math.max(nThreads, 1) + 1, submitStrategy);
+		SubThreadPoolExecutor subThreadPoolExecutor = executorInstance.createSubThreadPoolExecutor(Math.max(nThreads, 1) + 1, submitStrategy);
 		context.setRootNode(root);
-		context.setThreadPool(pool);
+		context.setThreadPool(subThreadPoolExecutor);
 		//触发监听器
 		if (listeners != null) {
 			listeners.forEach(listener -> listener.beforeStart(context));
 		}
 		Comparator<SpiderNode> comparator = submitStrategy.comparator();
 		//启动一个线程开始执行任务,并监听其结束并执行下一级
-		Future<?> f = pool.submitAsync(TtlRunnable.get(() -> {
+		Future<?> future = subThreadPoolExecutor.submitAsync(TtlRunnable.get(() -> {
 			try {
 				//执行具体节点
 				Spider.this.executeNode(null, root, context, variables);
@@ -152,21 +152,24 @@ public class Spider {
 				//循环从队列中获取Future,直到队列为空结束,当任务完成时，则执行下一级
 				while (!queue.isEmpty()) {
 					try {
-						//TODO 这里应该是取出最先执行完毕的任务
-						Optional<Future<?>> max = queue.stream().filter(Future::isDone).max((o1, o2) -> {
+						// 优先取出最先执行完毕的任务(SpiderNode以实现按照执行完成时间排序，执行完成时间越小表明越先完成任务)
+						Optional<Future<?>> minFutureOptional = queue.stream().filter(Future::isDone).min((o1, o2) -> {
 							try {
 								return comparator.compare(((SpiderTask) o1.get()).node, ((SpiderTask) o2.get()).node);
 							} catch (InterruptedException | ExecutionException e) {
 							}
 							return 0;
-
 						});
-						if (max.isPresent()) {    //判断任务是否完成
-							queue.remove(max.get());
-							if (context.isRunning()) {    //检测是否运行中(当在页面中点击"停止"时,此值为false,其余为true)
-								SpiderTask task = (SpiderTask) max.get().get();
-								task.node.decrement();    //任务执行完毕,计数器减一(该计数器是给Join节点使用)
-								if (task.executor.allowExecuteNext(task.node, context, task.variables)) {    //判断是否允许执行下一级
+						//判断任务是否完成
+						if (minFutureOptional.isPresent()) {
+							queue.remove(minFutureOptional.get());
+							//检测是否运行中(当在页面中点击"停止"时,此值为false,其余为true)
+							if (context.isRunning()) {
+								SpiderTask task = (SpiderTask) minFutureOptional.get().get();
+								//任务执行完毕,计数器减一(该计数器是给Join节点使用)
+								task.node.decrement();
+								//判断是否允许执行下一级
+								if (task.executor.allowExecuteNext(task.node, context, task.variables)) {
 									logger.debug("执行节点[{}:{}]完毕", task.node.getNodeName(), task.node.getNodeId());
 									//执行下一级
 									Spider.this.executeNextNodes(task.node, context, task.variables);
@@ -183,7 +186,7 @@ public class Spider {
 					}
 				}
 				//等待线程池结束
-				pool.awaitTermination();
+				subThreadPoolExecutor.awaitTermination();
 			} finally {
 				//触发监听器
 				if (listeners != null) {
@@ -192,7 +195,7 @@ public class Spider {
 			}
 		}), null, root);
 		try {
-			f.get();    //阻塞等待所有任务执行完毕
+			future.get();    //阻塞等待所有任务执行完毕
 		} catch (InterruptedException | ExecutionException ignored) {
 		}
 	}
@@ -302,6 +305,9 @@ public class Spider {
 							} catch (Throwable t) {
 								nVariables.put("ex", t);
 								logger.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), t);
+							} finally {
+								//设置节点执行完成时间的毫秒数
+								node.setExecutionCompletedTimeMills(System.currentTimeMillis());
 							}
 						}
 					}), node, nVariables, executor));

@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author jmxd
  */
-public class SpiderNode {
+public class SpiderNode implements Comparable<SpiderNode> {
 	/**
 	 * 节点的Json属性
 	 */
@@ -64,6 +64,11 @@ public class SpiderNode {
 	 * 计数器,用来计算当前节点执行中的个数
 	 */
 	private AtomicInteger counter = new AtomicInteger();
+
+	/**
+	 * 当前节点执行完成时间,以毫秒数表示
+	 */
+	private Long executionCompletedTimeMills;
 
 	public String getNodeId() {
 		return nodeId;
@@ -171,6 +176,14 @@ public class SpiderNode {
 		counter.decrementAndGet();
 	}
 
+	public Long getExecutionCompletedTimeMills() {
+		return executionCompletedTimeMills;
+	}
+
+	public void setExecutionCompletedTimeMills(Long executionCompletedTimeMills) {
+		this.executionCompletedTimeMills = executionCompletedTimeMills;
+	}
+
 	public boolean hasLeftNode(String nodeId) {
 		if (parentNodes == null) {
 			Set<String> parents = new HashSet<>();
@@ -208,5 +221,19 @@ public class SpiderNode {
 	public String toString() {
 		return "SpiderNode [jsonProperty=" + jsonProperty + ", nextNodes=" + nextNodes + ", condition=" + condition
 				+ ", nodeName=" + nodeName + ", nodeId=" + nodeId + "]";
+	}
+
+	@Override
+	public int compareTo(SpiderNode spiderNode) {
+		if (null == spiderNode && null == this) {
+			return 0;
+		}
+		if (null == spiderNode) {
+			return 1;
+		}
+		if (null == this) {
+			return -1;
+		}
+		return this.getExecutionCompletedTimeMills().compareTo(spiderNode.getExecutionCompletedTimeMills());
 	}
 }

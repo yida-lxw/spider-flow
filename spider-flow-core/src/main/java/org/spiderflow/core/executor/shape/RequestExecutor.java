@@ -113,6 +113,12 @@ public class RequestExecutor implements ShapeExecutor, Grammerable, SpiderListen
 	@Value("${spider.bloomfilter.error-rate:0.00001}")
 	private Double errorRate;
 
+	/**
+	 * 是否为重试后仍然失败的请求记录日志
+	 */
+	@Value("${spider.record-failed-request-after-retry:false}")
+	private boolean recordFailedRequestAfterRetry;
+
 	@Override
 	public String supportShape() {
 		return "request";
@@ -323,16 +329,16 @@ public class RequestExecutor implements ShapeExecutor, Grammerable, SpiderListen
 						}
 						logger.info("第{}次重试:{}", i + 1, url);
 					} else {
-						//记录访问失败的日志
-						if (context.getFlowId() != null) { //测试环境
-							//TODO 需增加记录请求参数
+						//记录重试后仍访问失败的请求日志
+						if (recordFailedRequestAfterRetry && context.getFlowId() != null) {
 							File file = new File(workspcace, context.getFlowId() + File.separator + "logs" + File.separator + "access_error.log");
 							try {
 								File directory = file.getParentFile();
 								if (!directory.exists()) {
 									directory.mkdirs();
 								}
-								FileUtils.write(file, url + "\r\n", "UTF-8", true);
+								String recordRequestJSON = JacksonUtils.toJSONString(httpRequestBean);
+								FileUtils.write(file, recordRequestJSON + "\r\n", "UTF-8", true);
 							} catch (IOException ignored) {
 							}
 						}

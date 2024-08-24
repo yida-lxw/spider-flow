@@ -16,6 +16,8 @@ server:
 
 
 spider:
+  # 是否为重试后仍然失败的请求记录日志
+  record-failed-request-after-retry: true
   notice:
     content:
       end: 流程执行完毕：{name}，结束时间：{currentDate}
