@@ -1,0 +1,55 @@
+spider:
+  workspace: /Users/yida/spider_spaces
+  thread:
+    default: 8
+    max: 64
+  bloomfilter:
+    capacity: 1000000
+    error-rate: 1.0E-4
+  job:
+    enable: false
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 1111
+    url: jdbc:mysql://localhost:3306/spiderflow?useSSL=false&useUnicode=true&characterEncoding=UTF8&serverTimezone=Asia/Shanghai&autoReconnect=true&rewriteBatchedStatements=true
+    hikari:
+      pool-name: HikariCP-JDBC-Connection-Pool
+      maximum-pool-size: 2000
+      minimum-idle: 10
+      connection-timeout: 5000
+      # 连接在池中闲置的最长时间(单位:毫秒)
+      idle-timeout: 600000
+      # 池中连接的最大生存期(单位:毫秒)
+      max-lifetime: 1800000
+      # 对连接进行有效性检测的间隔(单位:毫秒)
+      keepalive-time: 60000
+      # 连接的事务是否自动提交,默认为true
+      auto-commit: true
+      connection-test-query: select 1 from dual
+  mail:
+    default-encoding: UTF-8
+    host: smtp.qq.com
+    password: xxxx
+    port: 465
+    properties:
+      mail:
+        smtp:
+          auth: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+            fallback: false
+            port: 465
+          starttls:
+            enable: true
+            required: true
+    protocol: smtp
+    username: xxxx@qq.com
+
+selenium:
+  driver:
+    chrome: D:/chromedriver-127.0.6533.119-win64/chromedriver.exe
+    firefox: D:/geckodriver-v0.34.0-win64/geckodriver.exe
+

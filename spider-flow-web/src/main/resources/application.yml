@@ -41,6 +41,13 @@ spring:
   banner:
     charset: utf-8
     location: classpath:banner.txt
+  output:
+    ansi:
+      enabled: ALWAYS
+
+mybatis-plus:
+  global-config:
+    banner: false
 
 selenium:
   driver:
