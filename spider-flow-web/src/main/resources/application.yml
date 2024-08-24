@@ -38,6 +38,9 @@ spring:
     serialization:
       fail_on_empty_beans: false
     time-zone: Asia/Shanghai
+  banner:
+    charset: utf-8
+    location: classpath:banner.txt
 
 selenium:
   driver:

@@ -200,8 +200,9 @@ public class Spider {
 			}
 		}), null, root);
 		try {
-			future.get();    //阻塞等待所有任务执行完毕
-		} catch (InterruptedException | ExecutionException ignored) {
+			//阻塞等待所有任务执行完毕
+			future.get();
+		} catch (InterruptedException | ExecutionException e) {
 		}
 	}
 
@@ -345,7 +346,8 @@ public class Spider {
 				return false;
 			}
 			String condition = node.getCondition(fromNode.getNodeId());
-			if (StringUtils.isNotBlank(condition)) { // 判断是否有条件
+			// 判断是否有条件
+			if (StringUtils.isNotBlank(condition)) {
 				Object result = null;
 				try {
 					result = ExpressionUtils.execute(condition, variables);
@@ -364,13 +366,9 @@ public class Spider {
 	}
 
 	class SpiderTask {
-
 		Runnable runnable;
-
 		SpiderNode node;
-
 		Map<String, Object> variables;
-
 		ShapeExecutor executor;
 
 		public SpiderTask(Runnable runnable, SpiderNode node, Map<String, Object> variables, ShapeExecutor executor) {
