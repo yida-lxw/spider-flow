@@ -125,7 +125,6 @@ public class SubThreadPoolExecutor {
 				executing.decrementAndGet();
 			}
 		}, value, node, this);
-
 		submitStrategy.add(future);
 		//如果是第一次调用submitSync方法，则启动提交任务线程
 		if (!submitting) {
@@ -135,7 +134,6 @@ public class SubThreadPoolExecutor {
 		synchronized (submitStrategy) {
 			//通知继续从集合中取任务提交到线程池中
 			submitStrategy.notifyAll();
-
 		}
 		return future;
 	}

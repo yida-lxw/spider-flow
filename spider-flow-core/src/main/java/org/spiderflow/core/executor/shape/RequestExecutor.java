@@ -195,7 +195,7 @@ public class RequestExecutor implements ShapeExecutor, Grammerable, SpiderListen
 			request.followRedirect(followRedirects);
 			logger.debug("设置跟随重定向：{}", followRedirects);
 
-			//是否验证TLS证书,默认是验证
+			//是否验证TLS证书
 			if ("0".equals(node.getStringJsonValue(TLS_VALIDATE))) {
 				request.validateTLSCertificates(false);
 				logger.debug("设置TLS证书验证：{}", false);

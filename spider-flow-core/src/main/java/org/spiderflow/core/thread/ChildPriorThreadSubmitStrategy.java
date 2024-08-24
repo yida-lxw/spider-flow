@@ -10,6 +10,9 @@ public class ChildPriorThreadSubmitStrategy implements ThreadSubmitStrategy {
 	private Object mutex = this;
 
 	private Comparator<SpiderNode> comparator = (o1, o2) -> {
+		if (o1.equals(o2) || o1.getNodeId().equals(o2.getNodeId())) {
+			return 0;
+		}
 		if (o1.hasLeftNode(o2.getNodeId())) {
 			return -1;
 		}

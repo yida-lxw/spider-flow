@@ -16,6 +16,7 @@ import org.spiderflow.core.model.SpiderNode;
 import org.spiderflow.core.model.SpiderOutput;
 import org.spiderflow.core.service.FlowNoticeService;
 import org.spiderflow.core.thread.ChildPriorThreadSubmitStrategy;
+import org.spiderflow.core.thread.CompletedFirstPriorityThreadSubmitStrategy;
 import org.spiderflow.core.thread.LinkedThreadSubmitStrategy;
 import org.spiderflow.core.thread.ParentPriorThreadSubmitStrategy;
 import org.spiderflow.core.thread.RandomThreadSubmitStrategy;
@@ -131,8 +132,12 @@ public class Spider {
 			submitStrategy = new ChildPriorThreadSubmitStrategy();
 		} else if ("parent".equalsIgnoreCase(strategy)) {
 			submitStrategy = new ParentPriorThreadSubmitStrategy();
-		} else {
+		} else if ("random".equalsIgnoreCase(strategy)) {
 			submitStrategy = new RandomThreadSubmitStrategy();
+		} else if ("completed-first".equalsIgnoreCase(strategy)) {
+			submitStrategy = new CompletedFirstPriorityThreadSubmitStrategy();
+		} else {
+			submitStrategy = new CompletedFirstPriorityThreadSubmitStrategy();
 		}
 		//创建子线程池，采用一父多子的线程池,子线程数不能超过总线程数（超过时进入队列等待）,+1是因为会占用一个线程用来调度执行下一级
 		SubThreadPoolExecutor subThreadPoolExecutor = executorInstance.createSubThreadPoolExecutor(Math.max(nThreads, 1) + 1, submitStrategy);
