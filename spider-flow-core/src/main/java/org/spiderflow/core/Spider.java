@@ -238,9 +238,12 @@ public class Spider {
 			logger.error("执行失败,找不到对应的执行器:{}", shape);
 			context.setRunning(false);
 		}
-		int loopCount = 1;    //循环次数默认为1,如果节点有循环属性且填了循环次数/集合,则取出循环次数
-		int loopStart = 0;    //循环起始位置
-		int loopEnd = 1;    //循环结束位置
+		//循环次数默认为1,如果节点有循环属性且填了循环次数/集合,则取出循环次数
+		int loopCount = 1;
+		//循环起始位置
+		int loopStart = 0;
+		//循环结束位置
+		int loopEnd = 1;
 		String loopCountStr = node.getStringJsonValue(ShapeExecutor.LOOP_COUNT);
 		Object loopArray = null;
 		boolean isLoop = false;
@@ -321,7 +324,8 @@ public class Spider {
 			}
 			LinkedBlockingQueue<Future<?>> futureQueue = context.getFutureQueue();
 			for (SpiderTask task : tasks) {
-				if (executor.isThread()) {    //判断节点是否是异步运行
+				//判断节点是否是异步运行
+				if (executor.isThread()) {
 					//提交任务至线程池中,并将Future添加到队列末尾
 					futureQueue.add(context.getThreadPool().submitAsync(task.runnable, task, node));
 				} else {

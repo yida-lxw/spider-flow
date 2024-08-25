@@ -227,6 +227,21 @@ SpiderEditor.prototype.getXML = function(){
 SpiderEditor.prototype.selectCell = function(cell){
 	this.graph.setSelectionCell(cell);
 }
+
+SpiderEditor.prototype.flagCurNode = function (cellId, strokeColor, strokeWidth) {
+	var self = this;
+	var model = self.editor.graph.getModel();
+	var curCell = model.getCell(cellId);
+	model.beginUpdate();
+	try {
+		self.editor.graph.setCellStyles("strokeColor", strokeColor || "red", [curCell]);
+		self.editor.graph.setCellStyles("strokeWidth", strokeWidth || "2", [curCell]);
+	} finally {
+		model.endUpdate();
+	}
+}
+
+
 SpiderEditor.prototype.valid = function(){
 	var cells = editor.graph.getModel().cells;
 	for(var key in cells){

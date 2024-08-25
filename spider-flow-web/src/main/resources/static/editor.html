@@ -76,10 +76,8 @@
 </script>
 <script type="text/html" id="parameter-type-tmpl">
 	<select name="parameter-form-type" class="array">
-		<option value="text" {{d[
-		'parameter-form-type'] == 'text' ? 'selected': '' }}">text</option>
-		<option value="file" {{d[
-		'parameter-form-type'] == 'file' ? 'selected': '' }}>file</option>
+		<option value="text" selected="{{d['parameter-form-type'] == 'text' ? 'selected': 'false'}}">text</option>
+		<option value="file" selected="{{d['parameter-form-type'] == 'file' ? 'selected': 'false'}}">file</option>
 	</select>
 </script>
 <script type="text/html" id="parameter-from-name-tmpl">
@@ -96,10 +94,8 @@
 </script>
 <script type="text/html" id="parameter-from-type-tmpl">
 	<select name="parameter-form-type" class="array">
-		<option value="text" {{d[
-		'parameter-form-type'] == 'text' ? 'selected': '' }}">text</option>
-		<option value="file" {{d[
-		'parameter-form-type'] == 'file' ? 'selected': '' }}>file</option>
+		<option value="text" selected="{{d['parameter-form-type'] == 'text' ? 'selected': 'false'}}">text</option>
+		<option value="file" selected="{{d['parameter-form-type'] == 'file' ? 'selected': 'false'}}">file</option>
 	</select>
 </script>
 <script type="text/html" id="parameter-from-filename-tmpl">

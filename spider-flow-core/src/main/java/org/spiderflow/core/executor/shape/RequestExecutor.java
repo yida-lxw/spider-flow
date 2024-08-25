@@ -190,10 +190,10 @@ public class RequestExecutor implements ShapeExecutor, Grammerable, SpiderListen
 			httpRequestBean.setMethod(method.toLowerCase());
 			logger.debug("设置请求方法:{}", method);
 
-			//是否跟随重定向
+			//是否自动重定向
 			boolean followRedirects = !"0".equals(node.getStringJsonValue(FOLLOW_REDIRECT));
 			request.followRedirect(followRedirects);
-			logger.debug("设置跟随重定向：{}", followRedirects);
+			logger.debug("设置自动重定向：{}", followRedirects);
 
 			//是否验证TLS证书
 			if ("0".equals(node.getStringJsonValue(TLS_VALIDATE))) {

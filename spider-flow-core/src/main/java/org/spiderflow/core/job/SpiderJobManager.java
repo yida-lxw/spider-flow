@@ -26,11 +26,8 @@ import java.util.Date;
  */
 @Component
 public class SpiderJobManager {
-
 	private static Logger logger = LoggerFactory.getLogger(SpiderJobManager.class);
-
 	private final static String JOB_NAME = "SPIDER_TASK_";
-
 	public final static String JOB_PARAM_NAME = "SPIDER_FLOW";
 
 	@Lazy
@@ -61,11 +58,8 @@ public class SpiderJobManager {
 		try {
 			JobDetail job = JobBuilder.newJob(SpiderJob.class).withIdentity(getJobKey(spiderFlow.getId())).build();
 			job.getJobDataMap().put(JOB_PARAM_NAME, spiderFlow);
-
 			CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(spiderFlow.getCron()).withMisfireHandlingInstructionDoNothing();
-
 			CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(getTriggerKey(spiderFlow.getId())).withSchedule(cronScheduleBuilder).build();
-
 			return scheduler.scheduleJob(job, trigger);
 		} catch (SchedulerException e) {
 			logger.error("创建定时任务出错", e);
@@ -88,5 +82,4 @@ public class SpiderJobManager {
 			return false;
 		}
 	}
-
 }
