@@ -21,10 +21,15 @@ public class SpiderContext extends HashMap<String, Object> {
 
 	private String id = UUID.randomUUID().toString().replace("-", "");
 
+	protected  String instanceId;
+
 	/**
 	 * 流程ID
 	 */
-	private String flowId;
+	protected String flowId;
+
+	/**当前执行节点id*/
+	protected String currentNodeId;
 
 	/**
 	 * 流程执行线程
@@ -39,7 +44,7 @@ public class SpiderContext extends HashMap<String, Object> {
 	/**
 	 * 爬虫是否运行中
 	 */
-	private volatile boolean running = true;
+	protected volatile boolean running = true;
 
 	/**
 	 * Future队列
@@ -88,6 +93,26 @@ public class SpiderContext extends HashMap<String, Object> {
 
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getInstanceId() {
+		return instanceId;
+	}
+
+	public void setInstanceId(String instanceId) {
+		this.instanceId = instanceId;
+	}
+
+	public String getCurrentNodeId() {
+		return currentNodeId;
+	}
+
+	public void setCurrentNodeId(String currentNodeId) {
+		this.currentNodeId = currentNodeId;
+	}
+
 	public SubThreadPoolExecutor getThreadPool() {
 		return threadPool;
 	}
@@ -120,5 +145,4 @@ public class SpiderContext extends HashMap<String, Object> {
 
 	public void stop() {
 	}
-
 }

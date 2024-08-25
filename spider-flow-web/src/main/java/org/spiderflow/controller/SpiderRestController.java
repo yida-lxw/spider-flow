@@ -6,6 +6,9 @@ import org.spiderflow.core.Spider;
 import org.spiderflow.core.context.SpiderContext;
 import org.spiderflow.core.job.SpiderJob;
 import org.spiderflow.core.job.SpiderJobContext;
+import org.spiderflow.core.job.id.IdGenerator;
+import org.spiderflow.core.job.id.IdGeneratorFactory;
+import org.spiderflow.core.job.id.IdGeneratorStrategy;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.model.SpiderOutput;
 import org.spiderflow.core.model.Task;
@@ -43,6 +46,15 @@ public class SpiderRestController {
 
 	@Autowired
 	private TaskServiceImpl taskService;
+
+	@Value("${spider.idGeneratorStrategy}")
+	private String idGeneratorStrategyName;
+
+	@Value("${spider.workerId:1}")
+	private Long workerId;
+
+	@Value("${spider.datacenterId:1}")
+	private Long dataCenterId;
 
 	/**
 	 * 异步运行
@@ -111,14 +123,21 @@ public class SpiderRestController {
 		}
 		List<SpiderOutput> outputs;
 		Integer maxId = spiderFlowService.getFlowMaxTaskId(id);
-		SpiderJobContext context = SpiderJobContext.create(workspace, id, maxId, true);
+
+		//确定id生成器
+		IdGeneratorStrategy idGeneratorStrategy = IdGeneratorStrategy.of(idGeneratorStrategyName);
+		IdGenerator<String> idGenerator = IdGeneratorFactory.build(idGeneratorStrategy, workerId, dataCenterId);
+		String instanceId = idGenerator.nextId();
+
+		SpiderJobContext spiderJobContext = SpiderJobContext.create(workspace, id, maxId, instanceId, true);
+
 		try {
-			outputs = spider.run(flow, context, params);
+			outputs = spider.run(flow, spiderJobContext, params);
 		} catch (Exception e) {
 			logger.error("执行爬虫失败", e);
 			return new JsonBean<>(-1, "执行失败");
 		} finally {
-			context.close();
+			spiderJobContext.close();
 		}
 		return new JsonBean<>(outputs);
 	}

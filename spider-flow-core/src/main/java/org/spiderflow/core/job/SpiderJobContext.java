@@ -12,10 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SpiderJobContext extends SpiderContext {
-
 	private static final long serialVersionUID = 9099787449108938453L;
-
-	private static Logger logger = LoggerFactory.getLogger(SpiderJobContext.class);
+	private static final Logger logger = LoggerFactory.getLogger(SpiderJobContext.class);
 
 	private OutputStream outputstream;
 
@@ -23,8 +21,9 @@ public class SpiderJobContext extends SpiderContext {
 
 	private boolean output;
 
-	public SpiderJobContext(OutputStream outputstream, boolean output) {
+	public SpiderJobContext(String instanceId, OutputStream outputstream, boolean output) {
 		super();
+		this.instanceId = instanceId;
 		this.outputstream = outputstream;
 		this.output = output;
 	}
@@ -54,10 +53,10 @@ public class SpiderJobContext extends SpiderContext {
 		return this.outputstream;
 	}
 
-	public static SpiderJobContext create(String directory, String id, Integer taskId, boolean output) {
+	public static SpiderJobContext create(String directory, String id, Integer taskId, String instanceId, boolean output) {
 		OutputStream os = null;
 		try {
-			File file = new File(new File(directory), id + File.separator + "logs" + File.separator + taskId + ".log");
+			File file = new File(new File(directory), id + File.separator + "logs" + File.separator + taskId + File.separator + instanceId + ".log");
 			File dirFile = file.getParentFile();
 			if (!dirFile.exists()) {
 				dirFile.mkdirs();
@@ -66,7 +65,7 @@ public class SpiderJobContext extends SpiderContext {
 		} catch (Exception e) {
 			logger.error("创建日志文件出错", e);
 		}
-		SpiderJobContext context = new SpiderJobContext(os, output);
+		SpiderJobContext context = new SpiderJobContext(instanceId, os, output);
 		context.setFlowId(id);
 		return context;
 	}

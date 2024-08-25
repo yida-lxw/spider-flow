@@ -20,7 +20,7 @@ public class WebSocketScheduledTask {
 	@Async("websocketServerAsyncScheduledPool")
 	@Scheduled(cron = "${websocket.scheduled-cron}")
 	public void checkWebsocketClientIfAlive() {
-		logger.debug("Start to check the survival status of websocket sessions at {}.", DateUtils.format(System.currentTimeMillis()));
+		logger.info("Start to check the survival status of websocket sessions at {}.", DateUtils.format(System.currentTimeMillis()));
 		WebSocketManager.checkWebsocketClientIfAlive();
 	}
 }

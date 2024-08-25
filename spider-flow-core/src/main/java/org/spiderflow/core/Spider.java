@@ -10,6 +10,7 @@ import org.spiderflow.core.context.SpiderContextHolder;
 import org.spiderflow.core.enums.FlowNoticeType;
 import org.spiderflow.core.executor.ShapeExecutor;
 import org.spiderflow.core.executor.shape.LoopExecutor;
+import org.spiderflow.core.job.SpiderJobNodeStatusInfo;
 import org.spiderflow.core.job.id.IdGenerator;
 import org.spiderflow.core.job.id.IdGeneratorFactory;
 import org.spiderflow.core.job.id.IdGeneratorStrategy;
@@ -69,16 +70,6 @@ public class Spider {
 
 	@Value("${spider.detect.dead-cycle:5000}")
 	private Integer deadCycle;
-
-	@Value("${spider.idGeneratorStrategy}")
-	private String idGeneratorStrategyName;
-
-
-	@Value("${spider.workerId:1}")
-	private Long workerId;
-
-	@Value("${spider.datacenterId:1}")
-	private Long dataCenterId;
 
 	@Autowired
 	private FlowNoticeService flowNoticeService;
@@ -152,9 +143,6 @@ public class Spider {
 		} else {
 			submitStrategy = new CompletedFirstPriorityThreadSubmitStrategy();
 		}
-		//确定id生成器
-		IdGeneratorStrategy idGeneratorStrategy = IdGeneratorStrategy.of(idGeneratorStrategyName);
-		IdGenerator<String> idGenerator = IdGeneratorFactory.build(idGeneratorStrategy, workerId, dataCenterId);
 
 		//创建子线程池，采用一父多子的线程池,子线程数不能超过总线程数（超过时进入队列等待）,+1是因为会占用一个线程用来调度执行下一级
 		SubThreadPoolExecutor subThreadPoolExecutor = executorInstance.createSubThreadPoolExecutor(Math.max(nThreads, 1) + 1, submitStrategy);
@@ -169,7 +157,7 @@ public class Spider {
 		Future<?> future = subThreadPoolExecutor.submitAsync(TtlRunnable.get(() -> {
 			try {
 				//执行具体节点
-				Spider.this.executeNode(null, root, context, variables, idGenerator);
+				Spider.this.executeNode(null, root, context, variables);
 				Queue<Future<?>> queue = context.getFutureQueue();
 				//循环从队列中获取Future,直到队列为空结束,当任务完成时，则执行下一级
 				while (!queue.isEmpty()) {
@@ -194,7 +182,7 @@ public class Spider {
 								if (task.executor.allowExecuteNext(task.node, context, task.variables)) {
 									logger.debug("执行节点[{}:{}]完毕", task.node.getNodeName(), task.node.getNodeId());
 									//执行下一级
-									Spider.this.executeNextNodes(task.node, context, task.variables, idGenerator);
+									Spider.this.executeNextNodes(task.node, context, task.variables);
 								} else {
 									logger.debug("执行节点[{}:{}]完毕，忽略执行下一节点", task.node.getNodeName(), task.node.getNodeId());
 								}
@@ -226,11 +214,11 @@ public class Spider {
 	/**
 	 * 执行下一级节点
 	 */
-	private void executeNextNodes(SpiderNode node, SpiderContext context, Map<String, Object> variables, IdGenerator<String> idGenerator) {
+	private void executeNextNodes(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		List<SpiderNode> nextNodes = node.getNextNodes();
 		if (nextNodes != null) {
 			for (SpiderNode nextNode : nextNodes) {
-				executeNode(node, nextNode, context, variables, idGenerator);
+				executeNode(node, nextNode, context, variables);
 			}
 		}
 	}
@@ -238,10 +226,10 @@ public class Spider {
 	/**
 	 * 执行节点
 	 */
-	public void executeNode(SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables, IdGenerator<String> idGenerator) {
+	public void executeNode(SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		String shape = node.getStringJsonValue("shape");
 		if (StringUtils.isBlank(shape)) {
-			executeNextNodes(node, context, variables, idGenerator);
+			executeNextNodes(node, context, variables);
 			return;
 		}
 		//判断箭头上的条件，如果不成立则不执行
@@ -249,12 +237,22 @@ public class Spider {
 			return;
 		}
 		logger.debug("执行节点[{}:{}]", node.getNodeName(), node.getNodeId());
+		//记录当前节点的执行状态
+		String flowId = context.getFlowId();
+		String instanceId = context.getInstanceId();
+		String currentNodeId = node.getNodeId();
+		SpiderJobNodeStatusInfo spiderJobNodeStatusInfo = new SpiderJobNodeStatusInfo(flowId, instanceId, currentNodeId);
+		spiderJobNodeStatusInfo.setRunning(true);
+		spiderJobNodeStatusInfo.setHadCompleted(false);
+		//TODO 将当前节点的执行状态缓存至Map
+
 		//找到对应的执行器
 		ShapeExecutor executor = ExecutorsUtils.get(shape);
 		if (executor == null) {
 			logger.error("执行失败,找不到对应的执行器:{}", shape);
 			context.setRunning(false);
 		}
+		String spiderTaskInstanceId = context.getInstanceId();
 		//循环次数默认为1,如果节点有循环属性且填了循环次数/集合,则取出循环次数
 		int loopCount = 1;
 		//循环起始位置
@@ -300,7 +298,8 @@ public class Spider {
 			String loopItem = node.getStringJsonValue(LoopExecutor.LOOP_ITEM, "item");
 			List<SpiderTask> tasks = new ArrayList<>();
 			for (int i = loopStart; i < loopEnd; i++) {
-				node.increment();    //节点执行次数+1(后续Join节点使用)
+				//节点执行次数+1(后续Join节点使用)
+				node.increment();
 				if (context.isRunning()) {
 					Map<String, Object> nVariables = new HashMap<>();
 					// 判断是否需要传递变量
@@ -315,7 +314,7 @@ public class Spider {
 						// 存入item
 						nVariables.put(loopItem, loopArray == null ? i : Array.get(loopArray, i));
 					}
-					String spiderTaskInstanceId = idGenerator.nextId();
+
 					tasks.add(new SpiderTask(spiderTaskInstanceId, TtlRunnable.get(() -> {
 						if (context.isRunning()) {
 							try {
@@ -325,10 +324,12 @@ public class Spider {
 									context.setRunning(false);
 									return;
 								}
+
 								//执行节点具体逻辑
-								executor.execute(node, context, nVariables, idGenerator);
+								executor.execute(node, context, nVariables);
 								//当未发生异常时，移除ex变量
 								nVariables.remove("ex");
+								//当前节点执行成功后,更新节点执行状态
 							} catch (Throwable t) {
 								nVariables.put("ex", t);
 								logger.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), t);

@@ -2,7 +2,6 @@ package org.spiderflow.core.executor;
 
 
 import org.spiderflow.core.context.SpiderContext;
-import org.spiderflow.core.job.id.IdGenerator;
 import org.spiderflow.core.model.Shape;
 import org.spiderflow.core.model.SpiderNode;
 
@@ -39,7 +38,7 @@ public interface ShapeExecutor {
 	 * @param context   爬虫上下文
 	 * @param variables 节点流程的全部变量的集合
 	 */
-	void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables, IdGenerator<String> idGenerator);
+	void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables);
 
 	default boolean allowExecuteNext(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		return true;

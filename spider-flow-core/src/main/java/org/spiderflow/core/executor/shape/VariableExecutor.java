@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.core.context.SpiderContext;
 import org.spiderflow.core.executor.ShapeExecutor;
-import org.spiderflow.core.job.id.IdGenerator;
 import org.spiderflow.core.model.SpiderNode;
 import org.spiderflow.core.utils.ExpressionUtils;
 import org.springframework.stereotype.Component;
@@ -28,7 +27,7 @@ public class VariableExecutor implements ShapeExecutor {
 	private static final Logger logger = LoggerFactory.getLogger(VariableExecutor.class);
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables, IdGenerator<String> idGenerator) {
+	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		List<Map<String, String>> variableList = node.getListJsonValue(VARIABLE_NAME, VARIABLE_VALUE);
 		for (Map<String, String> nameValue : variableList) {
 			Object value = null;

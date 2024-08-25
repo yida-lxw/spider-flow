@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.spiderflow.core.context.SpiderContext;
 import org.spiderflow.core.executor.ShapeExecutor;
 import org.spiderflow.core.expression.Grammerable;
-import org.spiderflow.core.job.id.IdGenerator;
 import org.spiderflow.core.model.Grammer;
 import org.spiderflow.core.model.SpiderNode;
 import org.spiderflow.core.utils.DataSourceUtils;
@@ -59,7 +58,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 	private static final Logger logger = LoggerFactory.getLogger(ExecuteSQLExecutor.class);
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables, IdGenerator<String> idGenerator) {
+	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		String dsId = node.getStringJsonValue(DATASOURCE_ID);
 		String sql = node.getStringJsonValue(SQL);
 		if (StringUtils.isBlank(dsId)) {

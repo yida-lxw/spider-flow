@@ -34,13 +34,13 @@ public class ProcessExecutor implements ShapeExecutor {
 	private Spider spider;
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables, IdGenerator<String> idGenerator) {
+	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		String flowId = node.getStringJsonValue("flowId");
 		SpiderFlow spiderFlow = spiderFlowService.getById(flowId);
 		if (spiderFlow != null) {
 			logger.info("执行子流程:{}", spiderFlow.getName());
 			SpiderNode root = SpiderFlowUtils.loadXMLFromString(spiderFlow.getXml());
-			spider.executeNode(null, root, context, variables, idGenerator);
+			spider.executeNode(null, root, context, variables);
 		} else {
 			logger.info("执行子流程:{}失败，找不到该子流程", flowId);
 		}
