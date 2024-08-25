@@ -82,15 +82,13 @@
         </div>
     </div>
 </div>
-<script>
+<script type="text/javascript">
     layui.colorpicker.render({
         elem: '#line-color',
         color: $('input[name=lineColor]').val(),
         done: function (color) {
             $('input[name=lineColor]').val(color);
-            editor.graph.setCellStyles('strokeColor', color, [editor.getModel().getCell({{d.cell.id}
-        })])
-            ;
+            editor.graph.setCellStyles('strokeColor', color, [editor.getModel().getCell({{d.cell.id}})]);
         }
     });
     layui.form.on('select(exceptionFlow)', function (data) {
@@ -104,9 +102,7 @@
         } else {
             color = 'black';
         }
-        editor.graph.setCellStyles('strokeColor', color, [editor.getModel().getCell({{d.cell.id}
-    })])
-        ;
+        editor.graph.setCellStyles('strokeColor', color, [editor.getModel().getCell({{d.cell.id}})]);
         $('input[name=lineColor]').val(color);
     });
     $("input[name=lineWidth]").on('change', function () {

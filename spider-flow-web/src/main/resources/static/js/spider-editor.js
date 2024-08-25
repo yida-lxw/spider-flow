@@ -228,7 +228,7 @@ SpiderEditor.prototype.selectCell = function(cell){
 	this.graph.setSelectionCell(cell);
 }
 
-SpiderEditor.prototype.flagCurNode = function (cellId, strokeColor, strokeWidth) {
+SpiderEditor.prototype.flagCurNode = function(cellId, strokeColor, strokeWidth) {
 	var self = this;
 	var model = self.editor.graph.getModel();
 	var curCell = model.getCell(cellId);

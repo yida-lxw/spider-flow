@@ -113,8 +113,7 @@
 					<div class="layui-form-item">
 						<label class="layui-form-label">请求设置</label>
 						<div class="layui-input-block">
-                            <input type="checkbox" title="自动重定向" value="follow-redirect" lay-skin="primary"
-                                   {{d.data.object['follow-redirect'] == '0' ? '' : 'checked'}}/>
+							<input type="checkbox" title="自动重定向" value="follow-redirect" lay-skin="primary" {{d.data.object['follow-redirect'] == '0' ? '' : 'checked'}}/>
 							<input type="checkbox" title="TLS证书验证" value="tls-validate" lay-skin="primary" {{d.data.object['tls-validate'] == '0' ? '' : 'checked'}}/>
 							<input type="checkbox" title="自动管理Cookie" value="cookie-auto-set" lay-skin="primary" {{d.data.object['cookie-auto-set'] == '0' ? '' : 'checked'}}/>
 							<input type="checkbox" title="自动去重" value="auto-deduplicate" lay-skin="primary"
