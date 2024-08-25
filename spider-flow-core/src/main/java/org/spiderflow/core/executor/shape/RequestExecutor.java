@@ -18,6 +18,7 @@ import org.spiderflow.core.http.SpiderResponse;
 import org.spiderflow.core.io.HttpRequest;
 import org.spiderflow.core.io.HttpRequestBean;
 import org.spiderflow.core.io.HttpResponse;
+import org.spiderflow.core.job.id.IdGenerator;
 import org.spiderflow.core.listener.SpiderListener;
 import org.spiderflow.core.model.Grammer;
 import org.spiderflow.core.model.SpiderNode;
@@ -131,7 +132,7 @@ public class RequestExecutor implements ShapeExecutor, Grammerable, SpiderListen
 	}
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables, IdGenerator<String> idGenerator) {
 		CookieContext cookieContext = context.getCookieContext();
 		String sleepCondition = node.getStringJsonValue(SLEEP);
 		if (StringUtils.isNotBlank(sleepCondition)) {

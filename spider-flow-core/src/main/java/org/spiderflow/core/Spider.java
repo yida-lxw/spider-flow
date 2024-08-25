@@ -326,7 +326,7 @@ public class Spider {
 									return;
 								}
 								//执行节点具体逻辑
-								executor.execute(node, context, nVariables);
+								executor.execute(node, context, nVariables, idGenerator);
 								//当未发生异常时，移除ex变量
 								nVariables.remove("ex");
 							} catch (Throwable t) {

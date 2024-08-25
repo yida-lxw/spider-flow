@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.spiderflow.core.context.SpiderContext;
 import org.spiderflow.core.executor.ShapeExecutor;
 import org.spiderflow.core.http.SpiderResponse;
+import org.spiderflow.core.job.id.IdGenerator;
 import org.spiderflow.core.listener.SpiderListener;
 import org.spiderflow.core.model.SpiderNode;
 import org.spiderflow.core.model.SpiderOutput;
@@ -62,7 +63,7 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 	private Map<String, CSVPrinter> cachePrinter = new HashMap<>();
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables, IdGenerator<String> idGenerator) {
 		SpiderOutput output = new SpiderOutput();
 		output.setNodeName(node.getNodeName());
 		output.setNodeId(node.getNodeId());
