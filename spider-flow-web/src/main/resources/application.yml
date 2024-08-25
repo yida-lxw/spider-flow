@@ -16,6 +16,12 @@ server:
 
 
 spider:
+  # id生成策略
+  idGeneratorStrategy: snow-flake
+  # 工作机器id
+  workerId: 1
+  # 数据中心id
+  datacenterId: 1
   # 是否为重试后仍然失败的请求记录日志
   record-failed-request-after-retry: true
   notice:

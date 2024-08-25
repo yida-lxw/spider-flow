@@ -10,6 +10,9 @@ import org.spiderflow.core.context.SpiderContextHolder;
 import org.spiderflow.core.enums.FlowNoticeType;
 import org.spiderflow.core.executor.ShapeExecutor;
 import org.spiderflow.core.executor.shape.LoopExecutor;
+import org.spiderflow.core.job.id.IdGenerator;
+import org.spiderflow.core.job.id.IdGeneratorFactory;
+import org.spiderflow.core.job.id.IdGeneratorStrategy;
 import org.spiderflow.core.listener.SpiderListener;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.model.SpiderNode;
@@ -66,6 +69,16 @@ public class Spider {
 
 	@Value("${spider.detect.dead-cycle:5000}")
 	private Integer deadCycle;
+
+	@Value("${spider.idGeneratorStrategy}")
+	private String idGeneratorStrategyName;
+
+
+	@Value("${spider.workerId:1}")
+	private Long workerId;
+
+	@Value("${spider.datacenterId:1}")
+	private Long dataCenterId;
 
 	@Autowired
 	private FlowNoticeService flowNoticeService;
@@ -139,6 +152,10 @@ public class Spider {
 		} else {
 			submitStrategy = new CompletedFirstPriorityThreadSubmitStrategy();
 		}
+		//确定id生成器
+		IdGeneratorStrategy idGeneratorStrategy = IdGeneratorStrategy.of(idGeneratorStrategyName);
+		IdGenerator<String> idGenerator = IdGeneratorFactory.build(idGeneratorStrategy, workerId, dataCenterId);
+
 		//创建子线程池，采用一父多子的线程池,子线程数不能超过总线程数（超过时进入队列等待）,+1是因为会占用一个线程用来调度执行下一级
 		SubThreadPoolExecutor subThreadPoolExecutor = executorInstance.createSubThreadPoolExecutor(Math.max(nThreads, 1) + 1, submitStrategy);
 		context.setRootNode(root);
@@ -152,7 +169,7 @@ public class Spider {
 		Future<?> future = subThreadPoolExecutor.submitAsync(TtlRunnable.get(() -> {
 			try {
 				//执行具体节点
-				Spider.this.executeNode(null, root, context, variables);
+				Spider.this.executeNode(null, root, context, variables, idGenerator);
 				Queue<Future<?>> queue = context.getFutureQueue();
 				//循环从队列中获取Future,直到队列为空结束,当任务完成时，则执行下一级
 				while (!queue.isEmpty()) {
@@ -177,7 +194,7 @@ public class Spider {
 								if (task.executor.allowExecuteNext(task.node, context, task.variables)) {
 									logger.debug("执行节点[{}:{}]完毕", task.node.getNodeName(), task.node.getNodeId());
 									//执行下一级
-									Spider.this.executeNextNodes(task.node, context, task.variables);
+									Spider.this.executeNextNodes(task.node, context, task.variables, idGenerator);
 								} else {
 									logger.debug("执行节点[{}:{}]完毕，忽略执行下一节点", task.node.getNodeName(), task.node.getNodeId());
 								}
@@ -209,11 +226,11 @@ public class Spider {
 	/**
 	 * 执行下一级节点
 	 */
-	private void executeNextNodes(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+	private void executeNextNodes(SpiderNode node, SpiderContext context, Map<String, Object> variables, IdGenerator<String> idGenerator) {
 		List<SpiderNode> nextNodes = node.getNextNodes();
 		if (nextNodes != null) {
 			for (SpiderNode nextNode : nextNodes) {
-				executeNode(node, nextNode, context, variables);
+				executeNode(node, nextNode, context, variables, idGenerator);
 			}
 		}
 	}
@@ -221,10 +238,10 @@ public class Spider {
 	/**
 	 * 执行节点
 	 */
-	public void executeNode(SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+	public void executeNode(SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables, IdGenerator<String> idGenerator) {
 		String shape = node.getStringJsonValue("shape");
 		if (StringUtils.isBlank(shape)) {
-			executeNextNodes(node, context, variables);
+			executeNextNodes(node, context, variables, idGenerator);
 			return;
 		}
 		//判断箭头上的条件，如果不成立则不执行
@@ -298,7 +315,8 @@ public class Spider {
 						// 存入item
 						nVariables.put(loopItem, loopArray == null ? i : Array.get(loopArray, i));
 					}
-					tasks.add(new SpiderTask(TtlRunnable.get(() -> {
+					String spiderTaskInstanceId = idGenerator.nextId();
+					tasks.add(new SpiderTask(spiderTaskInstanceId, TtlRunnable.get(() -> {
 						if (context.isRunning()) {
 							try {
 								//死循环检测，当执行节点次数大于阈值时，结束本次测试
@@ -370,12 +388,15 @@ public class Spider {
 	}
 
 	class SpiderTask {
+		/**任务执行实例id(一个爬虫任务可能会执行多次,为了便于区分每次执行实例，故增加instanceId属性)*/
+		String instanceId;
 		Runnable runnable;
 		SpiderNode node;
 		Map<String, Object> variables;
 		ShapeExecutor executor;
 
-		public SpiderTask(Runnable runnable, SpiderNode node, Map<String, Object> variables, ShapeExecutor executor) {
+		public SpiderTask(String instanceId, Runnable runnable, SpiderNode node, Map<String, Object> variables, ShapeExecutor executor) {
+			this.instanceId = instanceId;
 			this.runnable = runnable;
 			this.node = node;
 			this.variables = variables;

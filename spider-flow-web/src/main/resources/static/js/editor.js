@@ -205,6 +205,8 @@ $(function () {
 				layui.form.render();
 				renderCodeMirror();
 				resizeSlideBar();
+				//测试高亮节点
+				editor.flagCurNode("14", "red", "2");
 				callback && callback();
 			})
 		}
@@ -227,7 +229,8 @@ $(function () {
 	} else {
 		editor = new SpiderEditor({
 			element: $('.editor-container')[0],
-			selectedCellListener: function (cell) {	//选中节点后打开属性面板
+			//选中节点后打开属性面板
+			selectedCellListener: function (cell) {
 				loadTemplate(cell, editor.getModel(), serializeForm);
 			}
 		});
@@ -235,6 +238,7 @@ $(function () {
 		bindToolbarClickAction(editor);
 		//加载图形
 		loadShapes(editor, $('.sidebar-container')[0]);
+
 		layui.form.on('checkbox', function (e) {
 			serializeForm();
 		});

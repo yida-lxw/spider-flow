@@ -228,19 +228,50 @@ SpiderEditor.prototype.selectCell = function(cell){
 	this.graph.setSelectionCell(cell);
 }
 
-SpiderEditor.prototype.flagCurNode = function(cellId, strokeColor, strokeWidth) {
+SpiderEditor.prototype.flagCurLine = function(cellId, strokeColor, strokeWidth) {
+	if(strokeWidth) {
+		if("string" == typeof strokeWidth) {
+			strokeWidth = ~~strokeWidth;
+			if(Number.isNaN(strokeWidth) || strokeWidth <= 0) {
+				strokeWidth = 2;
+			}
+		}
+	}
 	var self = this;
 	var model = self.editor.graph.getModel();
 	var curCell = model.getCell(cellId);
 	model.beginUpdate();
 	try {
 		self.editor.graph.setCellStyles("strokeColor", strokeColor || "red", [curCell]);
-		self.editor.graph.setCellStyles("strokeWidth", strokeWidth || "2", [curCell]);
+		self.editor.graph.setCellStyles("strokeWidth", strokeWidth || 2, [curCell]);
+		var curCellStyle = self.editor.graph.getCellStyle(curCell);
 	} finally {
 		model.endUpdate();
 	}
 }
 
+SpiderEditor.prototype.flagCurNode = function(cellId, strokeColor, strokeWidth) {
+	if(strokeWidth) {
+		if("string" == typeof strokeWidth) {
+			strokeWidth = ~~strokeWidth;
+			if(Number.isNaN(strokeWidth) || strokeWidth <= 0) {
+				strokeWidth = 2;
+			}
+		}
+	}
+	var self = this;
+	var graph = self.editor.graph;
+	var view = graph.getView();
+	var model = graph.getModel();
+	var curCell = model.getCell(cellId);
+	model.beginUpdate();
+	try {
+		var highlight = new mxCellHighlight(graph, strokeColor || "red", strokeWidth || 2);
+		highlight.highlight(view.getState(curCell));
+	} finally {
+		model.endUpdate();
+	}
+}
 
 SpiderEditor.prototype.valid = function(){
 	var cells = editor.graph.getModel().cells;
