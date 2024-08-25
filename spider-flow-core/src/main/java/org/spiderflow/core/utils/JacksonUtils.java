@@ -164,7 +164,7 @@ public final class JacksonUtils {
 		try {
 			TypeReference<Map<K, V>> typeReference = new TypeReference<Map<K, V>>() {
 			};
-			map = new ObjectMapper().readValue(jsonString, typeReference);
+			map = objectMapper.readValue(jsonString, typeReference);
 		} catch (Exception e) {
 		}
 		return map;

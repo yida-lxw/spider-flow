@@ -31,7 +31,7 @@ public class WebSocketManager {
 	 * @date 2024-08-25 20:51:33
 	 */
 	public static void checkWebsocketClientIfAlive() {
-		if(webSocketServerSet.size() > 0) {
+		if(!webSocketServerSet.isEmpty()) {
 			try {
 				lock.lock();
 				for (WebSocketEditorServer webSocketServer : webSocketServerSet) {
