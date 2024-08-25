@@ -48,6 +48,14 @@ spring:
     protocol: smtp
     username: xxxx@qq.com
 
+websocket:
+  scheduled-cron: 0/30 * * * * ?
+  thread-pool:
+    core-pool-size: 2
+    max-pool-size: 8
+    queue-capacity: 1024
+    thread-pool-name-prefix: Websocket-Server-AsyncScheduled-ThreadPool-
+
 selenium:
   driver:
     chrome: D:/chromedriver-127.0.6533.119-win64/chromedriver.exe

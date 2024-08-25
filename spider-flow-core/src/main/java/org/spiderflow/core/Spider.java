@@ -174,7 +174,7 @@ public class Spider {
 				//循环从队列中获取Future,直到队列为空结束,当任务完成时，则执行下一级
 				while (!queue.isEmpty()) {
 					try {
-						// 优先取出最先执行完毕的任务(SpiderNode以实现按照执行完成时间排序，执行完成时间越小表明越先完成任务)
+						// 优先取出最先执行完毕的任务(SpiderNode已实现按照执行完成时间排序，执行完成时间越小表明越先完成任务)
 						Optional<Future<?>> minFutureOptional = queue.stream().filter(Future::isDone).min((o1, o2) -> {
 							try {
 								return comparator.compare(((SpiderTask) o1.get()).node, ((SpiderTask) o2.get()).node);

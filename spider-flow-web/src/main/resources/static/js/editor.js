@@ -907,6 +907,14 @@ function runSpider(debug) {
 						}));
 					},
 					onmessage: function (e) {
+						var messageData = e.data;
+						if("ping" == messageData) {
+							socket.send("pong");
+							return;
+						}
+						if("pong" == messageData || "connected" == messageData) {
+							return;
+						}
 						var event = JSON.parse(e.data);
 						var eventType = event.eventType;
 						var message = event.message;
@@ -1083,6 +1091,13 @@ function runSpider(debug) {
 								jsonTree.create(msg, $dom[0]);
 							}
 						}
+					}
+				});
+
+				//开启心跳定时器
+				$jq('body').everyTime('1s','websocket-ping-pong-check-timer', function(){
+					if(socket && WebSocket.OPEN == socket.readyState) {
+						socket.send("ping");
 					}
 				});
 			}

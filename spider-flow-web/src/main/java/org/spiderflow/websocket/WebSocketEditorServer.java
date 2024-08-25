@@ -1,5 +1,7 @@
 package org.spiderflow.websocket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spiderflow.core.Spider;
 import org.spiderflow.core.utils.JacksonUtils;
 import org.spiderflow.core.utils.SpiderFlowUtils;
@@ -8,7 +10,9 @@ import org.spiderflow.model.WebSocketEvent;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import java.util.Map;
@@ -21,13 +25,33 @@ import java.util.Map;
 @ServerEndpoint("/ws")
 @Component
 public class WebSocketEditorServer {
+	private static Logger logger = LoggerFactory.getLogger(WebSocketEditorServer.class);
+	private Session session;
 
 	public static Spider spider;
 
 	private SpiderWebSocketContext context;
 
+	@OnOpen
+	public void onOpen(Session session) {
+		this.session = session;
+		WebSocketManager.sendMessage(session, "connected");
+		WebSocketManager.addWebSocketServer(this);
+		WebSocketManager.updateHearBeat(session);
+		logger.info("Establish a WebSocket connection with the client with sessionId:[{}] successfully.", session.getId());
+	}
+
 	@OnMessage
 	public void onMessage(String message, Session session) {
+		if("ping".equals(message)) {
+			String sessionId = session.getId();
+			logger.info("Recieved the hearbeat packet from the websocket client with sessionId:[{}].", sessionId);
+			WebSocketManager.updateHearBeat(session);
+			if(session.isOpen()) {
+				WebSocketManager.sendMessage(sessionId, "pong");
+			}
+			return;
+		}
 		Map<String, Object> event = JacksonUtils.json2Map(message);
 		Object eventTypeObj = event.get("eventType");
 		String eventType = null;
@@ -65,5 +89,21 @@ public class WebSocketEditorServer {
 	public void onClose(Session session) {
 		context.setRunning(false);
 		context.stop();
+		WebSocketManager.removeWebSocketServer(this);
+		WebSocketManager.removeWebSocketSession(session);
+		logger.info("WebSocket connection was closed.");
+	}
+
+	@OnError
+	public void onError(Session session, Throwable error) {
+		logger.info("Establish a WebSocket connection with the client with sessionId:[{}] failed.", session.getId());
+	}
+
+	public Session getSession() {
+		return session;
+	}
+
+	public String getSessionId() {
+		return session.getId();
 	}
 }
