@@ -9,11 +9,11 @@ package org.spiderflow.websocket;
 public class WebSocketSession {
 	private String sessionId;
 	/**最近一次接收到心跳包的时间(毫秒数)*/
-	private long lastRecieveHearbeatTime;
+	private long lastRecieveHeartbeatTime;
 
-	public WebSocketSession(String sessionId, long lastRecieveHearbeatTime) {
+	public WebSocketSession(String sessionId, long lastRecieveHeartbeatTime) {
 		this.sessionId = sessionId;
-		this.lastRecieveHearbeatTime = lastRecieveHearbeatTime;
+		this.lastRecieveHeartbeatTime = lastRecieveHeartbeatTime;
 	}
 
 	public String getSessionId() {
@@ -24,11 +24,11 @@ public class WebSocketSession {
 		this.sessionId = sessionId;
 	}
 
-	public long getLastRecieveHearbeatTime() {
-		return lastRecieveHearbeatTime;
+	public long getLastRecieveHeartbeatTime() {
+		return lastRecieveHeartbeatTime;
 	}
 
-	public void setLastRecieveHearbeatTime(long lastRecieveHearbeatTime) {
-		this.lastRecieveHearbeatTime = lastRecieveHearbeatTime;
+	public void setLastRecieveHeartbeatTime(long lastRecieveHeartbeatTime) {
+		this.lastRecieveHeartbeatTime = lastRecieveHeartbeatTime;
 	}
 }

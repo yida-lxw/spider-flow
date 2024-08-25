@@ -37,7 +37,7 @@ public class WebSocketEditorServer {
 		this.session = session;
 		WebSocketManager.sendMessage(session, "connected");
 		WebSocketManager.addWebSocketServer(this);
-		WebSocketManager.updateHearBeat(session);
+		WebSocketManager.updateHeartBeat(session);
 		logger.info("Establish a WebSocket connection with the client with sessionId:[{}] successfully.", session.getId());
 	}
 
@@ -45,8 +45,8 @@ public class WebSocketEditorServer {
 	public void onMessage(String message, Session session) {
 		if("ping".equals(message)) {
 			String sessionId = session.getId();
-			logger.info("Recieved the hearbeat packet from the websocket client with sessionId:[{}].", sessionId);
-			WebSocketManager.updateHearBeat(session);
+			logger.info("Recieved the heartbeat packet from the websocket client with sessionId:[{}].", sessionId);
+			WebSocketManager.updateHeartBeat(session);
 			if(session.isOpen()) {
 				WebSocketManager.sendMessage(sessionId, "pong");
 			}

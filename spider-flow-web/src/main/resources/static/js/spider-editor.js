@@ -244,7 +244,6 @@ SpiderEditor.prototype.flagCurLine = function(cellId, strokeColor, strokeWidth) 
 	try {
 		self.editor.graph.setCellStyles("strokeColor", strokeColor || "red", [curCell]);
 		self.editor.graph.setCellStyles("strokeWidth", strokeWidth || 2, [curCell]);
-		var curCellStyle = self.editor.graph.getCellStyle(curCell);
 	} finally {
 		model.endUpdate();
 	}

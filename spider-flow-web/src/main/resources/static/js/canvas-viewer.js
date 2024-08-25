@@ -134,7 +134,6 @@ function CanvasViewer(options) {
 				}
 			}
 		}
-
 	}
 	var animate = function () {
 		_this.animateIndex = requestAnimFrame(animate);

@@ -23,7 +23,6 @@ public class WebSocketManager {
 	private static final Map<String, WebSocketEditorServer> webSocketServerMap = new ConcurrentHashMap<>();
 	private static final Map<String, WebSocketSession> webSocketSessionMap = new ConcurrentHashMap<>();
 
-
 	private static final ReentrantLock lock = new ReentrantLock();
 
 	/**
@@ -47,9 +46,9 @@ public class WebSocketManager {
 					} else {
 						WebSocketSession webSocketSession = webSocketSessionMap.get(sessionId);
 						if(null != webSocketSession) {
-							long lastRecieveHearbeatTime = webSocketSession.getLastRecieveHearbeatTime();
+							long lastRecieveHeartbeatTime = webSocketSession.getLastRecieveHeartbeatTime();
 							long currentTimeMills = System.currentTimeMillis();
-							if(currentTimeMills - lastRecieveHearbeatTime > Constants.MAX_INTERVAL_OF_NOT_RECIEVING_HEARTBEAT_PACKET) {
+							if(currentTimeMills - lastRecieveHeartbeatTime > Constants.MAX_INTERVAL_OF_NOT_RECIEVING_HEARTBEAT_PACKET) {
 								boolean removeResult = webSocketServerSet.remove(webSocketServer);
 								if(removeResult) {
 									webSocketServerMap.remove(sessionId);
@@ -74,7 +73,7 @@ public class WebSocketManager {
 	 * @date 2024-08-25 21:45:02
 	 * @param session
 	 */
-	public static void updateHearBeat(Session session){
+	public static void updateHeartBeat(Session session){
 		if (session != null && session.isOpen()){
 			String sessionId = session.getId();
 			long currentTimeMills = System.currentTimeMillis();
@@ -83,9 +82,9 @@ public class WebSocketManager {
 				webSocketSession = new WebSocketSession(sessionId, currentTimeMills);
 			} else {
 				webSocketSession.setSessionId(sessionId);
-				webSocketSession.setLastRecieveHearbeatTime(currentTimeMills);
+				webSocketSession.setLastRecieveHeartbeatTime(currentTimeMills);
 			}
-			webSocketSessionMap.remove(sessionId, webSocketSession);
+			webSocketSessionMap.put(sessionId, webSocketSession);
 		}
 	}
 
@@ -138,7 +137,7 @@ public class WebSocketManager {
 	}
 
 	/**
-	 * 发送消息给所有用户
+	 * 发送消息
 	 * @param msg
 	 */
 	public static void sendMessage(String msg){
