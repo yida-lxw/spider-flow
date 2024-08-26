@@ -8,12 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.spiderflow.core.context.SpiderContext;
 import org.spiderflow.core.context.SpiderContextHolder;
 import org.spiderflow.core.enums.FlowNoticeType;
+import org.spiderflow.core.event.NotifySpiderTaskExecutionStatusEvent;
+import org.spiderflow.core.event.NotifySpiderTaskExecutionStatusEventPublisher;
 import org.spiderflow.core.executor.ShapeExecutor;
 import org.spiderflow.core.executor.shape.LoopExecutor;
 import org.spiderflow.core.job.SpiderJobNodeStatusInfo;
-import org.spiderflow.core.job.id.IdGenerator;
-import org.spiderflow.core.job.id.IdGeneratorFactory;
-import org.spiderflow.core.job.id.IdGeneratorStrategy;
 import org.spiderflow.core.listener.SpiderListener;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.model.SpiderNode;
@@ -73,6 +72,9 @@ public class Spider {
 
 	@Autowired
 	private FlowNoticeService flowNoticeService;
+
+	@Autowired
+	private NotifySpiderTaskExecutionStatusEventPublisher notifySpiderTaskExecutionStatusEventPublisher;
 
 	public static SpiderFlowThreadPoolExecutor executorInstance;
 
@@ -244,7 +246,8 @@ public class Spider {
 		SpiderJobNodeStatusInfo spiderJobNodeStatusInfo = new SpiderJobNodeStatusInfo(flowId, instanceId, currentNodeId);
 		spiderJobNodeStatusInfo.setRunning(true);
 		spiderJobNodeStatusInfo.setHadCompleted(false);
-		//TODO 将当前节点的执行状态缓存至Map
+		NotifySpiderTaskExecutionStatusEvent notifySpiderTaskExecutionStatusEvent = new NotifySpiderTaskExecutionStatusEvent(spiderJobNodeStatusInfo);
+		notifySpiderTaskExecutionStatusEventPublisher.notifySpiderTaskExecutionStatusChange(notifySpiderTaskExecutionStatusEvent);
 
 		//找到对应的执行器
 		ShapeExecutor executor = ExecutorsUtils.get(shape);

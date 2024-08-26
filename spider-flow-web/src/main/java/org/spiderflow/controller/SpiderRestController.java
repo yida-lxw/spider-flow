@@ -121,6 +121,7 @@ public class SpiderRestController {
 		if (flow == null) {
 			return new JsonBean<>(0, "找不到此爬虫信息");
 		}
+		String flowId = flow.getId();
 		List<SpiderOutput> outputs;
 		Integer maxId = spiderFlowService.getFlowMaxTaskId(id);
 
@@ -130,7 +131,7 @@ public class SpiderRestController {
 		String instanceId = idGenerator.nextId();
 
 		SpiderJobContext spiderJobContext = SpiderJobContext.create(workspace, id, maxId, instanceId, true);
-
+		spiderJobContext.setFlowId(flowId);
 		try {
 			outputs = spider.run(flow, spiderJobContext, params);
 		} catch (Exception e) {

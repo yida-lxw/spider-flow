@@ -2,6 +2,7 @@ package org.spiderflow.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,7 @@ public class ThreadExecutorConfig {
 	private String threadPoolNamePrefix;
 
 	@Bean("websocketServerAsyncScheduledPool")
-	public Executor websocketServerAsyncScheduledPool(){
+	public TaskExecutor websocketServerAsyncScheduledPool(){
 		ThreadPoolTaskExecutor threadPoolExecutor = new ThreadPoolTaskExecutor();
 		threadPoolExecutor.setCorePoolSize(corePoolSize);
 		threadPoolExecutor.setMaxPoolSize(maxPoolSize);

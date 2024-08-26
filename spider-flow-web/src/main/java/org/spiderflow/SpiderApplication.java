@@ -4,6 +4,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.servlet.ServletContext;
@@ -12,6 +13,7 @@ import java.io.IOException;
 
 @SpringBootApplication
 @EnableScheduling
+@EnableAsync
 @MapperScan(basePackages = {"org.spiderflow.mapper", "org.spiderflow.**.mapper"})
 public class SpiderApplication implements ServletContextInitializer {
 

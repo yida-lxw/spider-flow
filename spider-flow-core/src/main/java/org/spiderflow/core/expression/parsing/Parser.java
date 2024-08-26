@@ -36,6 +36,7 @@ import java.util.List;
  * Parses a {@link Source} into a {@link ExpressionTemplate}. The implementation is a simple recursive descent parser with a lookahead of
  * 1.
  **/
+@SuppressWarnings("ALL")
 public class Parser {
 
 	/**
