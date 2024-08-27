@@ -114,9 +114,27 @@ public class WebSocketManager {
 	 * @param
 	 * @param msg
 	 */
-	public static void sendMessage(String sessionId, String msg){
+	public static void sendMessage(String sessionId, String msg) {
+		sendMessage(sessionId, msg, false);
+	}
+
+	/**
+	 * 通过SessionId发送消息
+	 * @param
+	 * @param msg
+	 */
+	public static void sendMessage(String sessionId, String msg, boolean asyncSend){
 		Session session = webSocketServerMap.get(sessionId).getSession();
-		sendMessage(session, msg);
+		sendMessage(session, msg, asyncSend);
+	}
+
+	/**
+	 * 通过SessionId发送消息
+	 * @param
+	 * @param msg
+	 */
+	public static void sendMessage(Session session, String msg) {
+		sendMessage(session, msg, false);
 	}
 
 	/**
@@ -124,7 +142,7 @@ public class WebSocketManager {
 	 * @param session
 	 * @param msg
 	 */
-	public static void sendMessage(Session session, String msg){
+	public static void sendMessage(Session session, String msg, boolean asyncSend){
 		if (session == null){
 			logger.error("The session doesn't exists，so we can't send message.");
 			return;
@@ -134,8 +152,14 @@ public class WebSocketManager {
 			return;
 		}
 		try {
-			session.getBasicRemote().sendText(msg);
-		} catch (Exception e) {}
+			if(asyncSend) {
+				session.getAsyncRemote().sendText(msg);
+			} else {
+				session.getBasicRemote().sendText(msg);
+			}
+		} catch (Exception e) {
+			logger.error("As sending message with Websocket Session {} occur exception:\n{}.", asyncSend?"asynchronously" : "synchronously", e.getMessage());
+		}
 	}
 
 	/**

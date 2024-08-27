@@ -222,7 +222,8 @@ SpiderEditor.prototype.getSelectedCell = function(){
 	return cell;
 }
 SpiderEditor.prototype.getXML = function(){
-	return mxUtils.getPrettyXml(new mxCodec(mxUtils.createXmlDocument()).encode(this.graph.getModel()));
+	var xmlString = new mxCodec(mxUtils.createXmlDocument()).encode(this.graph.getModel());
+	return mxUtils.getPrettyXml(xmlString);
 }
 SpiderEditor.prototype.selectCell = function(cell){
 	this.graph.setSelectionCell(cell);
@@ -244,6 +245,24 @@ SpiderEditor.prototype.flagCurLine = function(cellId, strokeColor, strokeWidth) 
 	try {
 		self.editor.graph.setCellStyles("strokeColor", strokeColor || "red", [curCell]);
 		self.editor.graph.setCellStyles("strokeWidth", strokeWidth || 2, [curCell]);
+	} finally {
+		model.endUpdate();
+	}
+}
+
+
+var highlighterMappings = {};
+SpiderEditor.prototype.unflagCurNode = function(cellId) {
+	var self = this;
+	var graph = self.editor.graph;
+	var view = graph.getView();
+	var model = graph.getModel();
+	var curCell = model.getCell(cellId);
+	model.beginUpdate();
+	try {
+		var highlight = highlighterMappings[cellId];
+		highlight = new mxCellHighlight(graph, "", 2);
+		highlight.unhighlight(view.getState(curCell));
 	} finally {
 		model.endUpdate();
 	}
