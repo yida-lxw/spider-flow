@@ -81980,6 +81980,7 @@ mxCellHighlight.prototype.highlight = function(state)
 
 mxCellHighlight.prototype.unhighlight = function(state)
 {
+    this.state.styleSheet
     if (this.state != state)
     {
         if (this.shape != null)

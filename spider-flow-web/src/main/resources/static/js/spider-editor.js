@@ -250,25 +250,58 @@ SpiderEditor.prototype.flagCurLine = function(cellId, strokeColor, strokeWidth) 
 	}
 }
 
-
 var highlighterMappings = {};
-SpiderEditor.prototype.unflagCurNode = function(cellId) {
+SpiderEditor.prototype.unflagCurNode = function(flowId, cellId) {
 	var self = this;
 	var graph = self.editor.graph;
-	var view = graph.getView();
 	var model = graph.getModel();
-	var curCell = model.getCell(cellId);
 	model.beginUpdate();
 	try {
-		var highlight = highlighterMappings[cellId];
-		highlight = new mxCellHighlight(graph, "", 2);
-		highlight.unhighlight(view.getState(curCell));
+		var highlighterKey = flowId + "#" + cellId;
+		var highlighter = highlighterMappings[highlighterKey];
+		if(highlighter) {
+			highlighter.hide();
+		}
 	} finally {
 		model.endUpdate();
 	}
 }
 
-SpiderEditor.prototype.flagCurNode = function(cellId, strokeColor, strokeWidth) {
+SpiderEditor.prototype.unflagAllNode = function(flowId) {
+	var self = this;
+	var graph = self.editor.graph;
+	var model = graph.getModel();
+	var cells = model.cells;
+	var cellLen = 0;
+	var proNames = [];
+	for(var proName in cells) {
+		if(cells.hasOwnProperty(proName)) {
+			proNames.push(proName);
+			cellLen++;
+		}
+	}
+	model.beginUpdate();
+	try {
+		for(var i=0; i < cellLen; i++) {
+			var proName = proNames[i];
+			var curCell = cells[proName];
+			var vertex = curCell["vertex"];
+			if(vertex != 1) {
+				continue;
+			}
+			var cellId = curCell["id"];
+			var highlighterKey = flowId + "#" + cellId;
+			var highlighter = highlighterMappings[highlighterKey];
+			if(highlighter) {
+				highlighter.hide();
+			}
+		}
+	} finally {
+		model.endUpdate();
+	}
+}
+
+SpiderEditor.prototype.flagCurNode = function(flowId, cellId, strokeColor, strokeWidth) {
 	if(strokeWidth) {
 		if("string" == typeof strokeWidth) {
 			strokeWidth = ~~strokeWidth;
@@ -284,8 +317,13 @@ SpiderEditor.prototype.flagCurNode = function(cellId, strokeColor, strokeWidth) 
 	var curCell = model.getCell(cellId);
 	model.beginUpdate();
 	try {
-		var highlight = new mxCellHighlight(graph, strokeColor || "red", strokeWidth || 2);
-		highlight.highlight(view.getState(curCell));
+		var highlighterKey = flowId + "#" + cellId;
+		var highlighter = highlighterMappings[highlighterKey];
+		if(!highlighter) {
+			highlighter = new mxCellHighlight(graph, strokeColor || "red", strokeWidth || 2);
+			highlighterMappings[highlighterKey] = highlighter;
+		}
+		highlighter.highlight(view.getState(curCell));
 	} finally {
 		model.endUpdate();
 	}

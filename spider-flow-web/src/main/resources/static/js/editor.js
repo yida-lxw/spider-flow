@@ -799,10 +799,8 @@ function runSpider(debug) {
 			btn: ['关闭', '显示/隐藏输出', '显示/隐藏日志', '停止'],
 			yes: function(index, layero){
 				layer.close(index);
-				//editor.unflagCurNode("0");
-				$(".editor-container").hide();
-				$(".xml-container textarea").val(editor.getXML());
-				$(".editor-container").show();
+				var flowId = getQueryString('id');
+				editor.unflagAllNode(flowId);
 			},
 			cancel: function(index, layero){
 				layer.close(index);
@@ -929,14 +927,14 @@ function runSpider(debug) {
 						var eventType = event.eventType;
 						if("jobNodeExecutionStatusChanged" == eventType) {
 							//高亮节点
+							var flowId = event.flowId;
 							var currentNodeId = event.nodeId;
 							var running = event.running;
 							var hadCompleted = event.hadCompleted;
 							var occurError = event.occurError;
 							var strokeColor = running?runningColor : (hadCompleted?hadCompletedColor : (occurError?occurErrorColor : ""));
-							console.log("节点:" + currentNodeId + "的颜色:" + strokeColor);
 							if(strokeColor) {
-								editor.flagCurNode(currentNodeId, strokeColor, "2");
+								editor.flagCurNode(flowId, currentNodeId, strokeColor, "2");
 							}
 							return;
 						}
