@@ -133,7 +133,9 @@ public class WebSocketManager {
 			logger.error("The sesion with sessionId:[{}] was closed, so we can't send any message to websocket client.", session.getId());
 			return;
 		}
-		session.getAsyncRemote().sendText(msg);
+		try {
+			session.getBasicRemote().sendText(msg);
+		} catch (Exception e) {}
 	}
 
 	/**

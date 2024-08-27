@@ -700,7 +700,6 @@ layui.define(["jquery", "laytpl"], function (exports) {
                 data[options.request.key] = d[obj.i][options.request.key];
                 data[options.request.children] = d[obj.i][options.request.children];
                 d[obj.i] = $.extend({}, d[obj.i], data);
-                console.log(options.data);
             });
         },
         remove: function (key) {

@@ -6,6 +6,7 @@ import org.spiderflow.core.job.SpiderJobNodeStatusInfo;
 import org.spiderflow.core.event.NotifySpiderTaskExecutionStatusEvent;
 import org.spiderflow.core.event.NotifySpiderTaskExecutionStatusEventListener;
 import org.spiderflow.core.utils.JacksonUtils;
+import org.spiderflow.core.utils.StringUtils;
 import org.spiderflow.websocket.WebSocketManager;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -26,6 +27,10 @@ public class NotifySpiderTaskExecutionStatusEventListenerImpl implements NotifyS
 	@Override
 	public void sendMessageToNotifyWebSocketClient(NotifySpiderTaskExecutionStatusEvent notifySpiderTaskExecutionStatusEvent) {
 		SpiderJobNodeStatusInfo spiderJobNodeStatusInfo = notifySpiderTaskExecutionStatusEvent.getSpiderJobNodeStatusInfo();
+		String eventType = notifySpiderTaskExecutionStatusEvent.getEventType();
+		if(StringUtils.isEmpty(spiderJobNodeStatusInfo.getEventType())) {
+			spiderJobNodeStatusInfo.setEventType(eventType);
+		}
 		String message = JacksonUtils.toJSONString(spiderJobNodeStatusInfo);
 		WebSocketManager.sendMessage(message);
 		logger.info("Had sent message:[{}] to all websocket client to notify them to update jobNode style for UI rendeing.", message);

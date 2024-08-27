@@ -17,18 +17,25 @@ public class SpiderJobNodeStatusInfo {
 	private boolean running;
 	/**是否已执行完成*/
 	private boolean hadCompleted;
+	/**执行出现异常*/
+	private boolean occurError;
+
+	private String eventType;
 
 	public SpiderJobNodeStatusInfo() {}
 
-	public SpiderJobNodeStatusInfo(String flowId, String instanceId, String nodeId, boolean running, boolean hadCompleted) {
+	public SpiderJobNodeStatusInfo(String eventType, String flowId, String instanceId, String nodeId, boolean running, boolean hadCompleted, boolean occurError) {
+		this.eventType = eventType;
 		this.flowId = flowId;
 		this.instanceId = instanceId;
 		this.nodeId = nodeId;
 		this.running = running;
 		this.hadCompleted = hadCompleted;
+		this.occurError = occurError;
 	}
 
-	public SpiderJobNodeStatusInfo(String flowId, String instanceId, String nodeId) {
+	public SpiderJobNodeStatusInfo(String eventType, String flowId, String instanceId, String nodeId) {
+		this.eventType = eventType;
 		this.flowId = flowId;
 		this.instanceId = instanceId;
 		this.nodeId = nodeId;
@@ -72,5 +79,21 @@ public class SpiderJobNodeStatusInfo {
 
 	public void setHadCompleted(boolean hadCompleted) {
 		this.hadCompleted = hadCompleted;
+	}
+
+	public boolean isOccurError() {
+		return occurError;
+	}
+
+	public void setOccurError(boolean occurError) {
+		this.occurError = occurError;
+	}
+
+	public String getEventType() {
+		return eventType;
+	}
+
+	public void setEventType(String eventType) {
+		this.eventType = eventType;
 	}
 }

@@ -12,16 +12,27 @@ import java.time.Clock;
  * @description 通知爬虫任务执行状态事件
  */
 public class NotifySpiderTaskExecutionStatusEvent extends ApplicationEvent {
+	private String eventType;
 	private SpiderJobNodeStatusInfo spiderJobNodeStatusInfo;
 
-	public NotifySpiderTaskExecutionStatusEvent(SpiderJobNodeStatusInfo spiderJobNodeStatusInfo) {
+	public NotifySpiderTaskExecutionStatusEvent(String eventType, SpiderJobNodeStatusInfo spiderJobNodeStatusInfo) {
 		super(spiderJobNodeStatusInfo);
+		this.eventType = eventType;
 		this.spiderJobNodeStatusInfo = spiderJobNodeStatusInfo;
 	}
 
-	public NotifySpiderTaskExecutionStatusEvent(SpiderJobNodeStatusInfo spiderJobNodeStatusInfo, Clock clock) {
+	public NotifySpiderTaskExecutionStatusEvent(String eventType, SpiderJobNodeStatusInfo spiderJobNodeStatusInfo, Clock clock) {
 		super(spiderJobNodeStatusInfo, clock);
+		this.eventType = eventType;
 		this.spiderJobNodeStatusInfo = spiderJobNodeStatusInfo;
+	}
+
+	public String getEventType() {
+		return eventType;
+	}
+
+	public void setEventType(String eventType) {
+		this.eventType = eventType;
 	}
 
 	public SpiderJobNodeStatusInfo getSpiderJobNodeStatusInfo() {

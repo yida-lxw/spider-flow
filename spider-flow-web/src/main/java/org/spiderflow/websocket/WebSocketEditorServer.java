@@ -3,10 +3,16 @@ package org.spiderflow.websocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.core.Spider;
+import org.spiderflow.core.job.id.IdGenerator;
+import org.spiderflow.core.job.id.IdGeneratorFactory;
+import org.spiderflow.core.job.id.IdGeneratorStrategy;
+import org.spiderflow.core.model.SpiderNode;
 import org.spiderflow.core.utils.JacksonUtils;
 import org.spiderflow.core.utils.SpiderFlowUtils;
 import org.spiderflow.model.SpiderWebSocketContext;
 import org.spiderflow.model.WebSocketEvent;
+import org.spiderflow.utils.XMLUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.OnClose;
@@ -60,6 +66,11 @@ public class WebSocketEditorServer {
 		}
 		boolean isDebug = "debug".equalsIgnoreCase(eventType);
 		if ("test".equalsIgnoreCase(eventType) || isDebug) {
+			String idGeneratorStrategyName = spider.getIdGeneratorStrategyName();
+			long workerId = spider.getWorkerId();
+			long dataCenterId = spider.getDataCenterId();
+			IdGeneratorStrategy idGeneratorStrategy = IdGeneratorStrategy.of(idGeneratorStrategyName);
+			IdGenerator<String> idGenerator = IdGeneratorFactory.build(idGeneratorStrategy, workerId, dataCenterId);
 			context = new SpiderWebSocketContext(session);
 			context.setDebug(isDebug);
 			context.setRunning(true);
@@ -70,7 +81,14 @@ public class WebSocketEditorServer {
 					xml = messageObj.toString();
 				}
 				if (xml != null && xml.length() > 0) {
-					spider.runWithTest(SpiderFlowUtils.loadXMLFromString(xml), context);
+					String flowId = XMLUtils.getFlowIdFromXML(xml);
+					context.setFlowId(flowId);
+					String instanceId = idGenerator.nextId();
+					context.setInstanceId(instanceId);
+					SpiderNode spiderNode = SpiderFlowUtils.loadXMLFromString(xml);
+					String currentNodeId = spiderNode.getNodeId();
+					context.setCurrentNodeId(currentNodeId);
+					spider.runWithTest(spiderNode, context);
 					context.write(new WebSocketEvent<>("finish", null));
 				} else {
 					context.write(new WebSocketEvent<>("error", "xml不正确！"));

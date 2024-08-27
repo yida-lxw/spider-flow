@@ -70,6 +70,15 @@ public class Spider {
 	@Value("${spider.detect.dead-cycle:5000}")
 	private Integer deadCycle;
 
+	@Value("${spider.idGeneratorStrategy}")
+	private String idGeneratorStrategyName;
+
+	@Value("${spider.workerId:1}")
+	private Long workerId;
+
+	@Value("${spider.datacenterId:1}")
+	private Long dataCenterId;
+
 	@Autowired
 	private FlowNoticeService flowNoticeService;
 
@@ -239,15 +248,6 @@ public class Spider {
 			return;
 		}
 		logger.debug("执行节点[{}:{}]", node.getNodeName(), node.getNodeId());
-		//记录当前节点的执行状态
-		String flowId = context.getFlowId();
-		String instanceId = context.getInstanceId();
-		String currentNodeId = node.getNodeId();
-		SpiderJobNodeStatusInfo spiderJobNodeStatusInfo = new SpiderJobNodeStatusInfo(flowId, instanceId, currentNodeId);
-		spiderJobNodeStatusInfo.setRunning(true);
-		spiderJobNodeStatusInfo.setHadCompleted(false);
-		NotifySpiderTaskExecutionStatusEvent notifySpiderTaskExecutionStatusEvent = new NotifySpiderTaskExecutionStatusEvent(spiderJobNodeStatusInfo);
-		notifySpiderTaskExecutionStatusEventPublisher.notifySpiderTaskExecutionStatusChange(notifySpiderTaskExecutionStatusEvent);
 
 		//找到对应的执行器
 		ShapeExecutor executor = ExecutorsUtils.get(shape);
@@ -329,12 +329,15 @@ public class Spider {
 								}
 
 								//执行节点具体逻辑
+								notifyJobNodeExecutionStatus(node, context, true, false, false);
 								executor.execute(node, context, nVariables);
 								//当未发生异常时，移除ex变量
 								nVariables.remove("ex");
 								//当前节点执行成功后,更新节点执行状态
+								notifyJobNodeExecutionStatus(node, context, false, true, false);
 							} catch (Throwable t) {
 								nVariables.put("ex", t);
+								notifyJobNodeExecutionStatus(node, context, false, false, true);
 								logger.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), t);
 							} finally {
 								//设置节点执行完成时间的毫秒数
@@ -357,6 +360,20 @@ public class Spider {
 				}
 			}
 		}
+	}
+
+	private void notifyJobNodeExecutionStatus(SpiderNode node, SpiderContext context, boolean running, boolean completed, boolean occurError) {
+		//记录当前节点的执行状态
+		String eventType = "jobNodeExecutionStatusChanged";
+		String flowId = context.getFlowId();
+		String instanceId = context.getInstanceId();
+		String currentNodeId = node.getNodeId();
+		SpiderJobNodeStatusInfo spiderJobNodeStatusInfo = new SpiderJobNodeStatusInfo(eventType, flowId, instanceId, currentNodeId);
+		spiderJobNodeStatusInfo.setRunning(running);
+		spiderJobNodeStatusInfo.setHadCompleted(completed);
+		spiderJobNodeStatusInfo.setOccurError(occurError);
+		NotifySpiderTaskExecutionStatusEvent notifySpiderTaskExecutionStatusEvent = new NotifySpiderTaskExecutionStatusEvent(eventType, spiderJobNodeStatusInfo);
+		notifySpiderTaskExecutionStatusEventPublisher.notifySpiderTaskExecutionStatusChange(notifySpiderTaskExecutionStatusEvent);
 	}
 
 	/**
@@ -406,5 +423,29 @@ public class Spider {
 			this.variables = variables;
 			this.executor = executor;
 		}
+	}
+
+	public Integer getTotalThreads() {
+		return totalThreads;
+	}
+
+	public Integer getDefaultThreads() {
+		return defaultThreads;
+	}
+
+	public Integer getDeadCycle() {
+		return deadCycle;
+	}
+
+	public String getIdGeneratorStrategyName() {
+		return idGeneratorStrategyName;
+	}
+
+	public Long getWorkerId() {
+		return workerId;
+	}
+
+	public Long getDataCenterId() {
+		return dataCenterId;
 	}
 }

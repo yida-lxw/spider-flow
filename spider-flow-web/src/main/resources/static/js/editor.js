@@ -205,8 +205,6 @@ $(function () {
 				layui.form.render();
 				renderCodeMirror();
 				resizeSlideBar();
-				//测试高亮节点
-				editor.flagCurNode("14", "red", "2");
 				callback && callback();
 			})
 		}
@@ -776,6 +774,10 @@ function bindToolbarClickAction(editor) {
 	$('.btn-dock-bottom').click();
 }
 
+var runningColor = "#04F70C";
+var hadCompletedColor = "#000000";
+var occurErrorColor = "#FC0429";
+
 function runSpider(debug) {
 	validXML(function () {
 		$(".btn-debug,.btn-test,.btn-resume").addClass('disabled');
@@ -791,7 +793,7 @@ function runSpider(debug) {
 			content: '<div class="test-window-container"><div class="output-container"><div class="layui-tab layui-tab-fixed layui-tab-brief"><ul class="layui-tab-title"></ul><div class="layui-tab-content"></div></div></div><canvas class="log-container" width="677" height="100"></canvas></div>',
 			area: ["680px", "400px"],
 			shade: 0,
-			offset: 'rt',
+			offset: 'rb',
 			maxmin: true,
 			maxWidth: 700,
 			maxHeight: 400,
@@ -917,6 +919,19 @@ function runSpider(debug) {
 						}
 						var event = JSON.parse(e.data);
 						var eventType = event.eventType;
+						if("jobNodeExecutionStatusChanged" == eventType) {
+							//高亮节点
+							var currentNodeId = event.nodeId;
+							var running = event.running;
+							var hadCompleted = event.hadCompleted;
+							var occurError = event.occurError;
+							var strokeColor = running?runningColor : (hadCompleted?hadCompletedColor : (occurError?occurErrorColor : ""));
+							console.log("节点:" + currentNodeId + "的颜色:" + strokeColor);
+							if(strokeColor) {
+								editor.flagCurNode(currentNodeId, strokeColor, "2");
+							}
+							return;
+						}
 						var message = event.message;
 						if (eventType == 'finish') {
 							$(".spiderflow-debug-tooltip").remove();

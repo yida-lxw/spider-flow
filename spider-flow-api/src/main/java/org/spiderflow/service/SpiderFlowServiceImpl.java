@@ -18,6 +18,7 @@ import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.service.SpiderFlowService;
 import org.spiderflow.mapper.FlowNoticeMapper;
 import org.spiderflow.mapper.SpiderFlowMapper;
+import org.spiderflow.utils.XMLUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -120,17 +121,23 @@ public class SpiderFlowServiceImpl extends ServiceImpl<SpiderFlowMapper, SpiderF
 					.build();
 			spiderFlow.setNextExecuteTime(trigger.getStartTime());
 		}
-		if (StringUtils.isNotEmpty(spiderFlow.getId())) {    //update 任务
-			spiderFlowMapper.updateSpiderFlow(spiderFlow.getId(), spiderFlow.getName(), spiderFlow.getXml());
-			spiderJobManager.remove(spiderFlow.getId());
-			spiderFlow = getById(spiderFlow.getId());
+		if (StringUtils.isNotEmpty(spiderFlow.getId())) {
+			String flowId = spiderFlow.getId();
+			String xmlString = spiderFlow.getXml();
+			xmlString = XMLUtils.updateXML(flowId, xmlString);
+			spiderFlowMapper.updateSpiderFlow(flowId, spiderFlow.getName(), xmlString);
+			spiderJobManager.remove(flowId);
+			spiderFlow = getById(flowId);
 			if ("1".equals(spiderFlow.getEnabled()) && StringUtils.isNotEmpty(spiderFlow.getCron())) {
 				spiderJobManager.addJob(spiderFlow);
 			}
-		} else {//insert 任务
-			String id = UUID.randomUUID().toString().replace("-", "");
-			spiderFlowMapper.insertSpiderFlow(id, spiderFlow.getName(), spiderFlow.getXml());
-			spiderFlow.setId(id);
+		} else {
+			//insert 任务
+			String flowId = UUID.randomUUID().toString().replace("-", "");
+			String xmlString = spiderFlow.getXml();
+			xmlString = XMLUtils.updateXML(flowId, xmlString);
+			spiderFlowMapper.insertSpiderFlow(flowId, spiderFlow.getName(), xmlString);
+			spiderFlow.setId(flowId);
 		}
 		File file = new File(workspace, spiderFlow.getId() + File.separator + "xmls" + File.separator + System.currentTimeMillis() + ".xml");
 		try {
