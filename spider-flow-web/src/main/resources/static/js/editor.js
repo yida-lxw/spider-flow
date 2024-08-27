@@ -800,7 +800,7 @@ function runSpider(debug) {
 			yes: function(index, layero){
 				layer.close(index);
 				var flowId = getQueryString('id');
-				editor.unflagAllNode(flowId);
+				editor.unflagAllNode(flowId, [runningColor, hadCompletedColor, occurErrorColor]);
 			},
 			cancel: function(index, layero){
 				layer.close(index);
@@ -933,6 +933,7 @@ function runSpider(debug) {
 							var hadCompleted = event.hadCompleted;
 							var occurError = event.occurError;
 							var strokeColor = running?runningColor : (hadCompleted?hadCompletedColor : (occurError?occurErrorColor : ""));
+							editor.unflagCurNode(flowId, currentNodeId, [runningColor, hadCompletedColor, occurErrorColor]);
 							if(strokeColor) {
 								editor.flagCurNode(flowId, currentNodeId, strokeColor, "2");
 							}

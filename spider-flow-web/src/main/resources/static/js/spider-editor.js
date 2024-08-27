@@ -238,36 +238,42 @@ SpiderEditor.prototype.flagCurLine = function(cellId, strokeColor, strokeWidth) 
 			}
 		}
 	}
+	strokeWidth = strokeWidth || 2;
+	strokeColor = (strokeColor || "red");
 	var self = this;
 	var model = self.editor.graph.getModel();
 	var curCell = model.getCell(cellId);
 	model.beginUpdate();
 	try {
-		self.editor.graph.setCellStyles("strokeColor", strokeColor || "red", [curCell]);
-		self.editor.graph.setCellStyles("strokeWidth", strokeWidth || 2, [curCell]);
+		self.editor.graph.setCellStyles("strokeColor", strokeColor, [curCell]);
+		self.editor.graph.setCellStyles("strokeWidth", strokeWidth, [curCell]);
 	} finally {
 		model.endUpdate();
 	}
 }
 
 var highlighterMappings = {};
-SpiderEditor.prototype.unflagCurNode = function(flowId, cellId) {
+SpiderEditor.prototype.unflagCurNode = function(flowId, cellId, colorArray) {
 	var self = this;
 	var graph = self.editor.graph;
 	var model = graph.getModel();
+
 	model.beginUpdate();
-	try {
-		var highlighterKey = flowId + "#" + cellId;
-		var highlighter = highlighterMappings[highlighterKey];
-		if(highlighter) {
-			highlighter.hide();
+	for (var index in colorArray) {
+		var strokeColor = colorArray[index];
+		try {
+			var highlighterKey = flowId + "_" + cellId + "_" + strokeColor;
+			var highlighter = highlighterMappings[highlighterKey];
+			if(highlighter) {
+				highlighter.hide();
+			}
+		} finally {
+			model.endUpdate();
 		}
-	} finally {
-		model.endUpdate();
 	}
 }
 
-SpiderEditor.prototype.unflagAllNode = function(flowId) {
+SpiderEditor.prototype.unflagAllNode = function(flowId, colorArray) {
 	var self = this;
 	var graph = self.editor.graph;
 	var model = graph.getModel();
@@ -290,10 +296,13 @@ SpiderEditor.prototype.unflagAllNode = function(flowId) {
 				continue;
 			}
 			var cellId = curCell["id"];
-			var highlighterKey = flowId + "#" + cellId;
-			var highlighter = highlighterMappings[highlighterKey];
-			if(highlighter) {
-				highlighter.hide();
+			for(var index in colorArray) {
+				var strokeColor = colorArray[index];
+				var highlighterKey = flowId + "_" + cellId + "_" + strokeColor;
+				var highlighter = highlighterMappings[highlighterKey];
+				if(highlighter) {
+					highlighter.hide();
+				}
 			}
 		}
 	} finally {
@@ -310,6 +319,8 @@ SpiderEditor.prototype.flagCurNode = function(flowId, cellId, strokeColor, strok
 			}
 		}
 	}
+	strokeWidth = strokeWidth || 2;
+	strokeColor = (strokeColor || "red");
 	var self = this;
 	var graph = self.editor.graph;
 	var view = graph.getView();
@@ -317,10 +328,10 @@ SpiderEditor.prototype.flagCurNode = function(flowId, cellId, strokeColor, strok
 	var curCell = model.getCell(cellId);
 	model.beginUpdate();
 	try {
-		var highlighterKey = flowId + "#" + cellId;
+		var highlighterKey = flowId + "_" + cellId + "_" + strokeColor;
 		var highlighter = highlighterMappings[highlighterKey];
 		if(!highlighter) {
-			highlighter = new mxCellHighlight(graph, strokeColor || "red", strokeWidth || 2);
+			highlighter = new mxCellHighlight(graph, strokeColor, strokeWidth);
 			highlighterMappings[highlighterKey] = highlighter;
 		}
 		highlighter.highlight(view.getState(curCell));
