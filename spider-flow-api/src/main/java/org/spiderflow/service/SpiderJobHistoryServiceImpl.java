@@ -1,15 +1,19 @@
 package org.spiderflow.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.spiderflow.core.dto.SpiderJobHistoryDTO;
 import org.spiderflow.core.model.SpiderJobHistory;
+import org.spiderflow.core.page.PageResult;
 import org.spiderflow.core.service.SpiderJobHistoryService;
 import org.spiderflow.mapper.SpiderJobHistoryMapper;
+import org.spiderflow.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -25,9 +29,15 @@ public class SpiderJobHistoryServiceImpl extends ServiceImpl<SpiderJobHistoryMap
 	private SpiderJobHistoryMapper spiderJobHistoryMapper;
 
 	@Override
-	public IPage<SpiderJobHistoryDTO> spiderJobHistoryPageQuery(Page<SpiderJobHistoryDTO> page, String flowId, String spiderName,
-																Integer executionStatus, Date startExecutionTime, Date endExecutionTime) {
-		return spiderJobHistoryMapper.spiderJobHistoryPageQuery(page, flowId, spiderName, executionStatus, startExecutionTime, endExecutionTime);
+	public PageResult<SpiderJobHistoryDTO> spiderJobHistoryPageQuery(Page<SpiderJobHistoryDTO> page, String flowId, String spiderName,
+																	 Integer executionStatus, Date startExecutionTime, Date endExecutionTime) {
+		List<SpiderJobHistoryDTO> spiderJobHistoryDTOList = spiderJobHistoryMapper.selectPage(page, flowId, spiderName, executionStatus, startExecutionTime, endExecutionTime);
+		if(null == spiderJobHistoryDTOList) {
+			spiderJobHistoryDTOList = new ArrayList<>();
+		}
+		PageInfo<SpiderJobHistoryDTO> pageInfo = new PageInfo<>(spiderJobHistoryDTOList);
+		PageResult<SpiderJobHistoryDTO> pageResult = PageUtils.getPageResult(pageInfo);
+		return pageResult;
 	}
 
 	@Override

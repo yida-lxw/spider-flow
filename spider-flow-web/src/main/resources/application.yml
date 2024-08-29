@@ -55,6 +55,13 @@ mybatis-plus:
   global-config:
     banner: false
 
+pagehelper:
+  params: count=countSql
+  support-methods-arguments: true
+  helper-dialect: mysql
+  auto-runtime-dialect: false
+  reasonable: false
+
 selenium:
   driver:
     chrome: D:/chromedriver-127.0.6533.119-win64/chromedriver.exe

@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/spider")
 public class SpiderFlowController {
+	private static final Logger logger = LoggerFactory.getLogger(SpiderFlowController.class);
 
 	@Autowired
 	private List<FunctionExecutor> functionExecutors;
@@ -68,8 +69,6 @@ public class SpiderFlowController {
 	private String workspace;
 
 	private final List<Grammer> grammers = new ArrayList<Grammer>();
-
-	private static Logger logger = LoggerFactory.getLogger(SpiderFlowController.class);
 
 	@PostConstruct
 	private void init() {

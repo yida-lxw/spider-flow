@@ -1,8 +1,7 @@
 package org.spiderflow.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
@@ -37,19 +36,19 @@ public interface SpiderJobHistoryMapper extends BaseMapper<SpiderJobHistory> {
 			"	and sjh.execution_status = #{executionStatus}",
 			"</if>",
 			"<if test=\"startExecutionTime != null\">",
-			"	and sjh.start_execution_time <= #{startExecutionTime}",
+			"	and sjh.start_execution_time &lt;= #{startExecutionTime}",
 			"</if>",
 			"<if test=\"endExecutionTime != null\">",
-			"	and sjh.end_execution_time >= #{endExecutionTime}",
+			"	and sjh.end_execution_time &gt;= #{endExecutionTime}",
 			"</if>",
 			"order by sjh.start_execution_time desc",
 			"</script>"
 	})
-	IPage<SpiderJobHistoryDTO> spiderJobHistoryPageQuery(Page<SpiderJobHistoryDTO> page, @Param("flowId") String flowId,
-														 @Param("spiderName") String spiderName,
-														 @Param("executionStatus") Integer executionStatus,
-														 @Param("startExecutionTime") Date startExecutionTime,
-														 @Param("endExecutionTime") Date endExecutionTime);
+	List<SpiderJobHistoryDTO> selectPage(Page<SpiderJobHistoryDTO> page, @Param("flowId") String flowId,
+										 @Param("spiderName") String spiderName,
+										 @Param("executionStatus") Integer executionStatus,
+										 @Param("startExecutionTime") Date startExecutionTime,
+										 @Param("endExecutionTime") Date endExecutionTime);
 
 	@Insert("insert into sp_job_history(flow_id,start_execution_time,end_execution_time,execution_status) " +
 			"values(#{spiderJobHistory.flowId},#{spiderJobHistory.startExecutionTime}," +

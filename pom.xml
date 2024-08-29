@@ -43,6 +43,7 @@
         <jsonpath.version>2.9.0</jsonpath.version>
         <alibaba.transmittable.version>2.11.5</alibaba.transmittable.version>
         <mybatis.plus.version>3.5.7</mybatis.plus.version>
+        <pagehelper.version>2.1.0</pagehelper.version>
         <commons-text.version>1.12.0</commons-text.version>
         <commons-lang3>3.16.0</commons-lang3>
         <commons-csv.version>1.8</commons-csv.version>
@@ -503,6 +504,21 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>${pagehelper.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mybatis</groupId>
+                    <artifactId>mybatis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.github.jsqlparser</groupId>
+                    <artifactId>jsqlparser</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql-connector-java.version}</version>
@@ -568,6 +584,12 @@
             <groupId>us.codecraft</groupId>
             <artifactId>xsoup</artifactId>
             <version>${xsoup.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jsoup</groupId>
+                    <artifactId>jsoup</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
