@@ -1,6 +1,6 @@
 package org.spiderflow.utils;
 
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.spiderflow.core.page.PageResult;
 
 /**
@@ -10,13 +10,13 @@ import org.spiderflow.core.page.PageResult;
  * @description 分页工具类
  */
 public class PageUtils {
-	public static <T> PageResult<T> getPageResult(PageInfo<T> pageInfo) {
+	public static <T> PageResult<T> getPageResult(IPage<T> pageInfo) {
 		PageResult<T> pageResult = new PageResult();
-		pageResult.setPageNum(pageInfo.getPageNum());
-		pageResult.setPageSize(pageInfo.getPageSize());
+		pageResult.setPageNum(Long.valueOf(pageInfo.getCurrent()).intValue());
+		pageResult.setPageSize(Long.valueOf(pageInfo.getSize()).intValue());
 		pageResult.setTotalSize(pageInfo.getTotal());
-		pageResult.setTotalPages(pageInfo.getPages());
-		pageResult.setData(pageInfo.getList());
+		pageResult.setTotalPages(Long.valueOf(pageInfo.getPages()).intValue());
+		pageResult.setData(pageInfo.getRecords());
 		return pageResult;
 	}
 }

@@ -1,8 +1,7 @@
 package org.spiderflow.core.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.github.pagehelper.Page;
 import org.spiderflow.core.dto.SpiderJobHistoryDTO;
 import org.spiderflow.core.model.SpiderJobHistory;
 import org.spiderflow.core.page.PageResult;
@@ -38,4 +37,10 @@ public interface SpiderJobHistoryService  extends IService<SpiderJobHistory> {
 	List<SpiderJobHistory> queryByFlowId(String flowId);
 
 	SpiderJobHistory queryLastJobHistory(String flowId);
+
+	int deleteById(String id);
+
+	int deleteByFlowId(String flowId);
+
+	int batchDeleteByIds(List<String> idList);
 }

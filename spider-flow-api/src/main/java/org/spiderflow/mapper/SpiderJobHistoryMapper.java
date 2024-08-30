@@ -1,7 +1,9 @@
 package org.spiderflow.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.github.pagehelper.Page;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
@@ -44,11 +46,11 @@ public interface SpiderJobHistoryMapper extends BaseMapper<SpiderJobHistory> {
 			"order by sjh.start_execution_time desc",
 			"</script>"
 	})
-	List<SpiderJobHistoryDTO> selectPage(Page<SpiderJobHistoryDTO> page, @Param("flowId") String flowId,
-										 @Param("spiderName") String spiderName,
-										 @Param("executionStatus") Integer executionStatus,
-										 @Param("startExecutionTime") Date startExecutionTime,
-										 @Param("endExecutionTime") Date endExecutionTime);
+	IPage<SpiderJobHistoryDTO> selectPage(Page<SpiderJobHistoryDTO> page, @Param("flowId") String flowId,
+										  @Param("spiderName") String spiderName,
+										  @Param("executionStatus") Integer executionStatus,
+										  @Param("startExecutionTime") Date startExecutionTime,
+										  @Param("endExecutionTime") Date endExecutionTime);
 
 	@Insert("insert into sp_job_history(flow_id,start_execution_time,end_execution_time,execution_status) " +
 			"values(#{spiderJobHistory.flowId},#{spiderJobHistory.startExecutionTime}," +
@@ -80,4 +82,20 @@ public interface SpiderJobHistoryMapper extends BaseMapper<SpiderJobHistory> {
 	@Select("select id,flow_id,start_execution_time,end_execution_time,execution_status from sp_job_history " +
 			"where flow_id = #{flowId} order by start_execution_time desc limit 0,1")
 	SpiderJobHistory queryLastJobHistory(@Param("flowId") String flowId);
+
+	@Delete("delete from sp_job_history where id=#{id}")
+	int deleteById(@Param("id") String id);
+
+	@Delete("delete from sp_job_history where flowId=#{flowId}")
+	int deleteByFlowId(@Param("flowId") String flowId);
+
+	@Delete({
+			"<script>",
+			"delete from sp_job_history where id in ",
+			"    <foreach collection='idList' item='id' separator=',' open='(' close=')'> ",
+			"        #{id}",
+			"    </foreach>",
+			"</script>"
+	})
+	int batchDeleteByIds(@Param("idList") List<String> idList);
 }
