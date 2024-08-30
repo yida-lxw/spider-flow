@@ -39,11 +39,18 @@ public class Constants {
 	public static final long DEFAULT_2G_FILE_SIZE = 2147483648L;
 
 	public static final long DEFAULT_KEEP_ALIVE_TIME = 60000L;
-	public static final int DEFAULT_CAPACITY = 1024;
+
+	/**CPU核数*/
+	public static final int DEFAULT_CORE_SIZE = Runtime.getRuntime().availableProcessors();
+
+	/**线程池默认最大线程数*/
+	public static final int DEFAULT_MAX_POOL_SIZE = DEFAULT_CORE_SIZE * 2 + 1;
+
+	/**队列默认容量*/
+	public static final int DEFAULT_QUEUE_CAPACITY = 1024;
 	public static final int DEFAULT_MAX_RETRY_TIMES = 3;
 	public static final int DEFAULT_RETRY_TIMES_MAP_SIZE = 1024;
-	public static final String DEFAULT_THREAD_POOL_PREFFIX = "ThreadPool-";
-	public static final String DEFAULT_THREAD_POOL_TAG = "default";
+	public static final String DEFAULT_THREAD_POOL_PREFIX = "Default-ThreadPool-";
 
 	//默认保留4位小数
 	public static final int DEFAULT_BIGDECIMAL_SCALE = 4;

@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
+import java.util.function.Consumer;
 
 /**
  * @author yida
@@ -28,25 +28,35 @@ public class BlockingPolicy implements RejectedExecutionHandler {
 	// 队列未满条件变量
 	private final Condition notFull = lock.newCondition();
 
+	private final Consumer<Runnable> callbackWhenThreadPoolShutdown;
+
 	public BlockingPolicy() {
+		this(null);
+	}
+
+	public BlockingPolicy(Consumer<Runnable> callbackWhenThreadPoolShutdown) {
+		this.callbackWhenThreadPoolShutdown = callbackWhenThreadPoolShutdown;
 	}
 
 	@Override
 	public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {
 		// 如果线程池已经关闭，则直接抛出异常
 		if (executor.isShutdown()) {
+			if(null != callbackWhenThreadPoolShutdown) {
+				callbackWhenThreadPoolShutdown.accept(runnable);
+			}
 			throw new RejectedExecutionException("ThreadPoolExecutor has been shutdown");
 		} else {
 			BlockingQueue<Runnable> queue = executor.getQueue();
 			int queueSize = queue.size();
 			int remainingCapacity = queue.remainingCapacity();
-			// 如果在队列元素不足时，可以开启新的线程来执行任务，不阻塞入队操作
+			// 若队列已满且队列大小小于maxPoolSize，则获取线程进行执行
 			if (queueSize < executor.getMaximumPoolSize() && remainingCapacity == 0) {
 				executor.execute(runnable);
 			} else {
 				// 队列已满，等待队列未满条件变量，直到有任务被取出使得队列未满为止
-				lock.lock();
 				try {
+					lock.lock();
 					while (queue.remainingCapacity() == 0) {
 						// 每次等待 10 秒钟，避免无限等待造成线程阻塞
 						notFull.await(DEFAULT_BLOCKING_WAIT_TIMEOUT, TimeUnit.SECONDS);

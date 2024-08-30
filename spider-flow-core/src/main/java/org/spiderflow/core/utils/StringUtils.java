@@ -69,7 +69,7 @@ public class StringUtils {
 	 * @param source
 	 * @return
 	 */
-	public static boolean isEmpty(String source) {
+	public static <T extends CharSequence> boolean isEmpty(T source) {
 		return (null == source || "".equals(source));
 	}
 
@@ -79,7 +79,7 @@ public class StringUtils {
 	 * @param source
 	 * @return
 	 */
-	public static boolean isNotEmpty(String source) {
+	public static <T extends CharSequence> boolean isNotEmpty(T source) {
 		return !isEmpty(source);
 	}
 
