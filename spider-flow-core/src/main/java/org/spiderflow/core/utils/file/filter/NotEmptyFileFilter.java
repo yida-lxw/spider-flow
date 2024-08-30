@@ -5,7 +5,6 @@ import java.io.FileFilter;
 
 /**
  * @author yida
- * @package com.witarchive.common.file.filter
  * @date 2024-07-15 11:32
  * @description 过滤空文件.
  */

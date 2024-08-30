@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class FileWalkResult implements Serializable {
 	private static final long serialVersionUID = 5605638065384525402L;
 	/**
-	 * 是否增量备份模式
+	 * 是否增量模式
 	 */
 	private boolean deltaMode;
 

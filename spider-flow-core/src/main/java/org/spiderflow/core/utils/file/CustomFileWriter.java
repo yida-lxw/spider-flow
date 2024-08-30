@@ -8,7 +8,6 @@ import java.io.OutputStreamWriter;
 
 /**
  * @author yida
- * @package org.example.utils
  * @date 2024-01-30 11:48
  * @description Type your description over here.
  */

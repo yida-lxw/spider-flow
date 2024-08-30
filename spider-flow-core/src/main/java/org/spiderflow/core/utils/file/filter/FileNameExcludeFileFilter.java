@@ -7,7 +7,6 @@ import java.io.FileFilter;
 
 /**
  * @author yida
- * @package com.witarchive.common.file.filter
  * @date 2024-07-16 09:06
  * @description 排除特定文件名的文件/目录
  */
