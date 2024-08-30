@@ -4,7 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.spiderflow.core.annotation.Comment;
 import org.spiderflow.core.annotation.Example;
 import org.spiderflow.core.executor.FunctionExecutor;
-import org.spiderflow.core.utils.FileUtils;
+import org.spiderflow.core.utils.file.FileUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 

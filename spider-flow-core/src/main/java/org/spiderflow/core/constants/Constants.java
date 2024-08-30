@@ -45,6 +45,12 @@ public class Constants {
 	public static final String DEFAULT_THREAD_POOL_PREFFIX = "ThreadPool-";
 	public static final String DEFAULT_THREAD_POOL_TAG = "default";
 
+	//默认保留4位小数
+	public static final int DEFAULT_BIGDECIMAL_SCALE = 4;
+
+	//保留2位小数
+	public static final int DOUBLE_BIGDECIMAL_SCALE = 2;
+
 	/**
 	 * 当前进程ID
 	 */
