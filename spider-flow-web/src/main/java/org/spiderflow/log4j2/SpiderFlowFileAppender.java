@@ -72,7 +72,7 @@ public class SpiderFlowFileAppender extends AbstractAppender {
 			@PluginAttribute("name") String name,
 			@PluginElement("Layout") Layout<? extends Serializable> layout,
 			@PluginElement("Filter") final Filter filter,
-			@PluginElement("ignoreExceptions") final boolean ignoreExceptions) {
+			@PluginAttribute("ignoreExceptions") final boolean ignoreExceptions) {
 		if (name == null) {
 			LOGGER.error("No name provided for SpiderFlowFileAppender");
 			return null;
