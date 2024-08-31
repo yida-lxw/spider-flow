@@ -7,6 +7,7 @@ spider:
     capacity: 1000000
     error-rate: 1.0E-4
   job:
+    #是否开启爬虫定时任务
     enable: false
 
 spring:
