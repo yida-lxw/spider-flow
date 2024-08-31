@@ -20,11 +20,11 @@ public class SpiderJobHistoryDTO {
 	private String flowId;
 
 	/**爬虫任务执行开始时间*/
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date startExecutionTime;
 
 	/**爬虫任务执行结束时间*/
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date endExecutionTime;
 
 	/**爬虫任务执行状态,0=未开始,1=运行中,2=已完成,3=异常中断*/

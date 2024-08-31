@@ -38,10 +38,10 @@ public interface SpiderJobHistoryMapper extends BaseMapper<SpiderJobHistory> {
 			"	and sjh.execution_status = #{executionStatus}",
 			"</if>",
 			"<if test=\"startExecutionTime != null\">",
-			"	and sjh.start_execution_time &lt;= #{startExecutionTime}",
+			"	and sjh.start_execution_time &gt;= #{startExecutionTime}",
 			"</if>",
 			"<if test=\"endExecutionTime != null\">",
-			"	and sjh.end_execution_time &gt;= #{endExecutionTime}",
+			"	and sjh.end_execution_time &lt;= #{endExecutionTime}",
 			"</if>",
 			"order by sjh.start_execution_time desc",
 			"</script>"

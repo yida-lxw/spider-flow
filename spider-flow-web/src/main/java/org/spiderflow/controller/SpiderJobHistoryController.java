@@ -38,7 +38,7 @@ public class SpiderJobHistoryController {
 
 	@PostMapping("/page")
 	@ResponseBody
-	public IPage<SpiderJobHistoryDTO> list(@RequestBody SpiderJobHistoryDTO spiderJobHistoryDTO) {
+	public IPage<SpiderJobHistoryDTO> page(@RequestBody SpiderJobHistoryDTO spiderJobHistoryDTO) {
 		Date startExecutionDate = spiderJobHistoryDTO.getStartExecutionTime();
 		Date endExecutionDate = spiderJobHistoryDTO.getEndExecutionTime();
 		Integer pageNum = spiderJobHistoryDTO.getPageNum();
