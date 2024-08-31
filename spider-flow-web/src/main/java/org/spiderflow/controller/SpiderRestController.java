@@ -1,20 +1,19 @@
 package org.spiderflow.controller;
 
+import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.core.Spider;
 import org.spiderflow.core.context.SpiderContext;
 import org.spiderflow.core.job.SpiderJob;
 import org.spiderflow.core.job.SpiderJobContext;
-import org.spiderflow.core.job.id.IdGenerator;
-import org.spiderflow.core.job.id.IdGeneratorFactory;
-import org.spiderflow.core.job.id.IdGeneratorStrategy;
 import org.spiderflow.core.model.SpiderFlow;
+import org.spiderflow.core.model.SpiderJobHistory;
 import org.spiderflow.core.model.SpiderOutput;
-import org.spiderflow.core.model.Task;
+import org.spiderflow.core.service.SpiderJobHistoryService;
+import org.spiderflow.core.thread.GlobalThreadPool;
 import org.spiderflow.model.JsonBean;
 import org.spiderflow.service.SpiderFlowServiceImpl;
-import org.spiderflow.service.TaskServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,16 +44,7 @@ public class SpiderRestController {
 	private SpiderJob spiderJob;
 
 	@Autowired
-	private TaskServiceImpl taskService;
-
-	@Value("${spider.idGeneratorStrategy}")
-	private String idGeneratorStrategyName;
-
-	@Value("${spider.workerId:1}")
-	private Long workerId;
-
-	@Value("${spider.datacenterId:1}")
-	private Long dataCenterId;
+	private SpiderJobHistoryService spiderJobHistoryService;
 
 	/**
 	 * 异步运行
@@ -63,49 +53,69 @@ public class SpiderRestController {
 	 * @return
 	 */
 	@RequestMapping("/runAsync/{id}")
-	public JsonBean<Integer> runAsync(@PathVariable("id") String id) {
+	public JsonBean<String> runAsync(@PathVariable("id") String id) {
 		SpiderFlow flow = spiderFlowService.getById(id);
 		if (flow == null) {
 			return new JsonBean<>(0, "找不到此爬虫信息");
 		}
-		Task task = new Task();
-		task.setFlowId(flow.getId());
-		task.setBeginTime(new Date());
-		taskService.save(task);
-		Spider.executorInstance.submit(() -> {
-			spiderJob.run(flow, task, null);
+		Object shitObject = new Object();
+		IdentifierGenerator identifierGenerator = spiderJob.getIdentifierGenerator();
+		String jobHistoryId = identifierGenerator.nextId(shitObject).toString();
+		SpiderJobHistory spiderJobHistory = new SpiderJobHistory();
+		spiderJobHistory.setId(jobHistoryId);
+		spiderJobHistory.setFlowId(id);
+		spiderJobHistory.setStartExecutionTime(new Date());
+		spiderJobHistory.setExecutionStatus(1);
+		GlobalThreadPool.getInstance().execute(() -> {
+			int insertResult = spiderJobHistoryService.insertSpiderJobHistory(spiderJobHistory);
+			if(insertResult > 0) {
+				logger.info("insert SpiderJobHistory:[{}] into sp_job_history table successlly.", jobHistoryId);
+			}
 		});
-		return new JsonBean<>(task.getId());
+		Spider.executorInstance.submit(() -> {
+			spiderJob.run(flow, spiderJobHistory, null);
+		});
+		return new JsonBean<>(jobHistoryId);
 	}
 
 	/**
 	 * 停止运行任务
 	 *
-	 * @param taskId
+	 * @param jobHistoryId
 	 */
-	@RequestMapping("/stop/{taskId}")
-	public JsonBean<Void> stop(@PathVariable("taskId") Integer taskId) {
-		SpiderContext context = SpiderJob.getSpiderContext(taskId);
+	@RequestMapping("/stop/{jobHistoryId}")
+	public JsonBean<Void> stop(@PathVariable("jobHistoryId") String jobHistoryId) {
+		SpiderContext context = SpiderJob.getSpiderContext(jobHistoryId);
 		if (context == null) {
 			return new JsonBean<>(0, "任务不存在！");
 		}
 		context.setRunning(false);
 		return new JsonBean<>(1, "停止成功！");
+	}
 
+	@RequestMapping("/remove")
+	public JsonBean<Boolean> remove(String jobHistoryId) {
+		//删除任务记录之前先停止
+		SpiderContext context = SpiderJob.getSpiderContext(jobHistoryId);
+		if (context != null) {
+			context.setRunning(false);
+		}
+		int deleteResut = spiderJobHistoryService.deleteById(jobHistoryId);
+		return new JsonBean<>(deleteResut > 0);
 	}
 
 	/**
 	 * 查询任务状态
 	 *
-	 * @param taskId
+	 * @param jobHistoryId
 	 */
-	@RequestMapping("/status/{taskId}")
-	public JsonBean<Integer> status(@PathVariable("taskId") Integer taskId) {
-		SpiderContext context = SpiderJob.getSpiderContext(taskId);
+	@RequestMapping("/status/{jobHistoryId}")
+	public JsonBean<Integer> status(@PathVariable("jobHistoryId") String jobHistoryId) {
+		SpiderContext context = SpiderJob.getSpiderContext(jobHistoryId);
 		if (context == null) {
-			return new JsonBean<>(0);    //
+			return new JsonBean<>(0);
 		}
-		return new JsonBean<>(1);    //正在运行中
+		return new JsonBean<>(1);
 	}
 
 	/**
@@ -123,14 +133,22 @@ public class SpiderRestController {
 		}
 		String flowId = flow.getId();
 		List<SpiderOutput> outputs;
-		Integer maxId = spiderFlowService.getFlowMaxTaskId(id);
+		Object shitObject = new Object();
+		IdentifierGenerator identifierGenerator = spiderJob.getIdentifierGenerator();
+		String jobHistoryId = identifierGenerator.nextId(shitObject).toString();
+		SpiderJobHistory spiderJobHistory = new SpiderJobHistory();
+		spiderJobHistory.setId(jobHistoryId);
+		spiderJobHistory.setFlowId(flowId);
+		spiderJobHistory.setStartExecutionTime(new Date());
+		spiderJobHistory.setExecutionStatus(1);
+		GlobalThreadPool.getInstance().execute(() -> {
+			int insertResult = spiderJobHistoryService.insertSpiderJobHistory(spiderJobHistory);
+			if(insertResult > 0) {
+				logger.info("insert SpiderJobHistory:[{}] into sp_job_history table successlly.", jobHistoryId);
+			}
+		});
 
-		//确定id生成器
-		IdGeneratorStrategy idGeneratorStrategy = IdGeneratorStrategy.of(idGeneratorStrategyName);
-		IdGenerator<String> idGenerator = IdGeneratorFactory.build(idGeneratorStrategy, workerId, dataCenterId);
-		String instanceId = idGenerator.nextId();
-
-		SpiderJobContext spiderJobContext = SpiderJobContext.create(workspace, id, maxId, instanceId, true);
+		SpiderJobContext spiderJobContext = SpiderJobContext.create(workspace, id, jobHistoryId, true);
 		spiderJobContext.setFlowId(flowId);
 		try {
 			outputs = spider.run(flow, spiderJobContext, params);

@@ -53,10 +53,10 @@ public class SpiderJobContext extends SpiderContext {
 		return this.outputstream;
 	}
 
-	public static SpiderJobContext create(String directory, String id, Integer taskId, String instanceId, boolean output) {
+	public static SpiderJobContext create(String directory, String id, String jobHistoryId, boolean output) {
 		OutputStream os = null;
 		try {
-			File file = new File(new File(directory), id + File.separator + "logs" + File.separator + taskId + File.separator + instanceId + ".log");
+			File file = new File(new File(directory), id + File.separator + "logs" + File.separator + jobHistoryId + ".log");
 			File dirFile = file.getParentFile();
 			if (!dirFile.exists()) {
 				dirFile.mkdirs();
@@ -65,7 +65,7 @@ public class SpiderJobContext extends SpiderContext {
 		} catch (Exception e) {
 			logger.error("创建日志文件出错", e);
 		}
-		SpiderJobContext context = new SpiderJobContext(instanceId, os, output);
+		SpiderJobContext context = new SpiderJobContext(jobHistoryId, os, output);
 		context.setFlowId(id);
 		return context;
 	}

@@ -29,8 +29,6 @@ public interface SpiderFlowService extends IService<SpiderFlow> {
 
 	String readHistory(String id, String timestamp);
 
-	Integer getFlowMaxTaskId(String flowId);
-
 	void resetCornExpression(String id, String cron);
 
 	boolean save(SpiderFlow spiderFlow);

@@ -15,6 +15,8 @@ import org.spiderflow.core.model.Grammer;
 import org.spiderflow.core.model.Plugin;
 import org.spiderflow.core.model.Shape;
 import org.spiderflow.core.model.SpiderFlow;
+import org.spiderflow.core.model.SpiderJobHistory;
+import org.spiderflow.core.service.SpiderJobHistoryService;
 import org.spiderflow.core.utils.ExecutorsUtils;
 import org.spiderflow.io.Line;
 import org.spiderflow.io.RandomAccessFileReader;
@@ -61,6 +63,8 @@ public class SpiderFlowController {
 
 	@Autowired
 	private SpiderFlowServiceImpl spiderFlowService;
+	@Autowired
+	private SpiderJobHistoryService spiderJobHistoryService;
 
 	@Autowired(required = false)
 	private List<PluginConfig> pluginConfigs;
@@ -169,12 +173,12 @@ public class SpiderFlowController {
 	}
 
 	@RequestMapping("/log/download")
-	public ResponseEntity<FileSystemResource> download(String id, String taskId) {
-		if (StringUtils.isBlank(taskId) || NumberUtils.toInt(taskId, 0) == 0) {
-			Integer maxId = spiderFlowService.getFlowMaxTaskId(id);
-			taskId = maxId == null ? "" : maxId.toString();
+	public ResponseEntity<FileSystemResource> download(String id, String jobHistoryId) {
+		if (StringUtils.isBlank(jobHistoryId)) {
+			SpiderJobHistory spiderJobHistory = spiderJobHistoryService.queryLastJobHistory(id);
+			jobHistoryId = spiderJobHistory == null ? "" : spiderJobHistory.getId();
 		}
-		File file = new File(workspace, id + File.separator + "logs" + File.separator + taskId + ".log");
+		File file = new File(workspace, id + File.separator + "logs" + File.separator + jobHistoryId + ".log");
 		return ResponseEntity.ok()
 				.header("Content-Disposition", "attachment; filename=spider.log")
 				.contentType(MediaType.parseMediaType("application/octet-stream"))
@@ -182,12 +186,12 @@ public class SpiderFlowController {
 	}
 
 	@RequestMapping("/log")
-	public JsonBean<List<Line>> log(String id, String taskId, String keywords, Long index, Integer count, Boolean reversed, Boolean matchcase, Boolean regx) {
-		if (StringUtils.isBlank(taskId)) {
-			Integer maxId = spiderFlowService.getFlowMaxTaskId(id);
-			taskId = maxId == null ? "" : maxId.toString();
+	public JsonBean<List<Line>> log(String id, String jobHistoryId, String keywords, Long index, Integer count, Boolean reversed, Boolean matchcase, Boolean regx) {
+		if (StringUtils.isBlank(jobHistoryId)) {
+			SpiderJobHistory spiderJobHistory = spiderJobHistoryService.queryLastJobHistory(id);
+			jobHistoryId = spiderJobHistory == null ? "" : spiderJobHistory.getId();
 		}
-		File logFile = new File(workspace, id + File.separator + "logs" + File.separator + taskId + ".log");
+		File logFile = new File(workspace, id + File.separator + "logs" + File.separator + jobHistoryId + ".log");
 		try (RandomAccessFileReader reader = new RandomAccessFileReader(new RandomAccessFile(logFile, "r"), index == null ? -1 : index, reversed == null || reversed)) {
 			return new JsonBean<>(reader.readLine(count == null ? 10 : count, keywords, matchcase != null && matchcase, regx != null && regx));
 		} catch (FileNotFoundException e) {

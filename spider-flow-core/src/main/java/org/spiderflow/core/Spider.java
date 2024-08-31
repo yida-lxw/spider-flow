@@ -13,23 +13,21 @@ import org.spiderflow.core.event.NotifySpiderTaskExecutionStatusEvent;
 import org.spiderflow.core.event.NotifySpiderTaskExecutionStatusEventPublisher;
 import org.spiderflow.core.executor.ShapeExecutor;
 import org.spiderflow.core.executor.shape.LoopExecutor;
-import org.spiderflow.core.job.SpiderJobNodeStatusInfo;
-import org.spiderflow.core.listener.SpiderListener;
-import org.spiderflow.core.model.SpiderFlow;
-import org.spiderflow.core.model.SpiderJobHistory;
-import org.spiderflow.core.model.SpiderNode;
-import org.spiderflow.core.model.SpiderOutput;
-import org.spiderflow.core.service.FlowNoticeService;
 import org.spiderflow.core.executor.submit.strategy.ChildPriorThreadSubmitStrategy;
 import org.spiderflow.core.executor.submit.strategy.CompletedFirstPriorityThreadSubmitStrategy;
 import org.spiderflow.core.executor.submit.strategy.LinkedThreadSubmitStrategy;
 import org.spiderflow.core.executor.submit.strategy.ParentPriorThreadSubmitStrategy;
 import org.spiderflow.core.executor.submit.strategy.RandomThreadSubmitStrategy;
+import org.spiderflow.core.executor.submit.strategy.ThreadSubmitStrategy;
 import org.spiderflow.core.executor.thread.pool.SpiderFlowThreadPoolExecutor;
 import org.spiderflow.core.executor.thread.pool.SubThreadPoolExecutor;
-import org.spiderflow.core.executor.submit.strategy.ThreadSubmitStrategy;
+import org.spiderflow.core.job.SpiderJobNodeStatusInfo;
+import org.spiderflow.core.listener.SpiderListener;
+import org.spiderflow.core.model.SpiderFlow;
+import org.spiderflow.core.model.SpiderNode;
+import org.spiderflow.core.model.SpiderOutput;
+import org.spiderflow.core.service.FlowNoticeService;
 import org.spiderflow.core.service.SpiderJobHistoryService;
-import org.spiderflow.core.thread.GlobalThreadPool;
 import org.spiderflow.core.utils.ExecutorsUtils;
 import org.spiderflow.core.utils.ExpressionUtils;
 import org.spiderflow.core.utils.SpiderFlowUtils;
@@ -43,7 +41,6 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,9 +63,8 @@ public class Spider {
 	private static final Logger logger = LoggerFactory.getLogger(Spider.class);
 
 	private static final String ATOMIC_DEAD_CYCLE = "__atomic_dead_cycle";
-	public static SpiderFlowThreadPoolExecutor executorInstance;
 
-	private IdentifierGenerator identifierGenerator;
+	public static SpiderFlowThreadPoolExecutor executorInstance;
 
 	@Autowired(required = false)
 	private List<SpiderListener> listeners;
@@ -95,16 +91,12 @@ public class Spider {
 	private FlowNoticeService flowNoticeService;
 
 	@Autowired
-	private SpiderJobHistoryService spiderJobHistoryService;
-
-	@Autowired
 	private NotifySpiderTaskExecutionStatusEventPublisher notifySpiderTaskExecutionStatusEventPublisher;
 
 
 	@PostConstruct
 	private void init() {
 		executorInstance = new SpiderFlowThreadPoolExecutor(totalThreads);
-		identifierGenerator = new DefaultIdentifierGenerator();
 	}
 
 	public List<SpiderOutput> run(SpiderFlow spiderFlow, SpiderContext context, Map<String, Object> variables) {
@@ -131,21 +123,6 @@ public class Spider {
 		AtomicInteger executeCount = new AtomicInteger(0);
 		//存入到上下文中，以供后续检测
 		context.put(ATOMIC_DEAD_CYCLE, executeCount);
-		//MyBatis需要这个 shit Object
-		Object shitObject = new Object();
-		GlobalThreadPool.getInstance().execute(() -> {
-			String flowId = context.getFlowId();
-			Date startExecutionTime = new Date();
-			Integer executionStatus = 1;
-			SpiderJobHistory spiderJobHistory = new SpiderJobHistory(flowId, startExecutionTime, executionStatus);
-			String jobHistoryId = identifierGenerator.nextId(shitObject).toString();
-			spiderJobHistory.setId(jobHistoryId);
-			int insertResult = spiderJobHistoryService.insertSpiderJobHistory(spiderJobHistory);
-			context.setJobHistoryId(jobHistoryId);
-			if(insertResult > 0) {
-				logger.info("insert SpiderJobHistory:[{}] into sp_job_history table successlly.", jobHistoryId);
-			}
-		});
 		//执行根节点
 		boolean result = executeRoot(root, context, new HashMap<>());
 		//当爬虫任务执行完毕时,判断是否超过预期
@@ -154,18 +131,6 @@ public class Spider {
 		} else {
 			logger.info("测试完毕！");
 		}
-		Integer executionStatus = result?2 : 3;
-		GlobalThreadPool.getInstance().execute(() -> {
-			String jobHistoryId = context.getJobHistoryId();
-			if(StringUtils.isNotEmpty(jobHistoryId)) {
-				SpiderJobHistory spiderJobHistory = spiderJobHistoryService.queryById(jobHistoryId);
-				if(null != spiderJobHistory) {
-					spiderJobHistory.setEndExecutionTime(new Date());
-					spiderJobHistory.setExecutionStatus(executionStatus);
-					spiderJobHistoryService.updateSpiderJobHistory(spiderJobHistory);
-				}
-			}
-		});
 		//将上下文从ThreadLocal移除，防止内存泄漏
 		SpiderContextHolder.remove();
 	}

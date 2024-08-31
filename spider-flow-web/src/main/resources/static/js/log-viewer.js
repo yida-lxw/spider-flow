@@ -5,7 +5,7 @@ function LogViewer(options){
     this.onSearchFinish = options.onSearchFinish || function(){};
     this.bufferSize = this.maxLines * 10;
     this.logId = options.logId;
-    this.taskId = options.taskId;
+    this.jobHistoryId = options.jobHistoryId;
     this.url = options.url;
     this.buffer = [];
     this.displayIndex = -1;
@@ -149,7 +149,7 @@ LogViewer.prototype.loadLines = function(count,callback,async){
             reversed : this.reversed,
             count : this.bufferSize,
             id : this.logId,
-            taskId: this.taskId,
+            jobHistoryId: this.jobHistoryId,
             index : _this.index,
             keywords : this.keywords,
             matchcase : this.matchcase,
