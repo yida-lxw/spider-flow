@@ -27,7 +27,7 @@ import java.util.Map;
  * @author yida
  * @package org.spiderflow.controller
  * @date 2024-08-29 18:44
- * @description Type your description over here.
+ * @description 爬虫任务历史Controller
  */
 @RestController
 @RequestMapping("/spider_job_history")
@@ -39,11 +39,11 @@ public class SpiderJobHistoryController {
 
 	@GetMapping("/page")
 	@ResponseBody
-	public JsonBean<PageResult> list(@RequestParam("flowId") String flowId,
-										   @RequestParam("spiderName") String spiderName,
-										   @RequestParam("executionStatus") Integer executionStatus,
-										   @RequestParam("startExecutionTime") String startExecutionTime,
-										   @RequestParam("endExecutionTime") String endExecutionTime,
+	public JsonBean<PageResult> list(@RequestParam(name="flowId", required = false) String flowId,
+										   @RequestParam(name="spiderName") String spiderName,
+										   @RequestParam(name="executionStatus", required = false) Integer executionStatus,
+										   @RequestParam(name="startExecutionTime", required = false) String startExecutionTime,
+										   @RequestParam(name="endExecutionTime", required = false) String endExecutionTime,
 										   @RequestParam(name="pageNum", defaultValue = "1") Integer pageNum,
 									       @RequestParam(name="pageSize", defaultValue = "10") Integer pageSize) {
 		JsonBean jsonBean = null;

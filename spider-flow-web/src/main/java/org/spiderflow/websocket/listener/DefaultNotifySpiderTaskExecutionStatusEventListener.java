@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
  * @description NotifySpiderTaskExecutionStatusEvent事件监听者
  */
 @Component
-public class NotifySpiderTaskExecutionStatusEventListenerImpl implements NotifySpiderTaskExecutionStatusEventListener {
-	private static Logger logger = LoggerFactory.getLogger(NotifySpiderTaskExecutionStatusEventListenerImpl.class);
+public class DefaultNotifySpiderTaskExecutionStatusEventListener implements NotifySpiderTaskExecutionStatusEventListener {
+	private static Logger logger = LoggerFactory.getLogger(DefaultNotifySpiderTaskExecutionStatusEventListener.class);
 
 	@Async("websocketServerAsyncScheduledPool")
 	@EventListener

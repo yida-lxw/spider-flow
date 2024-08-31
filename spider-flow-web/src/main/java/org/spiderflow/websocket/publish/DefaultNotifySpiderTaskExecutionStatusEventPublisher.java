@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * @description NotifySpiderTaskExecutionStatusEvent事件发布者
  */
 @Component
-public class NotifySpiderTaskExecutionStatusEventPublisherImpl implements NotifySpiderTaskExecutionStatusEventPublisher {
+public class DefaultNotifySpiderTaskExecutionStatusEventPublisher implements NotifySpiderTaskExecutionStatusEventPublisher {
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
 

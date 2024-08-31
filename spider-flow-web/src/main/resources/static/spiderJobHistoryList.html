@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>SpiderFlow</title>
+	<link rel="stylesheet" href="js/layui/css/layui.css" />
+	<link rel="stylesheet" href="css/layui-blue.css" />
+	<script type="text/javascript" src="js/layui/layui.all.js" ></script>
+</head>
+<body style="padding:5px;">
+<div class="layui-form-item">
+	<div class="layui-input-inline">
+		<input type="text" name="spiderName" required  lay-verify="required" placeholder="请输入爬虫名称" autocomplete="off" class="layui-input" style="width:190px;height:25px;">
+	</div>
+	<div class="layui-input-inline">
+		<select name="executionStatus" lay-filter="executionStatus" class="layui-select" style="width:180px;height:25px;">
+			<option value="">请选择爬虫任务执行状态</option>
+			<option value="0">未开始</option>
+			<option value="1">运行中</option>
+			<option value="2">已完成</option>
+			<option value="3">异常中断</option>
+		</select>
+	</div>
+	<div class="layui-input-inline">
+		<input type="text" class="layui-input" id="startExecutionTime" name="startExecutionTime" placeholder="执行开始时间" style="width:180px;height:25px;">
+	</div>
+	<div class="layui-input-inline">
+		<input type="text" class="layui-input" id="endExecutionTime" name="endExecutionTime" placeholder="执行结束时间" style="width:180px;height:25px;">
+	</div>
+	<div class="layui-input-inline">
+		<a class="layui-btn layui-btn-sm layui-btn-normal btn-search"><i class="layui-icon">&#xe615;</i> 搜索</a>
+		<a class="layui-btn layui-btn-sm layui-btn-normal" href="editor.html"><i class="layui-icon">&#xe654;</i> 批量删除</a>
+	</div>
+</div>
+
+<hr>
+<table class="layui-table" id="spider_job_history_table" lay-filter="table"></table>
+<script>
+	var $ = layui.$;
+	layui.use(function(){
+		var laydate = layui.laydate;
+		laydate.render({
+			elem: '#startExecutionTime',
+			type: 'datetime'
+		});
+		laydate.render({
+			elem: '#endExecutionTime',
+			type: 'datetime'
+		});
+	});
+	var $table = layui.table.render({
+		id : 'spider_job_history_layui_table',
+		elem : '#spider_job_history_table',
+		url : 'spider_job_history/page',
+		where: {
+			"spiderName": $("input[name='spiderName']").val(),
+			"executionStatus": $("select[name='executionStatus']").val(),
+			"startExecutionTime": $("input[name='startExecutionTime']").val(),
+			"endExecutionTime": $("input[name='endExecutionTime']").val()
+		},
+		request: {
+			pageName: 'pageNum',
+			limitName: 'pageSize'
+		},
+		method : 'get',
+		page : true,
+		limit: 10,
+		limits: [10, 20, 50, 100, 200],
+		parseData : function(resp){
+			return {
+				"code": resp.code,
+				"msg": resp.message,
+				"data": resp.data.data,
+				"count": resp.data.totalSize
+			}
+		},
+		cols : [[
+		{ checkbox: true, fixed: true},
+		{ type: 'numbers', title: '序号', width: 20, fixed: 'left'},
+		{
+			title : '序号',
+			width : 35,
+			type : 'numbers',
+			align : 'center'
+		},{
+			title : 'id',
+			field : 'id',
+			width : 35,
+			hide: true,
+			align : 'center'
+		},{
+			title : '爬虫id',
+			field : 'flowId',
+			width : 35,
+			hide: true,
+			align : 'center'
+		},{
+			title : '爬虫名称',
+			field : 'spiderFlowName',
+			width : 80
+		},{
+			title : '执行状态',
+			field : 'endExecutionTime',
+			width : 80
+		},{
+			title : '任务开始时间',
+			field : 'startExecutionTime',
+			width : 100
+		},{
+			title : '任务结束时间',
+			field : 'endExecutionTime',
+			width : 100
+		},{
+			title : '操作',
+			width : 250,
+			align : 'center',
+			templet : '#buttons'
+		}]],
+		done: function(res, curr, count){
+			$(".layui-table-body, .layui-table-box, .layui-table-cell").css('overflow','visible');
+		}
+	})
+	function reloadTable() {
+		$table.reload({
+			url: 'spider_job_history/page',
+			contentType: 'application/json',
+			method: 'get',
+			loading: true,
+			text: {
+				none: '暂无相关数据！',
+			},
+			request: {
+				pageName: 'pageNum',
+				limitName: 'pageSize'
+			},
+			where : {
+				"spiderName": $("input[name='spiderName']").val(),
+				"executionStatus": $("select[name='executionStatus']").val(),
+				"startExecutionTime": $("input[name='startExecutionTime']").val(),
+				"endExecutionTime": $("input[name='endExecutionTime']").val()
+			},
+			page: {
+				layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip'],
+				limits: [10, 20, 50, 100, 200],
+				first: false,
+				last: false
+			},
+		})
+	}
+	$("body").on('click','.btn-search',function(){
+		reloadTable();
+	}).on('click','.btn-remove',function(){
+		var id = $(this).data('id');
+		layui.layer.confirm('您确定要删除此爬虫历史吗？',{
+			title : '删除'
+		},function(index){
+			$table.reload();
+			$.ajax({
+				url : 'spider_job_history/delete',
+				data : {
+					id : id
+				},
+				success : function(){
+					layui.layer.msg('删除成功',{time : 500},function(){
+						$table.reload();
+					})
+				},
+				error : function(){
+					layui.layer.msg('删除失败')
+				}
+			})
+			layui.layer.close(index);
+		})
+	});
+</script>
+<script type="text/html" id="buttons">
+	<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}" title="删除"><i class="layui-icon">&#xe640;</i></a>
+</script>
+</body>
+</html>
