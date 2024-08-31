@@ -5,12 +5,16 @@
 	<title>SpiderFlow</title>
 	<link rel="stylesheet" href="js/layui/css/layui.css" />
 	<link rel="stylesheet" href="css/layui-blue.css" />
+	<script type="text/javascript" src="js/cron/jquery-2.1.4.min.js"></script>
+	<script type="text/javascript">
+		var $jq = jQuery.noConflict();
+	</script>
 	<script type="text/javascript" src="js/layui/layui.js" ></script>
 </head>
 <body style="padding:5px;">
 <div class="layui-form-item">
 	<div class="layui-input-inline">
-		<input type="text" name="spiderName" required  lay-verify="required" placeholder="请输入爬虫名称" autocomplete="off" class="layui-input" style="width:190px;height:25px;">
+		<input type="text" name="spiderFlowName" required  lay-verify="required" placeholder="请输入爬虫名称" autocomplete="off" class="layui-input" style="width:190px;height:25px;">
 	</div>
 	<div class="layui-input-inline">
 		<select name="executionStatus" lay-filter="executionStatus" class="layui-select" style="width:180px;height:25px;">
@@ -52,17 +56,18 @@
 		id : 'spider_job_history_layui_table',
 		elem : '#spider_job_history_table',
 		url : 'spider_job_history/page',
+		contentType: 'application/json;charset=utf8',
 		where: {
-			"spiderName": $("input[name='spiderName']").val(),
-			"executionStatus": $("select[name='executionStatus']").val(),
-			"startExecutionTime": $("input[name='startExecutionTime']").val(),
-			"endExecutionTime": $("input[name='endExecutionTime']").val()
+			"spiderFlowName": $jq("input[name='spiderFlowName']").val(),
+			"executionStatus": $jq("select[name='executionStatus']").val(),
+			"startExecutionTime": $jq("input[name='startExecutionTime']").val(),
+			"endExecutionTime": $jq("input[name='endExecutionTime']").val()
 		},
 		request: {
 			pageName: 'pageNum',
 			limitName: 'pageSize'
 		},
-		method : 'get',
+		method : 'post',
 		page : true,
 		limit: 10,
 		limits: [10, 20, 50, 100, 200],
@@ -117,14 +122,14 @@
 			templet : '#buttons'
 		}]],
 		done: function(res, curr, count){
-			$(".layui-table-body, .layui-table-box, .layui-table-cell").css('overflow','visible');
+			$jq(".layui-table-body, .layui-table-box, .layui-table-cell").css('overflow','visible');
 		}
 	})
 	function reloadTable() {
 		$table.reload({
 			url: 'spider_job_history/page',
-			contentType: 'application/json',
-			method: 'get',
+			contentType: 'application/json;charset=utf8',
+			method: 'post',
 			loading: true,
 			text: {
 				none: '暂无相关数据！',
@@ -134,10 +139,10 @@
 				limitName: 'pageSize'
 			},
 			where : {
-				"spiderName": $("input[name='spiderName']").val(),
-				"executionStatus": $("select[name='executionStatus']").val(),
-				"startExecutionTime": $("input[name='startExecutionTime']").val(),
-				"endExecutionTime": $("input[name='endExecutionTime']").val()
+				"spiderFlowName": $jq("input[name='spiderFlowName']").val(),
+				"executionStatus": $jq("select[name='executionStatus']").val(),
+				"startExecutionTime": $jq("input[name='startExecutionTime']").val(),
+				"endExecutionTime": $jq("input[name='endExecutionTime']").val()
 			},
 			page: {
 				layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip'],

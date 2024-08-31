@@ -12,7 +12,9 @@ import org.spiderflow.core.utils.StringUtils;
 import org.spiderflow.model.JsonBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -37,39 +39,36 @@ public class SpiderJobHistoryController {
 	@Autowired
 	private SpiderJobHistoryService spiderJobHistoryService;
 
-	@GetMapping("/page")
+	@PostMapping("/page")
 	@ResponseBody
-	public JsonBean<PageResult> list(@RequestParam(name="flowId", required = false) String flowId,
-										   @RequestParam(name="spiderName") String spiderName,
-										   @RequestParam(name="executionStatus", required = false) Integer executionStatus,
-										   @RequestParam(name="startExecutionTime", required = false) String startExecutionTime,
-										   @RequestParam(name="endExecutionTime", required = false) String endExecutionTime,
-										   @RequestParam(name="pageNum", defaultValue = "1") Integer pageNum,
-									       @RequestParam(name="pageSize", defaultValue = "10") Integer pageSize) {
+	public JsonBean<PageResult> list(@RequestBody SpiderJobHistoryDTO spiderJobHistoryDTO) {
 		JsonBean jsonBean = null;
 		try {
-			Date startExecutionDate = null;
-			Date endExecutionDate = null;
-			if(StringUtils.isNotEmpty(startExecutionTime)) {
-				startExecutionDate = DateUtils.parseDate(startExecutionTime, DateUtils.PATTERN_YYYY_MM_DD_HH_MM_SS);
+			Date startExecutionDate = spiderJobHistoryDTO.getStartExecutionTime();
+			Date endExecutionDate = spiderJobHistoryDTO.getEndExecutionTime();
+			Integer pageNum = spiderJobHistoryDTO.getPageNum();
+			if(null == pageNum || pageNum <= 0) {
+				pageNum = 1;
 			}
-			if(StringUtils.isNotEmpty(endExecutionTime)) {
-				endExecutionDate = DateUtils.parseDate(endExecutionTime, DateUtils.PATTERN_YYYY_MM_DD_HH_MM_SS);
+			Integer pageSize = spiderJobHistoryDTO.getPageSize();
+			if(null == pageSize || pageSize <= 0) {
+				pageSize = 10;
 			}
 			Page<SpiderJobHistoryDTO> page = new Page(pageNum, pageSize, true);
-			PageResult<SpiderJobHistoryDTO> pageResult = spiderJobHistoryService.spiderJobHistoryPageQuery(page, flowId, spiderName,
-					executionStatus, startExecutionDate, endExecutionDate);
+			PageResult<SpiderJobHistoryDTO> pageResult = spiderJobHistoryService.spiderJobHistoryPageQuery(page,
+					spiderJobHistoryDTO.getFlowId(), spiderJobHistoryDTO.getSpiderFlowName(),
+					spiderJobHistoryDTO.getExecutionStatus(), startExecutionDate, endExecutionDate);
 			jsonBean = JsonBean.success(pageResult);
 		} catch (Exception e) {
 			jsonBean = JsonBean.error("server error");
 			Map<String, Object> paramMap = new HashMap<>();
-			paramMap.put("flowId", flowId);
-			paramMap.put("spiderName", spiderName);
-			paramMap.put("executionStatus", executionStatus);
-			paramMap.put("startExecutionTime", startExecutionTime);
-			paramMap.put("endExecutionTime", endExecutionTime);
-			paramMap.put("pageNum", pageNum);
-			paramMap.put("pageSize", pageSize);
+			paramMap.put("flowId", spiderJobHistoryDTO.getFlowId());
+			paramMap.put("spiderName", spiderJobHistoryDTO.getSpiderFlowName());
+			paramMap.put("executionStatus", spiderJobHistoryDTO.getExecutionStatus());
+			paramMap.put("startExecutionTime", spiderJobHistoryDTO.getStartExecutionTime());
+			paramMap.put("endExecutionTime", spiderJobHistoryDTO.getEndExecutionTime());
+			paramMap.put("pageNum", spiderJobHistoryDTO.getPageNum());
+			paramMap.put("pageSize", spiderJobHistoryDTO.getPageSize());
 			logger.error("As accessing the /spider_job_history/page interface with request parameters:{}, we occured exception:\n{}.",
 					JacksonUtils.toJSONString(paramMap), e.getMessage());
 		} finally {

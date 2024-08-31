@@ -1,5 +1,7 @@
 package org.spiderflow.core.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -18,13 +20,21 @@ public class SpiderJobHistoryDTO {
 	private String flowId;
 
 	/**爬虫任务执行开始时间*/
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date startExecutionTime;
 
 	/**爬虫任务执行结束时间*/
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date endExecutionTime;
 
 	/**爬虫任务执行状态,0=未开始,1=运行中,2=已完成,3=异常中断*/
 	private Integer executionStatus;
+
+	/**当前页码(从1开始计算)*/
+	private Integer pageNum;
+
+	/**每页显示条数*/
+	private Integer pageSize;
 
 	public String getId() {
 		return id;
@@ -72,5 +82,21 @@ public class SpiderJobHistoryDTO {
 
 	public void setExecutionStatus(Integer executionStatus) {
 		this.executionStatus = executionStatus;
+	}
+
+	public Integer getPageNum() {
+		return pageNum;
+	}
+
+	public void setPageNum(Integer pageNum) {
+		this.pageNum = pageNum;
+	}
+
+	public Integer getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(Integer pageSize) {
+		this.pageSize = pageSize;
 	}
 }
