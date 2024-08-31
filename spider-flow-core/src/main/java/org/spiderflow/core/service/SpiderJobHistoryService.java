@@ -1,5 +1,6 @@
 package org.spiderflow.core.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.spiderflow.core.dto.SpiderJobHistoryDTO;
@@ -16,15 +17,15 @@ import java.util.List;
  * @description Type your description over here.
  */
 public interface SpiderJobHistoryService  extends IService<SpiderJobHistory> {
-	PageResult<SpiderJobHistoryDTO> spiderJobHistoryPageQuery(Page<SpiderJobHistoryDTO> page, String flowId,
-															  String spiderName,
-															  Integer executionStatus,
-															  Date startExecutionTime,
-															  Date endExecutionTime);
+	IPage<SpiderJobHistoryDTO> spiderJobHistoryPageQuery(Page<SpiderJobHistoryDTO> page, String flowId,
+														 String spiderName,
+														 Integer executionStatus,
+														 Date startExecutionTime,
+														 Date endExecutionTime);
 
-	String insertSpiderFlow(SpiderJobHistory spiderJobHistory);
+	int insertSpiderJobHistory(SpiderJobHistory spiderJobHistory);
 
-	int updateSpiderFlow(SpiderJobHistory spiderJobHistory);
+	int updateSpiderJobHistory(SpiderJobHistory spiderJobHistory);
 
 	int updateExecutionStatus(String id, Integer executionStatus);
 

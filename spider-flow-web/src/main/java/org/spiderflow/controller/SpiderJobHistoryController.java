@@ -1,18 +1,15 @@
 package org.spiderflow.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.core.dto.SpiderJobHistoryDTO;
-import org.spiderflow.core.page.PageResult;
 import org.spiderflow.core.service.SpiderJobHistoryService;
-import org.spiderflow.core.utils.DateUtils;
 import org.spiderflow.core.utils.JacksonUtils;
 import org.spiderflow.core.utils.StringUtils;
 import org.spiderflow.model.JsonBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,26 +38,24 @@ public class SpiderJobHistoryController {
 
 	@PostMapping("/page")
 	@ResponseBody
-	public JsonBean<PageResult> list(@RequestBody SpiderJobHistoryDTO spiderJobHistoryDTO) {
-		JsonBean jsonBean = null;
+	public IPage<SpiderJobHistoryDTO> list(@RequestBody SpiderJobHistoryDTO spiderJobHistoryDTO) {
+		Date startExecutionDate = spiderJobHistoryDTO.getStartExecutionTime();
+		Date endExecutionDate = spiderJobHistoryDTO.getEndExecutionTime();
+		Integer pageNum = spiderJobHistoryDTO.getPageNum();
+		if(null == pageNum || pageNum <= 0) {
+			pageNum = 1;
+		}
+		Integer pageSize = spiderJobHistoryDTO.getPageSize();
+		if(null == pageSize || pageSize <= 0) {
+			pageSize = 10;
+		}
+		Page<SpiderJobHistoryDTO> page = new Page(pageNum, pageSize, true);
 		try {
-			Date startExecutionDate = spiderJobHistoryDTO.getStartExecutionTime();
-			Date endExecutionDate = spiderJobHistoryDTO.getEndExecutionTime();
-			Integer pageNum = spiderJobHistoryDTO.getPageNum();
-			if(null == pageNum || pageNum <= 0) {
-				pageNum = 1;
-			}
-			Integer pageSize = spiderJobHistoryDTO.getPageSize();
-			if(null == pageSize || pageSize <= 0) {
-				pageSize = 10;
-			}
-			Page<SpiderJobHistoryDTO> page = new Page(pageNum, pageSize, true);
-			PageResult<SpiderJobHistoryDTO> pageResult = spiderJobHistoryService.spiderJobHistoryPageQuery(page,
+			IPage<SpiderJobHistoryDTO> pageResult = spiderJobHistoryService.spiderJobHistoryPageQuery(page,
 					spiderJobHistoryDTO.getFlowId(), spiderJobHistoryDTO.getSpiderFlowName(),
 					spiderJobHistoryDTO.getExecutionStatus(), startExecutionDate, endExecutionDate);
-			jsonBean = JsonBean.success(pageResult);
+			return pageResult;
 		} catch (Exception e) {
-			jsonBean = JsonBean.error("server error");
 			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("flowId", spiderJobHistoryDTO.getFlowId());
 			paramMap.put("spiderName", spiderJobHistoryDTO.getSpiderFlowName());
@@ -71,8 +66,7 @@ public class SpiderJobHistoryController {
 			paramMap.put("pageSize", spiderJobHistoryDTO.getPageSize());
 			logger.error("As accessing the /spider_job_history/page interface with request parameters:{}, we occured exception:\n{}.",
 					JacksonUtils.toJSONString(paramMap), e.getMessage());
-		} finally {
-			return jsonBean;
+			return page;
 		}
 	}
 
@@ -97,7 +91,7 @@ public class SpiderJobHistoryController {
 
 	@PostMapping("/batch_delete")
 	@ResponseBody
-	public JsonBean batchDelete(@RequestParam("idList") List<String> idList) {
+	public JsonBean batchDelete(@RequestBody List<String> idList) {
 		if(null == idList || idList.size() <= 0) {
 			return JsonBean.error("idList MUST not be NULL or empty");
 		}

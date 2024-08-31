@@ -57,38 +57,6 @@ public final class JacksonUtils {
 	}
 
 	/**
-	 * @param content
-	 * @param valueType
-	 * @return {@link T}
-	 * @description 将JSON字符串转换成指定类型的对象
-	 * @author yida
-	 * @date 2023-05-25 09:39:41
-	 */
-	public static <T> T readValue(String content, Class<T> valueType) {
-		try {
-			return objectMapper.readValue(content, valueType);
-		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @param content
-	 * @param valueTypeRef
-	 * @return {@link T}
-	 * @description 将JSON字符串转换成指定类型的对象
-	 * @author yida
-	 * @date 2023-05-25 09:39:59
-	 */
-	public static <T> T readValue(String content, TypeReference<T> valueTypeRef) {
-		try {
-			return objectMapper.readValue(content, valueTypeRef);
-		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-	}
-
-	/**
 	 * @param jsonString
 	 * @description 将JSON字符串转成List<T>
 	 * @author yida
@@ -170,16 +138,64 @@ public final class JacksonUtils {
 	}
 
 	/**
+	 * @param jsonString
+	 * @param targetClass
+	 * @return {@link T}
+	 * @description 将JSON字符串转换成指定类型的对象
+	 * @author yida
+	 * @date 2023-05-25 09:40:15
+	 */
+	public static <T> T json2Bean(String jsonString, Class<T> targetClass) {
+		try {
+			return objectMapper.readValue(jsonString, targetClass);
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+
+	/**
 	 * @param src
-	 * @param valueType
+	 * @param targetClass
 	 * @return {@link T}
 	 * @description 将JSON字符串的字节数组转换成指定类型的对象
 	 * @author yida
 	 * @date 2023-05-25 09:40:15
 	 */
-	public static <T> T readValue(byte[] src, Class<T> valueType) {
+	public static <T> T readValue(byte[] src, Class<T> targetClass) {
 		try {
-			return objectMapper.readValue(src, valueType);
+			return objectMapper.readValue(src, targetClass);
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+
+	/**
+	 * @param content
+	 * @param valueTypeRef
+	 * @return {@link T}
+	 * @description 将JSON字符串转换成指定类型的对象
+	 * @author yida
+	 * @date 2023-05-25 09:39:59
+	 */
+	public static <T> T readValue(String content, TypeReference<T> valueTypeRef) {
+		try {
+			return objectMapper.readValue(content, valueTypeRef);
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+
+	/**
+	 * @param content
+	 * @param targetClass
+	 * @return {@link T}
+	 * @description 将JSON字符串转换成指定类型的对象
+	 * @author yida
+	 * @date 2023-05-25 09:39:41
+	 */
+	public static <T> T readValue(String content, Class<T> targetClass) {
+		try {
+			return objectMapper.readValue(content, targetClass);
 		} catch (IOException e) {
 			throw new RuntimeException(e.getMessage());
 		}

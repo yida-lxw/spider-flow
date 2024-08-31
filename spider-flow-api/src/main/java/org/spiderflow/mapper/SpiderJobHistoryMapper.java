@@ -52,25 +52,24 @@ public interface SpiderJobHistoryMapper extends BaseMapper<SpiderJobHistory> {
 										  @Param("startExecutionTime") Date startExecutionTime,
 										  @Param("endExecutionTime") Date endExecutionTime);
 
-	@Insert("insert into sp_job_history(flow_id,start_execution_time,end_execution_time,execution_status) " +
-			"values(#{spiderJobHistory.flowId},#{spiderJobHistory.startExecutionTime}," +
+	@Insert("insert into sp_job_history(id,flow_id,start_execution_time,end_execution_time,execution_status) " +
+			"values(#{spiderJobHistory.id},#{spiderJobHistory.flowId},#{spiderJobHistory.startExecutionTime}," +
 			"#{spiderJobHistory.endExecutionTime},#{spiderJobHistory.executionStatus})")
-	@Options(useGeneratedKeys = true, keyProperty = "id")
-	String insertSpiderFlow(@Param("spiderJobHistory") SpiderJobHistory spiderJobHistory);
+	int insertSpiderJobHistory(@Param("spiderJobHistory") SpiderJobHistory spiderJobHistory);
 
 	@Update("update sp_job_history set flow_id=#{spiderJobHistory.flowId}," +
 			"start_execution_time=#{spiderJobHistory.startExecutionTime}," +
 			"end_execution_time=#{spiderJobHistory.endExecutionTime}," +
-			"execution_status=#{spiderJobHistory.executionStatus} where id=#{spiderJobHistory.id})")
-	int updateSpiderFlow(@Param("spiderJobHistory") SpiderJobHistory spiderJobHistory);
+			"execution_status=#{spiderJobHistory.executionStatus} where id=#{spiderJobHistory.id}")
+	int updateSpiderJobHistory(@Param("spiderJobHistory") SpiderJobHistory spiderJobHistory);
 
-	@Update("update sp_job_history set execution_status=#{executionStatus} where id=#{id})")
+	@Update("update sp_job_history set execution_status=#{executionStatus} where id=#{id}")
 	int updateExecutionStatus(@Param("id") String id, @Param("executionStatus") Integer executionStatus);
 
-	@Update("update sp_job_history set start_execution_time=NOW() where id=#{id})")
+	@Update("update sp_job_history set start_execution_time=NOW() where id=#{id}")
 	int updateStartExecutionTime(@Param("id") String id);
 
-	@Update("update sp_job_history set end_execution_time=NOW() where id=#{id})")
+	@Update("update sp_job_history set end_execution_time=NOW() where id=#{id}")
 	int updateEndExecutionTime(@Param("id") String id);
 
 	@Select("select id,flow_id,start_execution_time,end_execution_time,execution_status from sp_job_history where id = #{id}")

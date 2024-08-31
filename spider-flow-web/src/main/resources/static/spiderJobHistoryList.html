@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>SpiderFlow</title>
+	<title>SpiderFlowHistory</title>
 	<link rel="stylesheet" href="js/layui/css/layui.css" />
 	<link rel="stylesheet" href="css/layui-blue.css" />
 	<script type="text/javascript" src="js/cron/jquery-2.1.4.min.js"></script>
@@ -14,7 +14,7 @@
 <body style="padding:5px;">
 <div class="layui-form-item">
 	<div class="layui-input-inline">
-		<input type="text" name="spiderFlowName" required  lay-verify="required" placeholder="请输入爬虫名称" autocomplete="off" class="layui-input" style="width:190px;height:25px;">
+		<input type="text" name="spiderFlowName" placeholder="请输入爬虫名称" autocomplete="off" class="layui-input" style="width:190px;height:25px;">
 	</div>
 	<div class="layui-input-inline">
 		<select name="executionStatus" lay-filter="executionStatus" class="layui-select" style="width:180px;height:25px;">
@@ -33,12 +33,12 @@
 	</div>
 	<div class="layui-input-inline">
 		<a class="layui-btn layui-btn-sm layui-btn-normal btn-search"><i class="layui-icon">&#xe615;</i> 搜索</a>
-		<a class="layui-btn layui-btn-sm layui-btn-normal" href="editor.html"><i class="layui-icon">&#xe654;</i> 批量删除</a>
+		<a id="batch_delete_job_history_btn" class="layui-btn layui-btn-sm layui-btn-normal"><i class="layui-icon">&#xe654;</i> 批量删除</a>
 	</div>
 </div>
 
 <hr>
-<table class="layui-table" id="spider_job_history_table" lay-filter="table"></table>
+<table class="layui-table" id="spider_job_history_table" lay-filter="spiderJobHistoryTable"></table>
 <script>
 	var $ = layui.$;
 	layui.use(function(){
@@ -53,7 +53,7 @@
 		});
 	});
 	var $table = layui.table.render({
-		id : 'spider_job_history_layui_table',
+		id: "spider_job_history_layui_table",
 		elem : '#spider_job_history_table',
 		url : 'spider_job_history/page',
 		contentType: 'application/json;charset=utf8',
@@ -69,25 +69,20 @@
 		},
 		method : 'post',
 		page : true,
+		loading: true,
 		limit: 10,
 		limits: [10, 20, 50, 100, 200],
 		parseData : function(resp){
 			return {
-				"code": resp.code,
-				"msg": resp.message,
-				"data": resp.data.data,
-				"count": resp.data.totalSize
+				"code" : 0,
+				"data" : resp.records,
+				"count" : resp.total
 			}
 		},
 		cols : [[
 		{ checkbox: true, fixed: true},
-		{ type: 'numbers', title: '序号', width: 20, fixed: 'left'},
+		{ type: 'numbers', title: '序号', width: 50, fixed: 'left'},
 		{
-			title : '序号',
-			width : 35,
-			type : 'numbers',
-			align : 'center'
-		},{
 			title : 'id',
 			field : 'id',
 			width : 35,
@@ -102,19 +97,19 @@
 		},{
 			title : '爬虫名称',
 			field : 'spiderFlowName',
-			width : 80
+			width : 220
 		},{
 			title : '执行状态',
-			field : 'endExecutionTime',
-			width : 80
+			field : 'executionStatus',
+			width : 90
 		},{
 			title : '任务开始时间',
 			field : 'startExecutionTime',
-			width : 100
+			width : 280
 		},{
 			title : '任务结束时间',
 			field : 'endExecutionTime',
-			width : 100
+			width : 280
 		},{
 			title : '操作',
 			width : 250,
@@ -165,17 +160,45 @@
 				data : {
 					id : id
 				},
-				success : function(){
+				method: "post",
+				success: function() {
 					layui.layer.msg('删除成功',{time : 500},function(){
 						$table.reload();
 					})
 				},
-				error : function(){
+				error: function() {
 					layui.layer.msg('删除失败')
 				}
 			})
 			layui.layer.close(index);
 		})
+	}).on('click','#batch_delete_job_history_btn',function() {
+		var checkStatus = layui.table.checkStatus('spider_job_history_layui_table');
+		var checkedData = checkStatus.data;
+		if(!checkedData || checkedData.length <= 0) {
+			layui.layer.msg('请先勾选需要删除的数据',{time : 2000});
+			return;
+		}
+		var ids = [];
+		checkedData.forEach(function(v, i) {
+			ids.push(v.id);
+		});
+		$jq.ajax({
+			url: "spider_job_history/batch_delete",
+			type: "POST",
+			dataType: 'json',
+			contentType: 'application/json',
+			data: JSON.stringify(ids),
+			success: function (resp) {
+				if(resp && resp.code == 200) {
+					layui.layer.msg('批量删除成功',{time : 1000},function(){
+						$table.reload();
+					});
+				} else {
+					layui.layer.msg('批量删除失败',{time : 1000});
+				}
+			}
+		});
 	});
 </script>
 <script type="text/html" id="buttons">

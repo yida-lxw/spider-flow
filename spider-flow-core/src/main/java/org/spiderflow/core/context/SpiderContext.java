@@ -21,7 +21,10 @@ public class SpiderContext extends HashMap<String, Object> {
 
 	private String id = UUID.randomUUID().toString().replace("-", "");
 
-	protected  String instanceId;
+	protected String instanceId;
+
+	/**爬虫执行历史Id*/
+	protected String jobHistoryId;
 
 	/**
 	 * 流程ID
@@ -103,6 +106,14 @@ public class SpiderContext extends HashMap<String, Object> {
 
 	public void setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
+	}
+
+	public String getJobHistoryId() {
+		return jobHistoryId;
+	}
+
+	public void setJobHistoryId(String jobHistoryId) {
+		this.jobHistoryId = jobHistoryId;
 	}
 
 	public String getCurrentNodeId() {

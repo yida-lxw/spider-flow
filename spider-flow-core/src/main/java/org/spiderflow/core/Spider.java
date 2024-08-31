@@ -1,7 +1,8 @@
 package org.spiderflow.core;
 
 import com.alibaba.ttl.TtlRunnable;
-import org.apache.commons.lang3.StringUtils;
+import com.baomidou.mybatisplus.core.incrementer.DefaultIdentifierGenerator;
+import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import org.spiderflow.core.executor.shape.LoopExecutor;
 import org.spiderflow.core.job.SpiderJobNodeStatusInfo;
 import org.spiderflow.core.listener.SpiderListener;
 import org.spiderflow.core.model.SpiderFlow;
+import org.spiderflow.core.model.SpiderJobHistory;
 import org.spiderflow.core.model.SpiderNode;
 import org.spiderflow.core.model.SpiderOutput;
 import org.spiderflow.core.service.FlowNoticeService;
@@ -26,9 +28,12 @@ import org.spiderflow.core.executor.submit.strategy.RandomThreadSubmitStrategy;
 import org.spiderflow.core.executor.thread.pool.SpiderFlowThreadPoolExecutor;
 import org.spiderflow.core.executor.thread.pool.SubThreadPoolExecutor;
 import org.spiderflow.core.executor.submit.strategy.ThreadSubmitStrategy;
+import org.spiderflow.core.service.SpiderJobHistoryService;
+import org.spiderflow.core.thread.GlobalThreadPool;
 import org.spiderflow.core.utils.ExecutorsUtils;
 import org.spiderflow.core.utils.ExpressionUtils;
 import org.spiderflow.core.utils.SpiderFlowUtils;
+import org.spiderflow.core.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -38,6 +43,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +63,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Component
 public class Spider {
+	private static final Logger logger = LoggerFactory.getLogger(Spider.class);
+
+	private static final String ATOMIC_DEAD_CYCLE = "__atomic_dead_cycle";
+	public static SpiderFlowThreadPoolExecutor executorInstance;
+
+	private IdentifierGenerator identifierGenerator;
 
 	@Autowired(required = false)
 	private List<SpiderListener> listeners;
@@ -83,17 +95,16 @@ public class Spider {
 	private FlowNoticeService flowNoticeService;
 
 	@Autowired
+	private SpiderJobHistoryService spiderJobHistoryService;
+
+	@Autowired
 	private NotifySpiderTaskExecutionStatusEventPublisher notifySpiderTaskExecutionStatusEventPublisher;
 
-	public static SpiderFlowThreadPoolExecutor executorInstance;
-
-	private static final String ATOMIC_DEAD_CYCLE = "__atomic_dead_cycle";
-
-	private static Logger logger = LoggerFactory.getLogger(Spider.class);
 
 	@PostConstruct
 	private void init() {
 		executorInstance = new SpiderFlowThreadPoolExecutor(totalThreads);
+		identifierGenerator = new DefaultIdentifierGenerator();
 	}
 
 	public List<SpiderOutput> run(SpiderFlow spiderFlow, SpiderContext context, Map<String, Object> variables) {
@@ -120,14 +131,41 @@ public class Spider {
 		AtomicInteger executeCount = new AtomicInteger(0);
 		//存入到上下文中，以供后续检测
 		context.put(ATOMIC_DEAD_CYCLE, executeCount);
+		//MyBatis需要这个 shit Object
+		Object shitObject = new Object();
+		GlobalThreadPool.getInstance().execute(() -> {
+			String flowId = context.getFlowId();
+			Date startExecutionTime = new Date();
+			Integer executionStatus = 1;
+			SpiderJobHistory spiderJobHistory = new SpiderJobHistory(flowId, startExecutionTime, executionStatus);
+			String jobHistoryId = identifierGenerator.nextId(shitObject).toString();
+			spiderJobHistory.setId(jobHistoryId);
+			int insertResult = spiderJobHistoryService.insertSpiderJobHistory(spiderJobHistory);
+			context.setJobHistoryId(jobHistoryId);
+			if(insertResult > 0) {
+				logger.info("insert SpiderJobHistory:[{}] into sp_job_history table successlly.", jobHistoryId);
+			}
+		});
 		//执行根节点
-		executeRoot(root, context, new HashMap<>());
+		boolean result = executeRoot(root, context, new HashMap<>());
 		//当爬虫任务执行完毕时,判断是否超过预期
 		if (executeCount.get() > deadCycle) {
 			logger.error("检测到可能出现死循环,测试终止");
 		} else {
 			logger.info("测试完毕！");
 		}
+		Integer executionStatus = result?2 : 3;
+		GlobalThreadPool.getInstance().execute(() -> {
+			String jobHistoryId = context.getJobHistoryId();
+			if(StringUtils.isNotEmpty(jobHistoryId)) {
+				SpiderJobHistory spiderJobHistory = spiderJobHistoryService.queryById(jobHistoryId);
+				if(null != spiderJobHistory) {
+					spiderJobHistory.setEndExecutionTime(new Date());
+					spiderJobHistory.setExecutionStatus(executionStatus);
+					spiderJobHistoryService.updateSpiderJobHistory(spiderJobHistory);
+				}
+			}
+		});
 		//将上下文从ThreadLocal移除，防止内存泄漏
 		SpiderContextHolder.remove();
 	}
@@ -135,7 +173,7 @@ public class Spider {
 	/**
 	 * 执行根节点
 	 */
-	private void executeRoot(SpiderNode root, SpiderContext context, Map<String, Object> variables) {
+	private boolean executeRoot(SpiderNode root, SpiderContext context, Map<String, Object> variables) {
 		//获取当前流程执行线程数
 		int nThreads = NumberUtils.toInt(root.getStringJsonValue(ShapeExecutor.THREAD_COUNT), defaultThreads);
 		String strategy = root.getStringJsonValue("submit-strategy");
@@ -202,6 +240,7 @@ public class Spider {
 						//睡眠1ms,让出cpu
 						Thread.sleep(1);
 					} catch (InterruptedException ignored) {
+						Thread.currentThread().interrupt();
 					} catch (Throwable t) {
 						logger.error("程序发生异常", t);
 					}
@@ -218,7 +257,9 @@ public class Spider {
 		try {
 			//阻塞等待所有任务执行完毕
 			future.get();
+			return true;
 		} catch (InterruptedException | ExecutionException e) {
+			return false;
 		}
 	}
 
@@ -239,7 +280,7 @@ public class Spider {
 	 */
 	public void executeNode(SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		String shape = node.getStringJsonValue("shape");
-		if (StringUtils.isBlank(shape)) {
+		if (StringUtils.isEmpty(shape)) {
 			executeNextNodes(node, context, variables);
 			return;
 		}
@@ -265,7 +306,7 @@ public class Spider {
 		String loopCountStr = node.getStringJsonValue(ShapeExecutor.LOOP_COUNT);
 		Object loopArray = null;
 		boolean isLoop = false;
-		if (isLoop = StringUtils.isNotBlank(loopCountStr)) {
+		if (isLoop = StringUtils.isNotEmpty(loopCountStr)) {
 			try {
 				loopArray = ExpressionUtils.execute(loopCountStr, variables);
 				if (loopArray == null) {
@@ -311,7 +352,7 @@ public class Spider {
 					}
 					if (isLoop) {
 						// 存入下标变量
-						if (!StringUtils.isBlank(loopVariableName)) {
+						if (!StringUtils.isEmpty(loopVariableName)) {
 							nVariables.put(loopVariableName, i);
 						}
 						// 存入item
@@ -390,7 +431,7 @@ public class Spider {
 			}
 			String condition = node.getCondition(fromNode.getNodeId());
 			// 判断是否有条件
-			if (StringUtils.isNotBlank(condition)) {
+			if (StringUtils.isNotEmpty(condition)) {
 				Object result = null;
 				try {
 					result = ExpressionUtils.execute(condition, variables);

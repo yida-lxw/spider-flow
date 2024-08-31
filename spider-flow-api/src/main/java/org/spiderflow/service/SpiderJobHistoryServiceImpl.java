@@ -11,6 +11,7 @@ import org.spiderflow.mapper.SpiderJobHistoryMapper;
 import org.spiderflow.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -27,34 +28,38 @@ public class SpiderJobHistoryServiceImpl extends ServiceImpl<SpiderJobHistoryMap
 	private SpiderJobHistoryMapper spiderJobHistoryMapper;
 
 	@Override
-	public PageResult<SpiderJobHistoryDTO> spiderJobHistoryPageQuery(Page<SpiderJobHistoryDTO> page, String flowId, String spiderName,
+	public IPage<SpiderJobHistoryDTO> spiderJobHistoryPageQuery(Page<SpiderJobHistoryDTO> page, String flowId, String spiderName,
 																	 Integer executionStatus, Date startExecutionTime, Date endExecutionTime) {
 		IPage<SpiderJobHistoryDTO> pageInfo = spiderJobHistoryMapper.selectPage(page, flowId, spiderName, executionStatus, startExecutionTime, endExecutionTime);
-		PageResult<SpiderJobHistoryDTO> pageResult = PageUtils.getPageResult(pageInfo);
-		return pageResult;
+		return pageInfo;
 	}
 
 	@Override
-	public String insertSpiderFlow(SpiderJobHistory spiderJobHistory) {
-		return spiderJobHistoryMapper.insertSpiderFlow(spiderJobHistory);
+	@Transactional
+	public int insertSpiderJobHistory(SpiderJobHistory spiderJobHistory) {
+		return spiderJobHistoryMapper.insertSpiderJobHistory(spiderJobHistory);
 	}
 
 	@Override
-	public int updateSpiderFlow(SpiderJobHistory spiderJobHistory) {
-		return spiderJobHistoryMapper.updateSpiderFlow(spiderJobHistory);
+	@Transactional
+	public int updateSpiderJobHistory(SpiderJobHistory spiderJobHistory) {
+		return spiderJobHistoryMapper.updateSpiderJobHistory(spiderJobHistory);
 	}
 
 	@Override
+	@Transactional
 	public int updateExecutionStatus(String id, Integer executionStatus) {
 		return spiderJobHistoryMapper.updateExecutionStatus(id, executionStatus);
 	}
 
 	@Override
+	@Transactional
 	public int updateStartExecutionTime(String id) {
 		return spiderJobHistoryMapper.updateStartExecutionTime(id);
 	}
 
 	@Override
+	@Transactional
 	public int updateEndExecutionTime(String id) {
 		return spiderJobHistoryMapper.updateEndExecutionTime(id);
 	}
@@ -75,16 +80,19 @@ public class SpiderJobHistoryServiceImpl extends ServiceImpl<SpiderJobHistoryMap
 	}
 
 	@Override
+	@Transactional
 	public int deleteById(String id) {
 		return spiderJobHistoryMapper.deleteById(id);
 	}
 
 	@Override
+	@Transactional
 	public int deleteByFlowId(String flowId) {
 		return spiderJobHistoryMapper.deleteByFlowId(flowId);
 	}
 
 	@Override
+	@Transactional
 	public int batchDeleteByIds(List<String> idList) {
 		return spiderJobHistoryMapper.batchDeleteByIds(idList);
 	}

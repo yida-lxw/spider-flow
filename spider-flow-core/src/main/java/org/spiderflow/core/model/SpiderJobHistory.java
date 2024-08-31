@@ -28,6 +28,18 @@ public class SpiderJobHistory {
 
 	/**爬虫任务执行状态,0=未开始,1=运行中,2=已完成,3=异常中断*/
 	private Integer executionStatus;
+	public SpiderJobHistory() {}
+
+	public SpiderJobHistory(String flowId, Date startExecutionTime, Integer executionStatus) {
+		this(flowId, startExecutionTime, null, executionStatus);
+	}
+
+	public SpiderJobHistory(String flowId, Date startExecutionTime, Date endExecutionTime, Integer executionStatus) {
+		this.flowId = flowId;
+		this.startExecutionTime = startExecutionTime;
+		this.endExecutionTime = endExecutionTime;
+		this.executionStatus = executionStatus;
+	}
 
 	public String getId() {
 		return id;

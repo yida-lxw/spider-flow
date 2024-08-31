@@ -53,6 +53,8 @@ spring:
 
 mybatis-plus:
   global-config:
+    db-config:
+      id-type: assign_id
     banner: false
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
