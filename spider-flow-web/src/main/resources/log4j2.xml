@@ -70,7 +70,7 @@
             <DefaultRolloverStrategy max="15"/>
         </RollingFile>
 
-        <SpiderFlowFileAppender name="spiderFlowFileAppender"></SpiderFlowFileAppender>
+        <SpiderFlowFileAppender name="spiderFlowFileAppender" ignoreExceptions="true"></SpiderFlowFileAppender>
     </appenders>
 
     <!--Logger节点用来单独指定日志的形式，比如要为指定包下的class指定不同的日志级别等。-->

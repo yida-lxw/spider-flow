@@ -38,37 +38,38 @@
 		},
 		cols : [[{
 			title : '序号',
-			width : 35,
+			width : 55,
 			type : 'numbers',
 			align : 'center'
 		},{
 			title : '爬虫名称',
 			field : 'name',
+			width : 160,
 			templet : function(row){
 				return '<a class="layui-btn layui-btn-sm btn-details" data-name="'+row.name+'" data-id="'+row.id+'">'+row.name+'</a>';
 			}
 		},{
 			title : 'cron',
 			field : 'cron',
-			width : 80,
+			width : 105,
 			templet : function(row){
 				return '<a class="layui-btn layui-btn-sm btn-edit-cron" data-id="'+row.id+'" data-cron="'+row.cron+'">'+(row.cron || '编辑cron')+'</a>';
 			}
 		},{
-			title : '定时/长任务',
+			title : '定时任务',
 			field : 'enabled',
-			width : 105,
+			width : 100,
 			templet : function(row){
 				return '<input type="checkbox" data-cron="'+(row.cron||'')+'" name="switch" lay-skin="switch" lay-text="定时|长任务" value="'+row.id+'" '+(row.enabled == 1 ? 'checked':'')+'>';
 			}
 		},{
 			title : '创建时间',
-			width : 160,
+			width : 165,
 			field : 'createDate',
 			align : 'center'
 		},{
 			title : '上次执行时间',
-			width : 160,
+			width : 165,
 			field : 'lastExecuteTime',
 			align : 'center'
 		},{
@@ -79,12 +80,12 @@
 			templet : '#execute-count'
 		},{
 			title : '下次执行时间',
-			width : 160,
+			width : 165,
 			field : 'nextExecuteTime',
 			align : 'center'
 		},{
 			title : '操作',
-			width : 250,
+			width : 180,
 			align : 'center',
 			templet : '#buttons'
 		}]]
