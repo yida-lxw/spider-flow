@@ -23,7 +23,7 @@ public interface SpiderFlowMapper extends BaseMapper<SpiderFlow> {
 			"<script>",
 			"select",
 			"id,name,enabled,last_execute_time,next_execute_time,cron,create_date,execute_count,",
-			"(select count(*) from sp_task where flow_id = sf.id and end_time is null) running",
+			"(select count(*) from sp_job_history where flow_id = sf.id and execution_status=1) as running",
 			"from sp_flow sf",
 			"<if test=\"name != null and name != ''\">",
 			"where name like concat('%',#{name},'%')",

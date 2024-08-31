@@ -69,6 +69,8 @@
             <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件开始覆盖-->
             <DefaultRolloverStrategy max="15"/>
         </RollingFile>
+
+        <SpiderFlowFileAppender name="spiderFlowFileAppender"></SpiderFlowFileAppender>
     </appenders>
 
     <!--Logger节点用来单独指定日志的形式，比如要为指定包下的class指定不同的日志级别等。-->
@@ -105,6 +107,7 @@
             <appender-ref ref="RollingFileInfo"/>
             <appender-ref ref="RollingFileWarn"/>
             <appender-ref ref="RollingFileError"/>
+            <appender-ref ref="spiderFlowFileAppender"/>
         </root>
     </loggers>
 </configuration>
