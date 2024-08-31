@@ -182,13 +182,13 @@
     </div>
 	<script type="text/javascript">
 		$(function(){
-		    var logId = getQueryString('id');
-            var taskId = getQueryString('taskId');
+		    var jobHistoryId = getQueryString('jobHistoryId');
+            var flowId = getQueryString('id');
 			var viewer = new LogViewer({
 				url: 'spider/log',
 				maxLines : parseInt(($('.log-container').height() - 8) / 14),
-				logId : logId,
-                taskId: taskId,
+                flowId : flowId,
+                jobHistoryId: jobHistoryId,
 				element : $('.log-container'),
                 onSearchFinish : function(hasData){
 				    if(hasData){
@@ -243,7 +243,7 @@
                 viewer.setOptions('reversed',true);
                 viewer.init();
             }).on('click','.btn-download',function(){
-                window.open('spider/log/download?id=' + logId + "&taskId=" + (taskId || ''));
+                window.open('spider/log/download?id=' + flowId + "&jobHistoryId=" + (jobHistoryId || ''));
             });
 		});
 	</script>

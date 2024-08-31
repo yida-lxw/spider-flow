@@ -4,7 +4,7 @@ function LogViewer(options){
     this.maxLines = options.maxLines || 10;
     this.onSearchFinish = options.onSearchFinish || function(){};
     this.bufferSize = this.maxLines * 10;
-    this.logId = options.logId;
+    this.flowId = options.flowId;
     this.jobHistoryId = options.jobHistoryId;
     this.url = options.url;
     this.buffer = [];
@@ -120,14 +120,16 @@ LogViewer.prototype.scroll = function(reversed,count){
         }else{
             _this.displayIndex-=count;
         }
-    }else{
-        if(this.displayIndex + this.maxLines >= this.buffer.length){
-            this.index = this.buffer[this.buffer.length - 1].to;
-            this.loadLines(this.bufferSize,function(hasData){
-                if(hasData){
-                    _this.displayIndex = 0;
-                }
-            },false);
+    } else{
+        if(this.displayIndex + this.maxLines >= this.buffer.length) {
+            if(this.buffer.length > 0) {
+                this.index = this.buffer[this.buffer.length - 1].to;
+                this.loadLines(this.bufferSize,function(hasData){
+                    if(hasData){
+                        _this.displayIndex = 0;
+                    }
+                },false);
+            }
         }else{
             _this.displayIndex+=count;
         }
@@ -148,7 +150,7 @@ LogViewer.prototype.loadLines = function(count,callback,async){
         data : {
             reversed : this.reversed,
             count : this.bufferSize,
-            id : this.logId,
+            id : this.flowId,
             jobHistoryId: this.jobHistoryId,
             index : _this.index,
             keywords : this.keywords,

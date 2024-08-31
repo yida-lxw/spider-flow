@@ -191,9 +191,7 @@
 		})
 	}).on('click','.btn-task',function(){
 		parent.openTab($(this).data('name') + '-任务详情',$(this).data('id') + '-task','task.html?id=' + $(this).data('id') + '&name=' + encodeURIComponent(encodeURIComponent($(this).data('name'))));
-	}).on('click','.btn-log',function(){
-		parent.openTab($(this).data('name') + '-日志',$(this).data('id') + '-log','log.html?id=' + $(this).data('id'));
-	}).on('click','.btn-edit-cron',function(){
+	}).on('click','.btn-edit-cron',function() {
 		var id = $(this).data('id');
 		var value = $(this).data('cron') || '';
 		parent.$table = $table;
@@ -225,7 +223,6 @@
 	<a class="layui-btn layui-btn-sm btn-details" data-id="{{d.id}}" data-name="{{d.name}}" title="查看"><i class="layui-icon">&#xe615;</i></a>
 	<a class="layui-btn layui-btn-sm btn-notice" data-id="{{d.id}}" title="通知设置"><i class="layui-icon">&#xe667;</i></a>
 	<a class="layui-btn layui-btn-sm btn-run" data-id="{{d.id}}" title="手动运行"><i class="layui-icon">&#xe623;</i></a>
-	<a class="layui-btn layui-btn-sm btn-log" data-name="{{d.name}}" data-id="{{d.id}}" title="日志"><i class="layui-icon">&#xe60e;</i></a>
 	<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}" title="删除"><i class="layui-icon">&#xe640;</i></a>
 </script>
 </body>

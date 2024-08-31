@@ -10,6 +10,7 @@
 		var $jq = jQuery.noConflict();
 	</script>
 	<script type="text/javascript" src="js/layui/layui.js" ></script>
+	<script type="text/javascript" src="js/common.js" ></script>
 </head>
 <body style="padding:5px;">
 <div class="layui-form-item">
@@ -215,10 +216,17 @@
 				}
 			}
 		});
-	});
+	}).on('click','.btn-log',function() {
+		var jobHistoryId = $(this).data('id');
+		var flowId = $(this).data('flowid');
+		var spiderName = $(this).data('spidername');
+		parent.openTab(decodeURIComponent(decodeURIComponent(spiderName)) + '-日志',$(this).data('id') + '-log','log.html?id=' + flowId + "&jobHistoryId=" + jobHistoryId);
+	})
+	;
 </script>
 <script type="text/html" id="buttons">
 	<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}" title="删除"><i class="layui-icon">&#xe640;</i></a>
+	<a class="layui-btn layui-btn-sm btn-log" data-id="{{d.id}}" data-flowid="{{d.flowId}}" data-spidername="{{d.spiderFlowName}}">查看日志</a>
 </script>
 </body>
 </html>
