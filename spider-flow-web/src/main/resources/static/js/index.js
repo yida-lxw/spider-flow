@@ -20,11 +20,12 @@ function setTheSkin(value){
 }
 setTheSkin(getCookie('theSkin'));
 function openTab(title,id,href){
-	if($(".layui-tab[lay-filter=admin-tab]").find("[lay-id="+id+"]").length > 0){	//判断是否已打开
+	//判断是否已打开
+	if($(".layui-tab[lay-filter=admin-tab]").find("[lay-id="+id+"]").length > 0){
 		var $dom =  $(".layui-tab[lay-filter=admin-tab]");
 		var index = $dom.find("[lay-id="+id+"]").index();
 		$dom.find(".layui-tab-content .layui-tab-item").eq(index).find("iframe").attr("src",href);
-	}else{
+	} else{
 		var html  = '<iframe src="'+href+'" width="100%" height="100%" scrolling="yes" frameborder="0"></iframe>';
 		layui.element.tabAdd('admin-tab',{
 			title:title,
@@ -32,7 +33,7 @@ function openTab(title,id,href){
 			id:id,
 		});
 	}
-	layui.element.tabChange("admin-tab",id);
+	layui.element.tabChange("admin-tab", id);
 }
 $(function(){
 	$.ajax({
