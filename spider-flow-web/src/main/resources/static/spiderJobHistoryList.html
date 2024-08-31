@@ -101,7 +101,23 @@
 		},{
 			title : '执行状态',
 			field : 'executionStatus',
-			width : 90
+			width : 90,
+			templet: function(row){
+				var executionStatusVal = row["executionStatus"];
+				if(0 == executionStatusVal) {
+					return "<span style='color:grey;'>未开始</span>";
+				}
+				if(1 == executionStatusVal) {
+					return "<span style='color:green;'>运行中</span>";
+				}
+				if(2 == executionStatusVal) {
+					return "<span style='color:black;font-weight:900;'>运行中</span>";
+				}
+				if(3 == executionStatusVal) {
+					return "<span style='color:red;'>异常中断</span>";
+				}
+				return "<span>未知状态</span>";
+			}
 		},{
 			title : '任务开始时间',
 			field : 'startExecutionTime',
