@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.core.Spider;
 import org.spiderflow.core.context.SpiderContext;
-import org.spiderflow.core.job.SpiderJob;
+import org.spiderflow.core.job.SpiderScheduledJob;
 import org.spiderflow.core.job.SpiderJobContext;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.model.SpiderJobHistory;
@@ -41,7 +41,7 @@ public class SpiderRestController {
 	private String workspace;
 
 	@Autowired
-	private SpiderJob spiderJob;
+	private SpiderScheduledJob spiderScheduledJob;
 
 	@Autowired
 	private SpiderJobHistoryService spiderJobHistoryService;
@@ -59,7 +59,7 @@ public class SpiderRestController {
 			return new JsonBean<>(0, "找不到此爬虫信息");
 		}
 		Object shitObject = new Object();
-		IdentifierGenerator identifierGenerator = spiderJob.getIdentifierGenerator();
+		IdentifierGenerator identifierGenerator = spiderScheduledJob.getIdentifierGenerator();
 		String jobHistoryId = identifierGenerator.nextId(shitObject).toString();
 		SpiderJobHistory spiderJobHistory = new SpiderJobHistory();
 		spiderJobHistory.setId(jobHistoryId);
@@ -73,7 +73,7 @@ public class SpiderRestController {
 			}
 		});
 		Spider.executorInstance.submit(() -> {
-			spiderJob.run(flow, spiderJobHistory, null);
+			spiderScheduledJob.run(flow, spiderJobHistory, null);
 		});
 		return new JsonBean<>(jobHistoryId);
 	}
@@ -85,7 +85,7 @@ public class SpiderRestController {
 	 */
 	@RequestMapping("/stop/{jobHistoryId}")
 	public JsonBean<Void> stop(@PathVariable("jobHistoryId") String jobHistoryId) {
-		SpiderContext context = SpiderJob.getSpiderContext(jobHistoryId);
+		SpiderContext context = SpiderScheduledJob.getSpiderContext(jobHistoryId);
 		if (context == null) {
 			return new JsonBean<>(0, "任务不存在！");
 		}
@@ -96,7 +96,7 @@ public class SpiderRestController {
 	@RequestMapping("/remove")
 	public JsonBean<Boolean> remove(String jobHistoryId) {
 		//删除任务记录之前先停止
-		SpiderContext context = SpiderJob.getSpiderContext(jobHistoryId);
+		SpiderContext context = SpiderScheduledJob.getSpiderContext(jobHistoryId);
 		if (context != null) {
 			context.setRunning(false);
 		}
@@ -111,7 +111,7 @@ public class SpiderRestController {
 	 */
 	@RequestMapping("/status/{jobHistoryId}")
 	public JsonBean<Integer> status(@PathVariable("jobHistoryId") String jobHistoryId) {
-		SpiderContext context = SpiderJob.getSpiderContext(jobHistoryId);
+		SpiderContext context = SpiderScheduledJob.getSpiderContext(jobHistoryId);
 		if (context == null) {
 			return new JsonBean<>(0);
 		}
@@ -134,7 +134,7 @@ public class SpiderRestController {
 		String flowId = flow.getId();
 		List<SpiderOutput> outputs;
 		Object shitObject = new Object();
-		IdentifierGenerator identifierGenerator = spiderJob.getIdentifierGenerator();
+		IdentifierGenerator identifierGenerator = spiderScheduledJob.getIdentifierGenerator();
 		String jobHistoryId = identifierGenerator.nextId(shitObject).toString();
 		SpiderJobHistory spiderJobHistory = new SpiderJobHistory();
 		spiderJobHistory.setId(jobHistoryId);
@@ -160,5 +160,4 @@ public class SpiderRestController {
 		}
 		return new JsonBean<>(outputs);
 	}
-
 }

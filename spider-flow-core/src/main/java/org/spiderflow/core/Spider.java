@@ -124,7 +124,7 @@ public class Spider {
 		//存入到上下文中，以供后续检测
 		context.put(ATOMIC_DEAD_CYCLE, executeCount);
 		//执行根节点
-		boolean result = executeRoot(root, context, new HashMap<>());
+		executeRoot(root, context, new HashMap<>());
 		//当爬虫任务执行完毕时,判断是否超过预期
 		if (executeCount.get() > deadCycle) {
 			logger.error("检测到可能出现死循环,测试终止");

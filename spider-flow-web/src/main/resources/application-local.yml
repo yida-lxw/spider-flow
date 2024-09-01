@@ -8,7 +8,7 @@ spider:
     error-rate: 1.0E-4
   job:
     #是否开启爬虫定时任务
-    enable: true
+    enable: false
 
 spring:
   datasource:
@@ -30,6 +30,20 @@ spring:
       # 连接的事务是否自动提交,默认为true
       auto-commit: true
       connection-test-query: select 1 from dual
+
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    # 连接超时时间(单位:毫秒)
+    timeout: 5000
+    lettuce:
+      pool:
+        max-active: 20
+        max-wait: 6000
+        max-idle: 5
+        min-idle: 0
+
   mail:
     default-encoding: UTF-8
     host: smtp.qq.com

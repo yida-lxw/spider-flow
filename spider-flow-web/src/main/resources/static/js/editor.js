@@ -306,7 +306,7 @@ $(function () {
 					id: id
 				},
 				success: function (data) {
-					if (data.code == 1) {
+					if (data.code == 200) {
 						if (data.data.length > 0) {
 							var array = [];
 							for (var i = data.data.length - 1; i >= 0; i--) {

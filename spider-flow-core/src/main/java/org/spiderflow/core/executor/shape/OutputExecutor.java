@@ -229,11 +229,16 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 			if (printer != null) {
 				try {
 					printer.flush();
-					printer.close();
 					this.cachePrinter.remove(entry.getKey());
 				} catch (IOException e) {
 					logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
 					ExceptionUtils.wrapAndThrow(e);
+				} finally {
+					try {
+						printer.close();
+					} catch (Exception e) {
+						logger.error("As closing the printer occur exception:\n{}.", e.getMessage());
+					}
 				}
 			}
 		}
