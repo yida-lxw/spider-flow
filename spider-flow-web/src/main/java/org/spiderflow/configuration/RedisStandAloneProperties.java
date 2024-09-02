@@ -1,6 +1,7 @@
 package org.spiderflow.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.PropertySource;
@@ -12,10 +13,10 @@ import org.springframework.stereotype.Component;
  * @date 2024-09-01 21:45
  * @description Redis单机版配置项
  */
-@Component
 @Configuration
 @DependsOn("springContextUtils")
 @PropertySource(value = "classpath:application.yml", factory = YmlPropertySourceFactory.class)
+@ConditionalOnProperty(name = "redis.stand-alone.enabled", havingValue = "true", matchIfMissing = false)
 public class RedisStandAloneProperties {
 	@Value("${spring.redis.host}")
 	private String host;

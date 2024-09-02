@@ -2,6 +2,7 @@ package org.spiderflow.configuration;
 
 import org.spiderflow.core.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.PropertySource;
@@ -21,10 +22,10 @@ import java.util.Set;
  * @date 2024-09-01 21:46
  * @description Redis集群版配置项
  */
-@Component
 @Configuration
 @DependsOn("springContextUtils")
 @PropertySource(value = "classpath:application.yml", factory = YmlPropertySourceFactory.class)
+@ConditionalOnProperty(name = "redis.cluster.enabled", havingValue = "true", matchIfMissing = false)
 public class RedisClusterProperties {
 	@Value("${spring.redis.cluster.nodes}")
 	private List<String> nodes;
