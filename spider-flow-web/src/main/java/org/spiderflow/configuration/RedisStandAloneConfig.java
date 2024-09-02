@@ -3,6 +3,7 @@ package org.spiderflow.configuration;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
@@ -104,6 +105,10 @@ public class RedisStandAloneConfig {
 		template.setConnectionFactory(redisConnectionFactory);
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+		// 配置 ObjectMapper，在遇到未知属性时不会抛出异常。
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		//禁止添加类名
+		objectMapper.deactivateDefaultTyping();
 		objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,
 				ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
 		// 自定义ObjectMapper的时间处理模块

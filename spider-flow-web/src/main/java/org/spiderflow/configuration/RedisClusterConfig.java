@@ -3,6 +3,7 @@ package org.spiderflow.configuration;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
@@ -18,27 +19,20 @@ import io.lettuce.core.ReadFrom;
 import io.lettuce.core.SocketOptions;
 import io.lettuce.core.cluster.ClusterClientOptions;
 import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.spiderflow.core.utils.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.redis.connection.RedisPassword;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.lettuce.DefaultLettucePool;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.connection.lettuce.LettucePool;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.data.redis.support.collections.RedisProperties;
 
 import javax.annotation.Resource;
 import java.time.Duration;
@@ -46,7 +40,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Set;
 
 /**
  * @author yida
@@ -84,7 +77,14 @@ public class RedisClusterConfig {
 				.clientOptions(clusterClientOptions)
 				.readFrom(ReadFrom.SLAVE_PREFERRED)
 				.build();
-		return new LettuceConnectionFactory(redisClusterConfiguration, clientConfig);
+		LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(redisClusterConfiguration, clientConfig);
+		lettuceConnectionFactory.setShareNativeConnection(redisClusterProperties.isShareNativeConnection());
+		lettuceConnectionFactory.setValidateConnection(redisClusterProperties.isValidConnection());
+		lettuceConnectionFactory.setDatabase(redisClusterProperties.getDatabase());
+		lettuceConnectionFactory.setShutdownTimeout(redisClusterProperties.getShutDownTimeout());
+		lettuceConnectionFactory.setTimeout(redisClusterProperties.getConnectTimeout());
+		lettuceConnectionFactory.setUseSsl(false);
+		return lettuceConnectionFactory;
 	}
 
 	@Bean
@@ -103,6 +103,10 @@ public class RedisClusterConfig {
 		template.setConnectionFactory(lettuceConnectionFactory);
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+		// 配置 ObjectMapper，在遇到未知属性时不会抛出异常。
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		//禁止添加类名
+		objectMapper.deactivateDefaultTyping();
 		objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,
 				ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
 		// 自定义ObjectMapper的时间处理模块
