@@ -13,12 +13,22 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import io.lettuce.core.ClientOptions;
+import io.lettuce.core.ReadFrom;
+import io.lettuce.core.SocketOptions;
+import io.lettuce.core.cluster.ClusterClientOptions;
+import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.spiderflow.core.utils.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisClusterConfiguration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisNode;
+import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.DefaultLettucePool;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
@@ -28,6 +38,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.support.collections.RedisProperties;
 
 import javax.annotation.Resource;
 import java.time.Duration;
@@ -35,73 +46,61 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Set;
 
 /**
  * @author yida
  * @package org.spiderflow.configuration
  * @date 2024-09-01 21:38
- * @description Redis单机版配置
+ * @description Redis集群版配置
  */
 @EnableCaching
 @Configuration
-@ConditionalOnProperty(name = "redis.stand-alone.enabled", havingValue = "true", matchIfMissing = false)
-public class RedisStandAloneConfig {
+@ConditionalOnProperty(name = "redis.cluster.enabled", havingValue = "true", matchIfMissing = false)
+public class RedisClusterConfig {
 	@Resource
-	private RedisStandAloneProperties redisStandAloneProperties;
+	private RedisClusterProperties redisClusterProperties;
 
 	@Bean
-	public RedisStandaloneConfiguration redisStandaloneConfiguration() {
-		RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-		redisStandaloneConfiguration.setHostName(redisStandAloneProperties.getHost());
-		redisStandaloneConfiguration.setPort(redisStandAloneProperties.getPort());
-		redisStandaloneConfiguration.setDatabase(redisStandAloneProperties.getDatabase());
-		String password = redisStandAloneProperties.getPassword();
-		if(StringUtils.isNotEmpty(password)) {
-			redisStandaloneConfiguration.setPassword(password);
+	public RedisConnectionFactory lettuceConnectionFactory(RedisClusterConfiguration redisClusterConfiguration) {
+		// 配置用于开启自适应刷新和定时刷新。如自适应刷新不开启，Redis集群变更时将会导致连接异常
+		ClusterTopologyRefreshOptions clusterTopologyRefreshOptions = ClusterTopologyRefreshOptions.builder()
+				// 开启周期刷新(默认60秒)
+				.enablePeriodicRefresh(Duration.ofSeconds(60))
+				// 开启自适应刷新
+				.enableAdaptiveRefreshTrigger(ClusterTopologyRefreshOptions.RefreshTrigger.ASK_REDIRECT,
+						ClusterTopologyRefreshOptions.RefreshTrigger.UNKNOWN_NODE)
+				.build();
+		ClusterClientOptions clusterClientOptions = ClusterClientOptions.builder()
+				//拓扑刷新
+				.topologyRefreshOptions(clusterTopologyRefreshOptions)
+				.disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)
+				.autoReconnect(true)
+				.socketOptions(SocketOptions.builder().keepAlive(true).build())
+				// 取消校验集群节点的成员关系
+				.validateClusterNodeMembership(false)
+				.build();
+		LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
+				.clientOptions(clusterClientOptions)
+				.readFrom(ReadFrom.SLAVE_PREFERRED)
+				.build();
+		return new LettuceConnectionFactory(redisClusterConfiguration, clientConfig);
+	}
+
+	@Bean
+	public RedisClusterConfiguration redisClusterConfiguration() {
+		RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration(redisClusterProperties.getNodes());
+		String password = redisClusterProperties.getPassword();
+		if (StringUtils.isNotEmpty(password)) {
+			redisClusterConfiguration.setPassword(RedisPassword.of(password));
 		}
-		return redisStandaloneConfiguration;
+		return redisClusterConfiguration;
 	}
 
 	@Bean
-	public LettuceClientConfiguration clientConfig() {
-		LettuceConnectionFactory.MutableLettuceClientConfiguration mutableLettuceClientConfiguration = new LettuceConnectionFactory.MutableLettuceClientConfiguration();
-		mutableLettuceClientConfiguration.setTimeout(redisStandAloneProperties.getCommandTimeout());
-		mutableLettuceClientConfiguration.setShutdownTimeout(redisStandAloneProperties.getShutDownTimeout());
-		return mutableLettuceClientConfiguration;
-	}
-
-	@Bean
-	public LettucePool lettucePool(GenericObjectPoolConfig poolConfig) {
-		DefaultLettucePool lettucePool = new DefaultLettucePool(redisStandAloneProperties.getHost(),
-				redisStandAloneProperties.getPort(), poolConfig);
-		return lettucePool;
-	}
-
-	@Bean
-	public GenericObjectPoolConfig<Object> poolConfig() {
-		GenericObjectPoolConfig<Object> poolConfig = new GenericObjectPoolConfig<>();
-		poolConfig.setMaxTotal(redisStandAloneProperties.getMaxTotal());
-		poolConfig.setMaxIdle(redisStandAloneProperties.getMaxIdle());
-		poolConfig.setMinIdle(redisStandAloneProperties.getMinIdle());
-		poolConfig.setMaxWaitMillis(redisStandAloneProperties.getMaxWait());
-		poolConfig.setTimeBetweenEvictionRuns(Duration.ofMillis(redisStandAloneProperties.getTimeBetweenEvictionRuns()));
-		return poolConfig;
-	}
-
-	@Bean
-	public LettuceConnectionFactory redisConnectionFactory(RedisStandaloneConfiguration redisStandaloneConfiguration,
-														   LettuceClientConfiguration clientConfig, LettucePool lettucePool) {
-		LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(redisStandaloneConfiguration, clientConfig, lettucePool);
-		connectionFactory.setValidateConnection(redisStandAloneProperties.isValidConnection());
-		connectionFactory.setTimeout(redisStandAloneProperties.getConnectTimeout());
-		connectionFactory.setShareNativeConnection(redisStandAloneProperties.isShareNativeConnection());
-		return connectionFactory;
-	}
-
-	@Bean
-	public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory redisConnectionFactory) {
+	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory lettuceConnectionFactory) {
 		RedisTemplate<String, Object> template = new RedisTemplate<>();
-		template.setConnectionFactory(redisConnectionFactory);
+		template.setConnectionFactory(lettuceConnectionFactory);
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
 		objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,
@@ -134,7 +133,7 @@ public class RedisStandAloneConfig {
 	}
 
 	@Bean
-	public StringRedisTemplate stringRedisTemplate(LettuceConnectionFactory redisConnectionFactory) {
-		return new StringRedisTemplate(redisConnectionFactory);
+	public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory lettuceConnectionFactory) {
+		return new StringRedisTemplate(lettuceConnectionFactory);
 	}
 }

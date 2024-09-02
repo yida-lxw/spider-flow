@@ -73,6 +73,12 @@ spring:
     protocol: smtp
     username: xxxx@qq.com
 
+redis:
+  stand-alone:
+    enabled: false
+  cluster:
+    enabled: true
+
 websocket:
   scheduled-cron: 0/30 * * * * ?
   thread-pool:

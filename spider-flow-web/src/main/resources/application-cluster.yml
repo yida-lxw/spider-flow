@@ -32,8 +32,9 @@ spring:
       connection-test-query: select 1 from dual
 
   redis:
-    host: 127.0.0.1
-    port: 6379
+    cluster:
+      nodes:
+        - 192.168.0.56:6379
     password: 1111
     database: 0
     # 命令执行超时时间(单位:毫秒)
@@ -53,6 +54,11 @@ spring:
         time-between-eviction-runs: 1
       #Redis客户端关闭超时时间(单位:毫秒)
       shutdown-timeout: 10000
+      cluster:
+        refresh:
+          adaptive: true
+          period: 60
+
 
   mail:
     default-encoding: UTF-8
@@ -75,9 +81,9 @@ spring:
 
 redis:
   stand-alone:
-    enabled: true
-  cluster:
     enabled: false
+  cluster:
+    enabled: true
 
 websocket:
   scheduled-cron: 0/30 * * * * ?
