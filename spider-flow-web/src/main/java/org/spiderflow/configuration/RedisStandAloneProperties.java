@@ -29,6 +29,22 @@ public class RedisStandAloneProperties {
 	@Value("${spring.redis.database}")
 	private int database;
 
+	/**命令执行超时时间(单位:毫秒)*/
+	@Value("${spring.redis.timeout}")
+	private long commandTimeout;
+
+	/**连接超时时间(单位:毫秒)*/
+	@Value("${spring.redis.connect-timeout}")
+	private long connectTimeout;
+
+	/**是否验证连接*/
+	@Value("${spring.redis.valid-connection}")
+	private boolean validConnection;
+
+	/**是否共享连接*/
+	@Value("${spring.redis.share-native-connection}")
+	private boolean shareNativeConnection;
+
 	@Value("${spring.redis.lettuce.pool.max-total}")
 	private int maxTotal;
 
@@ -40,6 +56,13 @@ public class RedisStandAloneProperties {
 
 	@Value("${spring.redis.lettuce.pool.max-wait}")
 	private long maxWait;
+
+	@Value("${spring.redis.lettuce.pool.time-between-eviction-runs}")
+	private long timeBetweenEvictionRuns;
+
+	/**Redis客户端关闭超时时间(单位:毫秒)*/
+	@Value("${spring.redis.lettuce.shutdown-timeout}")
+	private long shutDownTimeout;
 
 	public String getHost() {
 		return host;
@@ -103,5 +126,53 @@ public class RedisStandAloneProperties {
 
 	public void setMaxWait(long maxWait) {
 		this.maxWait = maxWait;
+	}
+
+	public long getTimeBetweenEvictionRuns() {
+		return timeBetweenEvictionRuns;
+	}
+
+	public void setTimeBetweenEvictionRuns(long timeBetweenEvictionRuns) {
+		this.timeBetweenEvictionRuns = timeBetweenEvictionRuns;
+	}
+
+	public long getCommandTimeout() {
+		return commandTimeout;
+	}
+
+	public void setCommandTimeout(long commandTimeout) {
+		this.commandTimeout = commandTimeout;
+	}
+
+	public long getConnectTimeout() {
+		return connectTimeout;
+	}
+
+	public void setConnectTimeout(long connectTimeout) {
+		this.connectTimeout = connectTimeout;
+	}
+
+	public boolean isValidConnection() {
+		return validConnection;
+	}
+
+	public void setValidConnection(boolean validConnection) {
+		this.validConnection = validConnection;
+	}
+
+	public boolean isShareNativeConnection() {
+		return shareNativeConnection;
+	}
+
+	public void setShareNativeConnection(boolean shareNativeConnection) {
+		this.shareNativeConnection = shareNativeConnection;
+	}
+
+	public long getShutDownTimeout() {
+		return shutDownTimeout;
+	}
+
+	public void setShutDownTimeout(long shutDownTimeout) {
+		this.shutDownTimeout = shutDownTimeout;
 	}
 }

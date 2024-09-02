@@ -36,12 +36,23 @@ spring:
     port: 6379
     password: 1111
     database: 0
+    # 命令执行超时时间(单位:毫秒)
+    timeout: 5000
+    # 连接超时时间(单位:毫秒)
+    connect-timeout: 3000
+    # 是否验证连接
+    valid-connection: true
+    # 是否共享连接
+    share-native-connection: true
     lettuce:
       pool:
         max-total: 20
         max-wait: 6000
         max-idle: 5
         min-idle: 0
+        time-between-eviction-runs: 1
+      #Redis客户端关闭超时时间(单位:毫秒)
+      shutdown-timeout: 10000
 
   mail:
     default-encoding: UTF-8
