@@ -25,6 +25,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceClientConfigurat
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettucePool;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -129,5 +130,10 @@ public class RedisStandAloneConfig extends CachingConfigurerSupport {
 		template.setHashValueSerializer(jackson2JsonRedisSerializer);
 		template.afterPropertiesSet();
 		return template;
+	}
+
+	@Bean
+	public StringRedisTemplate stringRedisTemplate(LettuceConnectionFactory redisConnectionFactory) {
+		return new StringRedisTemplate(redisConnectionFactory);
 	}
 }

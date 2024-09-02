@@ -1,7 +1,11 @@
 package org.spiderflow.service;
 
+import org.spiderflow.common.config.CustomClassPathResource;
 import org.spiderflow.core.service.RedisService;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -20,6 +24,9 @@ import java.util.concurrent.TimeUnit;
 public class RedisServiceImpl implements RedisService {
 	@Resource
 	private RedisTemplate<String, Object> redisTemplate;
+
+	@Resource
+	private StringRedisTemplate stringRedisTemplate;
 
 	@Override
 	public void set(String key, Object value, long expireTime) {
@@ -197,5 +204,26 @@ public class RedisServiceImpl implements RedisService {
 	@Override
 	public Long lRemove(String key, long count, Object value) {
 		return redisTemplate.opsForList().remove(key, count, value);
+	}
+
+	/**
+	 * @param luaFileName
+	 * @param keyList
+	 * @return String
+	 * @description 执行Lua脚本，返回String字符串
+	 * @author yida
+	 * @date 2023-05-22 16:39:33
+	 */
+	public String runLuaScript(String luaFileName, List<String> keyList, Object[] args) {
+		DefaultRedisScript<String> redisScript = new DefaultRedisScript<>();
+		redisScript.setScriptSource(new ResourceScriptSource(new CustomClassPathResource("/lua/" + luaFileName, this.getClass())));
+		redisScript.setResultType(String.class);
+		String result = "";
+		try {
+			result = stringRedisTemplate.execute(redisScript, keyList, args);
+		} catch (Exception e) {
+			throw new IllegalStateException("Lua running abnormally");
+		}
+		return result;
 	}
 }
