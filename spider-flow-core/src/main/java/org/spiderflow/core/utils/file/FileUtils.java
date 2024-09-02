@@ -1198,7 +1198,7 @@ public class FileUtils {
 			long finalEndTime = endTime;
 			String finalSourceFolder = sourceFolder;
 			String finalTargetFolder = targetFolder;
-			FileWalkUtils.walkFileTree(sourceFolderPath,
+			Files.walkFileTree(sourceFolderPath,
 					new SimpleFileVisitor<Path>() {
 						@Override
 						public FileVisitResult visitFile(Path path,
@@ -1245,8 +1245,7 @@ public class FileUtils {
 						public FileVisitResult visitFileFailed(Path path, IOException exc) throws IOException {
 							return FileVisitResult.CONTINUE;
 						}
-					},
-					null
+					}
 			);
 		} catch (Exception e) {
 			logger.error("While traversing all files in the specified directory:[{}] for the file copy,an exception occurred:\n{}",
@@ -1287,7 +1286,7 @@ public class FileUtils {
 			Path sourceFolderPath = new File(sourceFolder).toPath();
 			long finalStartTime = startTime;
 			long finalEndTime = endTime;
-			FileWalkUtils.walkFileTree(sourceFolderPath,
+			Files.walkFileTree(sourceFolderPath,
 					new SimpleFileVisitor<Path>() {
 						@Override
 						public FileVisitResult visitFile(Path path,
@@ -1337,8 +1336,7 @@ public class FileUtils {
 						public FileVisitResult visitFileFailed(Path path, IOException exc) throws IOException {
 							return FileVisitResult.CONTINUE;
 						}
-					},
-					null
+					}
 			);
 		} catch (Exception e) {
 			logger.error("While traversing all files in the specified directory:[{}] for the file count,an exception occurred:\n{}",

@@ -2,7 +2,7 @@ package org.spiderflow.configuration;
 
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.spiderflow.core.utils.StringUtils;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -23,22 +23,25 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableCaching
 @Configuration
 public class RedisStandAloneConfig extends CachingConfigurerSupport {
+	@Autowired
+	private RedisStandAloneProperties redisStandAloneProperties;
+
 	@Bean
-	public LettuceConnectionFactory redisConnectionFactory(RedisProperties redisProperties) {
+	public LettuceConnectionFactory redisConnectionFactory() {
 		RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-		redisStandaloneConfiguration.setHostName(redisProperties.getHost());
-		redisStandaloneConfiguration.setPort(redisProperties.getPort());
-		redisStandaloneConfiguration.setDatabase(redisProperties.getDatabase());
-		String password = redisProperties.getPassword();
+		redisStandaloneConfiguration.setHostName(redisStandAloneProperties.getHost());
+		redisStandaloneConfiguration.setPort(redisStandAloneProperties.getPort());
+		redisStandaloneConfiguration.setDatabase(redisStandAloneProperties.getDatabase());
+		String password = redisStandAloneProperties.getPassword();
 		if(StringUtils.isNotEmpty(password)) {
 			redisStandaloneConfiguration.setPassword(password);
 		}
 		// 配置Redis连接池
 		GenericObjectPoolConfig<Object> poolConfig = new GenericObjectPoolConfig<>();
-		poolConfig.setMaxTotal(10);
-		poolConfig.setMaxIdle(5);
-		poolConfig.setMinIdle(1);
-		poolConfig.setMaxWaitMillis(2000);
+		poolConfig.setMaxTotal(redisStandAloneProperties.getMaxTotal());
+		poolConfig.setMaxIdle(redisStandAloneProperties.getMaxIdle());
+		poolConfig.setMinIdle(redisStandAloneProperties.getMinIdle());
+		poolConfig.setMaxWaitMillis(redisStandAloneProperties.getMaxWait());
 
 		LettucePoolingClientConfiguration lettucePoolingClientConfiguration =
 				LettucePoolingClientConfiguration.builder()

@@ -20,7 +20,9 @@ public class Constants {
 	public static final String BOOLEAN_TRUE = "true";
 	public static final String BOOLEAN_FALSE = "false";
 	public static final String EMPTY_STRING = "";
+	public static final String DOT = ".";
 	public static final String ASTERISK = "*";
+	public static final String HYPHEN = "-";
 	public static final String UNDERSCORE = "_";
 	public static final String POUNG_SIGN = "#";
 	public static final String PERCENTAGE_SIGN = "%";

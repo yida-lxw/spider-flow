@@ -11,7 +11,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import java.io.IOException;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages={"org.spiderflow"})
 @EnableScheduling
 @EnableAsync
 @MapperScan(basePackages = {"org.spiderflow.mapper", "org.spiderflow.**.mapper"})

@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @description 全局线程池
  */
 public class GlobalThreadPool {
-	private static Logger logger = LoggerFactory.getLogger(GlobalThreadPool.class);
+	private static final Logger logger = LoggerFactory.getLogger(GlobalThreadPool.class);
 	private ExecutorService executorService;
 
 	private final ReentrantLock lock = new ReentrantLock();

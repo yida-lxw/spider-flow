@@ -34,12 +34,11 @@ spring:
   redis:
     host: 127.0.0.1
     port: 6379
+    password: 1111
     database: 0
-    # 连接超时时间(单位:毫秒)
-    timeout: 5000
     lettuce:
       pool:
-        max-active: 20
+        max-total: 20
         max-wait: 6000
         max-idle: 5
         min-idle: 0
