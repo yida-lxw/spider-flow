@@ -116,11 +116,11 @@ public class SpiderJobNodeExecutionStatus {
 		this.loopTimes = loopTimes;
 	}
 
-	public int getHadLoopTimes() {
+	public AtomicInteger getHadLoopTimes() {
 		return hadLoopTimes;
 	}
 
-	public void setHadLoopTimes(int hadLoopTimes) {
+	public void setHadLoopTimes(AtomicInteger hadLoopTimes) {
 		this.hadLoopTimes = hadLoopTimes;
 	}
 
