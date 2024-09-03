@@ -31,6 +31,12 @@ public class SpiderJobNodeExecutionStatus {
 	 * 当前节点是否已经执行完毕
 	 */
 	private boolean completed;
+
+	/**
+	 * 当前节点是否处于暂停状态
+	 */
+	private boolean paused;
+
 	/**
 	 * 需要循环执行的次数
 	 */
@@ -106,6 +112,14 @@ public class SpiderJobNodeExecutionStatus {
 
 	public void setCompleted(boolean completed) {
 		this.completed = completed;
+	}
+
+	public boolean isPaused() {
+		return paused;
+	}
+
+	public void setPaused(boolean paused) {
+		this.paused = paused;
 	}
 
 	public int getLoopTimes() {
