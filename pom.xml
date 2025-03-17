@@ -45,6 +45,9 @@
         <commons-io.version>2.7</commons-io.version>
         <commons-codec.version>1.17.1</commons-codec.version>
         <commons-pool2.version>2.12.0</commons-pool2.version>
+        <command4j.version>2.0.0-RELEASE</command4j.version>
+        <httpclient.version>4.5.14</httpclient.version>
+        <commons-fileupload.version>1.5</commons-fileupload.version>
         <guava.version>33.3.0-jre</guava.version>
         <jsoup.version>1.18.1</jsoup.version>
         <xsoup.version>0.3.7</xsoup.version>
@@ -674,6 +677,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.github.jazzhow</groupId>
+            <artifactId>command4j</artifactId>
+            <version>${command4j.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
@@ -693,6 +702,23 @@
                     <artifactId>jsoup</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>${httpclient.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>${commons-fileupload.version}</version>
         </dependency>
 
         <dependency>
@@ -729,6 +755,7 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>3.0.22</version>
+            <type>pom</type>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>

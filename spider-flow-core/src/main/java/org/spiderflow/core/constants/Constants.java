@@ -12,6 +12,17 @@ import java.math.BigDecimal;
 public class Constants {
 	public static final String DEFAULT_CHARSET = "UTF-8";
 	public static final String DEFAULT_USER_TIMEZONE = "Asia/Shanghai";
+
+	/**
+	 * Http请求头：Content-Type
+	 */
+	public static final String CONTENT_TYPE_HEADER_KEY = "Content-Type";
+
+	/**
+	 * 缓冲区大小(单位:byte)
+	 */
+	public static final int DEFAULT_BUFFER_SIZE = 1024 * 1024;
+
 	/**
 	 * 默认项目运行环境:dev
 	 */
@@ -42,13 +53,19 @@ public class Constants {
 
 	public static final long DEFAULT_KEEP_ALIVE_TIME = 60000L;
 
-	/**CPU核数*/
+	/**
+	 * CPU核数
+	 */
 	public static final int DEFAULT_CORE_SIZE = Runtime.getRuntime().availableProcessors();
 
-	/**线程池默认最大线程数*/
+	/**
+	 * 线程池默认最大线程数
+	 */
 	public static final int DEFAULT_MAX_POOL_SIZE = DEFAULT_CORE_SIZE * 2 + 1;
 
-	/**队列默认容量*/
+	/**
+	 * 队列默认容量
+	 */
 	public static final int DEFAULT_QUEUE_CAPACITY = 1024;
 	public static final int DEFAULT_MAX_RETRY_TIMES = 3;
 	public static final int DEFAULT_RETRY_TIMES_MAP_SIZE = 1024;
@@ -131,7 +148,24 @@ public class Constants {
 	public static final String THREAD_POOL_NAME_PREFIX = "spider-flow-";
 
 	/**
+	 * 网页title元素值的key
+	 */
+	public static final String TITLE_VARAIABLE_NAME = "htmlTitle";
+
+	/**
 	 * 连续多久没有接收到心跳包，则判定Websocket Client已经断线,默认为10秒(单位:毫秒)
 	 */
 	public static final long MAX_INTERVAL_OF_NOT_RECIEVING_HEARTBEAT_PACKET = 10000;
+
+	public static final String CSS_LINK_TEMPLATE = "<link href=\"${cssUrl}\" type=\"text/css\" rel=\"styleSheet\"/>";
+
+	public static final String HTML_TEMPLATE = "<html lang=\"en\">\n" +
+			"\t<head>\n" +
+			"\t\t<title>${title}</title>\n" +
+			"\t\t${cssContent}\n" +
+			"\t</head>\n" +
+			"\t<body>\n" +
+			"\t${htmlContent}\n" +
+			"\t</body>\n" +
+			"</html>";
 }

@@ -1,12 +1,12 @@
 package org.spiderflow.core.utils;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.core.constants.Constants;
-
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
@@ -16,18 +16,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Stack;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,6 +52,12 @@ public class StringUtils {
 
 	private static final Pattern trimRegex = Pattern.compile("(^[ |　| |\\s]*)|([ |　| |\\s]*$)");
 
+	private static final String dateTimePattern = "(\\d{4}[-./年])(\\d{1,2}[-./月])?(\\d{1,2}[日]?)?\\s*(\\d{1,2}:\\d{1,2}(:\\d{1,2})?)?";
+
+	private static final String integerPattern = "-?\\d+(?:,\\d+)*";
+
+	private static final String doublePattern = "-?\\d+(?:,\\d+)*(?:\\.\\d+)?";
+
 	/**
 	 * 判断指定字符串是否为null或空字符串
 	 *
@@ -81,6 +76,38 @@ public class StringUtils {
 	 */
 	public static <T extends CharSequence> boolean isNotEmpty(T source) {
 		return !isEmpty(source);
+	}
+
+	/**
+	 * @param orignalText
+	 * @param preffix
+	 * @return boolean
+	 * @description 判断字符串是否以指定前缀开头(忽略大小写)
+	 * @author yida
+	 * @date 2024-09-23 14:02:14
+	 */
+	public static boolean startsWithIgnoreCase(String orignalText, String preffix, boolean ignoreCase) {
+		if (isEmpty(orignalText) || isEmpty(preffix)) {
+			return false;
+		}
+		if (!ignoreCase) {
+			return orignalText.startsWith(preffix);
+		}
+		orignalText = orignalText.toLowerCase();
+		preffix = preffix.toLowerCase();
+		return orignalText.startsWith(preffix);
+	}
+
+	/**
+	 * @param orignalText
+	 * @param preffix
+	 * @return boolean
+	 * @description 判断字符串是否以指定前缀开头(忽略大小写)
+	 * @author yida
+	 * @date 2024-09-23 14:02:14
+	 */
+	public static boolean startsWithIgnoreCase(String orignalText, String preffix) {
+		return startsWithIgnoreCase(orignalText, preffix, true);
 	}
 
 	/**
@@ -3210,5 +3237,617 @@ public class StringUtils {
 			}
 		}
 		return slashMatcher.start();
+	}
+
+	/**
+	 * @param content
+	 * @param desiredLength
+	 * @return String
+	 * @description 字符串左侧添加前导零
+	 * @author yida
+	 * @date 2024-09-19 17:59:41
+	 */
+	public static String leftPad(String content, int desiredLength) {
+		return content != null ? String.format("%0" + desiredLength + "s", content) : null;
+	}
+
+	/**
+	 * @param num
+	 * @param desiredLength
+	 * @return String
+	 * @description 数字左侧添加前导零
+	 * @author yida
+	 * @date 2024-09-19 18:01:02
+	 */
+	public static String leftPad(int num, int desiredLength) {
+		return String.format("%0" + desiredLength + "d", num);
+	}
+
+	/**
+	 * 驼峰命名的字符串转为下划线大写的方式
+	 *
+	 * @param orignalText
+	 * @return
+	 */
+	public static String camelCaseToUnderline(String orignalText) {
+		StringBuilder result = new StringBuilder();
+		if (orignalText != null && orignalText.length() > 0) {
+			result.append(orignalText.substring(0, 1).toUpperCase());
+			for (int i = 1; i < orignalText.length(); i++) {
+				String s = orignalText.substring(i, i + 1);
+				if (s.equals(s.toUpperCase()) &&
+						!Character.isDigit(s.charAt(0))) {
+					result.append("_");
+				}
+				result.append(s.toUpperCase());
+			}
+		}
+		return result.toString();
+	}
+
+	/**
+	 * 将下划线大写方式命名的字符串转换为驼峰式。如果转
+	 * 换前的下划线大写方式命名的字符串为空，则返回空字符串
+	 *
+	 * @param orignalText 转换前的下划线大写方式命名的字符串
+	 * @return 转换后的驼峰式命名的字符串
+	 */
+	public static String underlineToCamelCase(String orignalText) {
+		StringBuilder result = new StringBuilder();
+		if (orignalText == null || orignalText.isEmpty()) {
+			return "";
+		}
+		if (!orignalText.contains("_")) {
+			return orignalText.toLowerCase();
+		}
+		String[] camels = orignalText.split("_");
+		for (String camel : camels) {
+			if (camel.isEmpty()) {
+				continue;
+			}
+			result.append(camel.substring(0, 1).toUpperCase());
+			result.append(camel.substring(1).toLowerCase());
+		}
+		StringBuilder ret = new StringBuilder(result.substring(0, 1).toLowerCase());
+		ret.append(result.substring(1, result.toString().length()));
+		return ret.toString();
+	}
+
+	/**
+	 * @param url
+	 * @param host
+	 * @return String
+	 * @description 检测URL链接是否包含域名
+	 * @author yida
+	 * @date 2024-09-19 11:52:04
+	 */
+	public static String checkHost(String url, String host) {
+		if (StringUtils.isEmpty(url)) {
+			return null;
+		}
+		if (url.startsWith("https://")) {
+			return url;
+		}
+		if (url.startsWith("http://")) {
+			return url;
+		}
+		if (url.startsWith("/")) {
+			if (host.endsWith("/")) {
+				host = host.substring(0, host.length() - 1);
+			}
+			return host + url;
+		} else {
+			if (!host.endsWith("/")) {
+				url = "/" + url;
+			}
+			return host + url;
+		}
+	}
+
+	/**
+	 * @param text
+	 * @return {@link Date}
+	 * @description 从字符串中提取日期
+	 * @author yida
+	 * @date 2024-09-20 15:38:26
+	 */
+	public static List<String> extractDateStrs(String text) {
+		List<String> dateStringList = new ArrayList<>();
+		if (isEmpty(text)) {
+			return dateStringList;
+		}
+		text = text.replaceAll("年\\s+", "年");
+		text = text.replaceAll("月\\s+", "月");
+		text = text.replaceAll("\\s+年", "年");
+		text = text.replaceAll("\\s+月", " ").trim();
+		Pattern pattern = Pattern.compile(dateTimePattern);
+		Matcher matcher = pattern.matcher(text);
+		// 查找所有匹配的日期时间
+		while (matcher.find()) {
+			dateStringList.add(matcher.group());
+		}
+		return dateStringList;
+	}
+
+	/**
+	 * @param text
+	 * @return {@link Date}
+	 * @description 从字符串中提取日期
+	 * @author yida
+	 * @date 2024-09-20 15:38:26
+	 */
+	public static String extractDateStr(String text, int index) {
+		if (isEmpty(text)) {
+			return null;
+		}
+		text = text.replaceAll("年\\s+", "年");
+		text = text.replaceAll("月\\s+", "月");
+		text = text.replaceAll("\\s+年", "年");
+		text = text.replaceAll("\\s+月", " ").trim();
+		Pattern pattern = Pattern.compile(dateTimePattern);
+		Matcher matcher = pattern.matcher(text);
+		String dateString = null;
+		int curIndex = 0;
+		// 查找所有匹配的日期时间
+		while (matcher.find()) {
+			String matchedResult = matcher.group();
+			if (index == curIndex) {
+				dateString = matchedResult;
+				break;
+			}
+			curIndex++;
+		}
+		return dateString;
+	}
+
+	/**
+	 * @param text
+	 * @return {@link Date}
+	 * @description 从字符串中提取日期
+	 * @author yida
+	 * @date 2024-09-20 15:38:26
+	 */
+	public static String extractFirstDateStr(String text) {
+		if (isEmpty(text)) {
+			return null;
+		}
+		text = text.replaceAll("年\\s+", "年");
+		text = text.replaceAll("月\\s+", "月");
+		text = text.replaceAll("\\s+年", "年");
+		text = text.replaceAll("\\s+月", " ").trim();
+		Pattern pattern = Pattern.compile(dateTimePattern);
+		Matcher matcher = pattern.matcher(text);
+		String dateString = null;
+		// 查找所有匹配的日期时间
+		if (matcher.find()) {
+			dateString = matcher.group();
+		}
+		return dateString;
+	}
+
+	/**
+	 * @param text
+	 * @param index
+	 * @return {@link Date}
+	 * @description 从字符串中提取出日期并转化为java.util.Date
+	 * @author yida
+	 * @date 2024-09-24 15:43:41
+	 */
+	public static Date extractDate(String text, int index) {
+		String dateString = extractDateStr(text, index);
+		if (StringUtils.isEmpty(dateString)) {
+			return null;
+		}
+		return parseStr2Date(dateString);
+	}
+
+	/**
+	 * @return {@link Date}
+	 * @description 从字符串中提取出日期并转化为java.util.Date
+	 * @author yida
+	 * @date 2024-09-24 15:43:41
+	 */
+	public static Date extractFirstDate(String text) {
+		return extractDate(text, 0);
+	}
+
+	/**
+	 * @param text
+	 * @return {@link Date}
+	 * @description 从字符串中提取出日期并转化为java.util.Date
+	 * @author yida
+	 * @date 2024-09-24 15:43:41
+	 */
+	public static List<Date> extractDates(String text) {
+		List<Date> dateList = new ArrayList<>();
+		List<String> dateStringList = extractDateStrs(text);
+		if (null == dateStringList || dateStringList.size() <= 0) {
+			return dateList;
+		}
+		for (String dateString : dateStringList) {
+			Date date = parseStr2Date(dateString);
+			if (null == date) {
+				continue;
+			}
+			dateList.add(date);
+		}
+		return dateList;
+	}
+
+	/**
+	 * @param text
+	 * @return {@link Date}
+	 * @description 从字符串中提取日期
+	 * @author yida
+	 * @date 2024-09-20 15:38:26
+	 */
+	public static String extractDateStr(String text, int index, String formatPattern) {
+		Date date = extractDate(text, index);
+		if (null == date) {
+			return null;
+		}
+		if (StringUtils.isEmpty(formatPattern)) {
+			formatPattern = DateUtils.PATTERN_YYYY_MM_DD;
+		}
+		return DateUtils.format(date, formatPattern);
+	}
+
+	/**
+	 * @param text
+	 * @return {@link Date}
+	 * @description 从字符串中提取日期
+	 * @author yida
+	 * @date 2024-09-20 15:38:26
+	 */
+	public static String extractFirstDateStr(String text, String formatPattern) {
+		return extractDateStr(text, 0, formatPattern);
+	}
+
+	/**
+	 * @param text
+	 * @return {@link Date}
+	 * @description 从字符串中提取日期
+	 * @author yida
+	 * @date 2024-09-20 15:38:26
+	 */
+	public static List<String> extractDateStrs(String text, String formatPattern) {
+		List<String> dateStringList = new ArrayList<>();
+		List<Date> dateList = extractDates(text);
+		if (null == dateList || dateList.size() <= 0) {
+			return dateStringList;
+		}
+		if (StringUtils.isEmpty(formatPattern)) {
+			formatPattern = DateUtils.PATTERN_YYYY_MM_DD;
+		}
+		for (Date date : dateList) {
+			String dateStr = DateUtils.format(date, formatPattern);
+			dateStringList.add(dateStr);
+		}
+		return dateStringList;
+	}
+
+	/**
+	 * @param dateStr
+	 * @return {@link Date}
+	 * @description 将日期字符串解析为java.util.Date
+	 * @author yida
+	 * @date 2024-09-24 15:38:27
+	 */
+	public static Date parseStr2Date(String dateStr) {
+		if (StringUtils.isEmpty(dateStr)) {
+			return null;
+		}
+		List<Integer> numbers = extractIntegers(dateStr);
+		if (null == numbers || numbers.size() <= 0) {
+			return null;
+		}
+		int numSize = numbers.size();
+		if (numSize == 1) {
+			int year = numbers.get(0);
+			return new Date(year - 1900, 0, 1);
+		}
+		if (numSize == 2) {
+			int year = numbers.get(0);
+			int month = numbers.get(1) - 1;
+			return new Date(year - 1900, month, 1);
+		}
+		if (numSize == 3) {
+			int year = numbers.get(0);
+			int month = numbers.get(1) - 1;
+			int day = numbers.get(2);
+			return new Date(year - 1900, month, day);
+		}
+		if (numSize == 4) {
+			int year = numbers.get(0);
+			int month = numbers.get(1) - 1;
+			int day = numbers.get(2);
+			int hour = (numbers.get(3) <= 0) ? 0 : numbers.get(3);
+			return new Date(year - 1900, month, day, hour, 0, 0);
+		}
+		if (numSize == 5) {
+			int year = numbers.get(0);
+			int month = numbers.get(1) - 1;
+			int day = numbers.get(2);
+			int hour = (numbers.get(3) == 0) ? 0 : numbers.get(3);
+			int minute = (numbers.get(4) <= 0) ? 0 : numbers.get(4);
+			return new Date(year - 1900, month, day, hour, minute, 0);
+		}
+		if (numSize == 6) {
+			int year = numbers.get(0);
+			int month = numbers.get(1) - 1;
+			int day = numbers.get(2);
+			int hour = (numbers.get(3) == 0) ? 0 : numbers.get(3);
+			int minute = (numbers.get(4) <= 0) ? 0 : numbers.get(4);
+			int second = (numbers.get(5) <= 0) ? 0 : numbers.get(5);
+			return new Date(year - 1900, month, day, hour, minute, second);
+		}
+		return null;
+	}
+
+	public static String extractFirstIntegerStr(String str) {
+		return extractIntegerStr(str, 0);
+	}
+
+	public static String extractIntegerStr(String str, int index) {
+		List<String> numbers = extractIntegerStrs(str);
+		if (numbers == null || numbers.size() <= 0) {
+			return null;
+		}
+		int numSize = numbers.size();
+		if (index >= numSize) {
+			return null;
+		}
+		return numbers.get(index);
+	}
+
+	public static Integer extractFirstInteger(String str) {
+		return extractInteger(str, 0);
+	}
+
+	public static Integer extractFirstInteger(String str, Integer defaultValue) {
+		return extractInteger(str, 0, defaultValue);
+	}
+
+	public static Integer extractInteger(String str, int index) {
+		return extractInteger(str, index, null);
+	}
+
+	public static Integer extractInteger(String str, int index, Integer defaultValue) {
+		List<String> numbers = extractIntegerStrs(str);
+		if (numbers == null || numbers.size() <= 0) {
+			return null;
+		}
+		int numSize = numbers.size();
+		if (index >= numSize) {
+			return null;
+		}
+		try {
+			String numStr = numbers.get(index);
+			Integer num = Integer.valueOf(numStr);
+			return num;
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+
+	public static List<String> extractIntegerStrs(String str) {
+		if (str == null || str.isEmpty()) {
+			return new ArrayList<>();
+		}
+		String regex = integerPattern;
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(str);
+		List<String> numbers = new ArrayList<>();
+		while (matcher.find()) {
+			String numStr = matcher.group();
+			if (numStr.contains(",")) {
+				numStr = numStr.replace(",", "");
+			}
+			numbers.add(numStr);
+		}
+		return numbers;
+	}
+
+	/**
+	 * @description 从字符串中提取整数
+	 * @author yida
+	 * @date 2024-09-24 16:48:29
+	 * @param str
+	 *
+	 * @return {@link List}
+	 */
+	public static List<Integer> extractIntegers(String str) {
+		if (str == null || str.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		String regex = integerPattern;
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(str);
+		List<Integer> numbers = new ArrayList<>();
+		while (matcher.find()) {
+			String numStr = matcher.group();
+			if (numStr.contains(",")) {
+				numStr = numStr.replace(",", "");
+			}
+			numbers.add(Integer.valueOf(numStr));
+		}
+		return numbers;
+	}
+
+	public static String extractFirstDecimalStr(String str) {
+		return extractDecimalStr(str, 0);
+	}
+
+	public static String extractDecimalStr(String str, int index) {
+		List<String> numbers = extractDecimalStrs(str);
+		if (numbers == null || numbers.size() <= 0) {
+			return null;
+		}
+		int numSize = numbers.size();
+		if (index >= numSize) {
+			return null;
+		}
+		return numbers.get(index);
+	}
+
+	public static Double extractFirstDouble(String str) {
+		return extractDouble(str, 0);
+	}
+
+	public static Double extractFirstDouble(String str, Double defaultValue) {
+		return extractDouble(str, 0, defaultValue);
+	}
+
+	public static Double extractDouble(String str, int index) {
+		return extractDouble(str, index, null);
+	}
+
+	public static Double extractDouble(String str, int index, Double defaultValue) {
+		List<String> numbers = extractDecimalStrs(str);
+		if (numbers == null || numbers.size() <= 0) {
+			return null;
+		}
+		int numSize = numbers.size();
+		if (index >= numSize) {
+			return null;
+		}
+		try {
+			String numStr = numbers.get(index);
+			Double num = Double.valueOf(numStr);
+			return num;
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+
+	public static BigDecimal extractFirstBigDecimal(String str) {
+		return extractBigDecimal(str, 0);
+	}
+
+	public static BigDecimal extractFirstBigDecimal(String str, BigDecimal defaultValue) {
+		return extractBigDecimal(str, 0, defaultValue);
+	}
+
+	public static BigDecimal extractBigDecimal(String str, int index) {
+		return extractBigDecimal(str, index, null);
+	}
+
+	public static BigDecimal extractBigDecimal(String str, int index, BigDecimal defaultValue) {
+		List<String> numbers = extractDecimalStrs(str);
+		if (numbers == null || numbers.size() <= 0) {
+			return null;
+		}
+		int numSize = numbers.size();
+		if (index >= numSize) {
+			return null;
+		}
+		try {
+			String numStr = numbers.get(index);
+			BigDecimal bigDecimal = new BigDecimal(numStr);
+			return bigDecimal;
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+
+	public static List<String> extractDecimalStrs(String str) {
+		if (str == null || str.isEmpty()) {
+			return new ArrayList<>();
+		}
+		String regex = doublePattern;
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(str);
+		List<String> numbers = new ArrayList<>();
+		while (matcher.find()) {
+			String numStr = matcher.group();
+			if (numStr.contains(",")) {
+				numStr = numStr.replace(",", "");
+			}
+			numbers.add(numStr);
+		}
+		return numbers;
+	}
+
+	/**
+	 * @param str
+	 * @return {@link List}
+	 * @description 从字符串中提取小数
+	 * @author yida
+	 * @date 2024-09-24 16:48:29
+	 */
+	public static List<Double> extractDoubles(String str) {
+		if (str == null || str.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		String regex = doublePattern;
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(str);
+		List<Double> numbers = new ArrayList<>();
+		while (matcher.find()) {
+			String numStr = matcher.group();
+			if (numStr.contains(",")) {
+				numStr = numStr.replace(",", "");
+			}
+			numbers.add(Double.valueOf(numStr));
+		}
+		return numbers;
+	}
+
+	/**
+	 * @param str
+	 * @return {@link List}
+	 * @description 从字符串中提取小数
+	 * @author yida
+	 * @date 2024-09-24 16:48:29
+	 */
+	public static List<BigDecimal> extractBigDecimals(String str) {
+		if (str == null || str.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		String regex = doublePattern;
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(str);
+		List<BigDecimal> numbers = new ArrayList<>();
+		while (matcher.find()) {
+			String numStr = matcher.group();
+			if (numStr.contains(",")) {
+				numStr = numStr.replace(",", "");
+			}
+			numbers.add(new BigDecimal(numStr));
+		}
+		return numbers;
+	}
+
+
+	public static void main(String[] args) {
+		String text = "会议将在2023年8月   2日 09:3举行，asdfasfdasfasf2024/09/8 06:15 asdfasf2024.06.7 08:12asdfasf2024-02.19 8:06sdgsdg";
+		List<String> dateStrList = extractDateStrs(text, DateUtils.PATTERN_YYYY_MM_DD_HH_MM_SS);
+		for (String dateStr : dateStrList) {
+			System.out.println("dateStr:" + dateStr);
+		}
+
+		String str = "给定字符串：\n" +
+				"发布日期：2024年09月13日\n" +
+				"单价: 122.15\n" +
+				"总额: -679.84\n" +
+				"或者\n" +
+				"给定字符串：\n" +
+				"发布日期：2024年09月13日\n" +
+				"单价: 122,000.23\n" +
+				"总额: -246\n" +
+				"或者\n" +
+				"给定字符串：\n" +
+				"发布日期：2024年09月13日\n" +
+				"单价: -122,000.2\n" +
+				"总额: -246.1";
+		List<BigDecimal> numStrList = extractBigDecimals(str);
+		if (null != numStrList && numStrList.size() > 0) {
+			for (BigDecimal bigDecimal : numStrList) {
+				System.out.println("numStr:" + bigDecimal.toPlainString());
+			}
+		}
 	}
 }
